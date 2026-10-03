@@ -1,0 +1,47 @@
+@import '../../../../assets/styles/img-management';
+
+
+.tyc .mat-card-header .mat-card-title {
+  flex-direction: row !important;
+  align-items: center
+}
+
+.tyc .brand {
+  max-height: 6rem;
+  width: 80% !important;
+  margin-bottom: 0 !important;
+  background-position-x: left;
+}
+
+.tyc .tyc-container {
+  max-height: calc(90vh - 32px - 108px - 24px - 36px - 16px);
+  margin-bottom: 0 !important
+}
+
+.tyc .sticky {
+  top: 0px;
+  position: sticky;
+  z-index: 10;
+}
+
+.tyc .title {
+  white-space: normal;
+  max-width: calc(100% - (40px * 4 + 16px));
+  line-height: 32px;
+  display: block;
+}
+
+.tyc-container.tyc-text {
+  margin-bottom: 16px !important;
+  max-height: calc(90vh - 32px - 108px - 36px - 72px);
+}
+
+.tyc mat-card-header.mat-card-header {
+  margin-bottom: 0;
+}
+
+@mixin tyc($bg-card) {
+  .tyc .sticky {
+    background: $bg-card;
+  }
+}

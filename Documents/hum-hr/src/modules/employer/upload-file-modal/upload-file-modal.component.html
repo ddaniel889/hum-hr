@@ -1,0 +1,66 @@
+<div class="dialog-content" fxLayout="column">
+    <mat-toolbar class="view-toolbar">
+        <mat-toolbar-row fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="56px">
+            <!-- document-selected-header-info -->
+            <div class="view-description" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                <mat-icon fxLayout="row" fxLayoutAlign="center center" class="fa-lg primary" fontSet="fa"
+                    fontIcon="fa-file-upload">
+                </mat-icon>
+                <div class="view-description-text" fxLayout="column" fxLayoutAlign="center start">
+                    <h3 class="primary" matLine>Agregar Archivos</h3>
+                    <h5 matLine>{{ showingFile ? 'Vista Previa: '+(fileName | titlecase):'(Sin Vista Previa)' }}</h5>
+                </div>
+            </div>
+            <div class="view-actions">
+                <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                    <!-- PDF-controls -->
+                    <app-pdf-wrapper-controls [hidden]="isZip || fileImage" [pdfWrapper]="pdfWrapper" [showPrint]="false"
+                        [showSave]="false" [showZoomIn]="true" [showZoomOut]="true" [showRemove]="false" [hidden]="!showingFile">
+                    </app-pdf-wrapper-controls>
+
+                    <button mat-icon-button title="Cancelar" (click)="close()">
+                        <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times">
+                        </mat-icon>
+                    </button>
+                </div>
+            </div>
+        </mat-toolbar-row>
+    </mat-toolbar>
+    <div class="dialog-container" fxLayout="row">
+        <div class="document-template-container">
+            <div class="document-selection">
+                <app-upload-form [canViewFile]="canViewFile" [canRemove]="canRemove"
+                    [multipleSelection]="multipleSelection" [acceptedExtensions]="acceptedExtensions"
+                    [maxFile]="maxFiles" [files]="files" (fileSelected)="onSelectedFile($event, null)"
+                    (filesChanged)="onFilesChanged($event)" (seeFileDefault)="onSelectedFile($event, true)">
+                </app-upload-form>
+            </div>
+        </div>
+        <!-- loader -->
+        <div class="view-container" *ngIf="false">
+            <div class="load-window new">
+                <mat-progress-spinner mode="indeterminate" color="primary">
+                </mat-progress-spinner>
+            </div>
+        </div>
+        <div class="view-container" [hidden]="!showingFile">
+            <!-- PDF-viewer -->
+            <app-pdf-wrapper #pdfWrapper [showControls]="false" [file]="fileBase64" [fileName]="fileName" [autoView]="false"
+                [hidden]="fileImage || isZip">
+            </app-pdf-wrapper>
+            <div class="preview-container" *ngIf="fileImage || isZip">
+                <div class="preview-container" *ngIf="fileImage else elseBlock">
+                    <img src="{{fileImage}}" />
+                </div>
+                <ng-template #elseBlock>
+                    <h4>El formato del archivo seleccionado no puede ser previsualizado, pero se cargará
+                        correctamente</h4>
+                </ng-template>
+            </div>
+        </div>
+    </div>
+    <div class="form-actions" fxLayout="row-reverse" fxLayoutAlign="start center" fxLayoutGap="16px">
+        <button mat-raised-button color="primary" (click)="save()" [disabled]="files.length<1 || isSaving">Agregar Archivo{{files.length > 1 ? 's' : ''}}</button>
+        <button mat-button (click)="close()">Cancelar</button>
+    </div>
+</div>

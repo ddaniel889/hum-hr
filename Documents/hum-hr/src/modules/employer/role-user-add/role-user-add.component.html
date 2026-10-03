@@ -1,0 +1,355 @@
+<mat-horizontal-stepper #stepper>
+    <!-- Selección de Ous -->
+    <mat-step [stepControl]="selectOuFormGroup">
+        <mat-progress-bar mode="indeterminate" [style.display]="clickOnce ? 'block' : 'none'">
+        </mat-progress-bar>
+        <form [formGroup]="selectOuFormGroup" fxFlex="grow">
+            <div class="form-body" fxLayout="column">
+                <div class="line" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+                    <div class="header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-layer-group">
+                        </mat-icon>
+                        <div class="info" fxLayout="column">
+                            <h4>Origen del Actor</h4>
+                            <h6>Selecciona una opción</h6>
+                        </div>
+                    </div>
+                </div>
+                <mat-radio-group formControlName="isOuUserFrmControl" fxLayout="column" fxLayoutGap="16px">
+                    <mat-radio-button value="false">
+                        Grupo
+                    </mat-radio-button>
+                    <mat-radio-button value="true">
+                        Empresa del Grupo
+                    </mat-radio-button>
+                </mat-radio-group>
+                <mat-form-field fxFlex="grow" *ngIf="isOuUserFrmControl.value === 'true'">
+                    <mat-icon matPrefix fxLayout="row" fxLayoutAlign="center center" class="fa-lg" fontSet="fas"
+                        fontIcon="fa-industry-alt">
+                    </mat-icon>
+                    <mat-select placeholder="Selecciona una Empresa" formControlName="selectedOuFormControl" required>
+                        <mat-option *ngFor="let organizationalUnit of organizationalUnits" [value]="organizationalUnit">
+                            {{organizationalUnit?.name}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div class="form-actions">
+                <button [disabled]="!validateSelectOuFormGroup()" mat-raised-button (click)="setOrganizationalUnit()"
+                    color="primary">Siguiente</button>
+                <button mat-button (click)="close()">Cancelar</button>
+            </div>
+        </form>
+    </mat-step>
+
+    <!-- Creación de Rol y Usuario -->
+    <mat-step [stepControl]="addRoleFormGroup">
+        <mat-progress-bar mode="indeterminate" [style.display]="clickOnce ? 'block' : 'none'">
+        </mat-progress-bar>
+        <div class="resume" fxFlex="grow" *ngIf="noContainerType">
+            <div class="form-body" fxLayout="column">
+                <app-chapa [className]="'info-empty'" [icon]="'fa-traffic-light-stop'"
+                    [text]="selectedOu?.name + ' no tiene configuración de Legajo'"
+                    [subText]="'Elige otra Empresa o contacta a tu Administrador'">
+                </app-chapa>
+            </div>
+            <div class="form-actions">
+                <button mat-raised-button (click)="close()" color="primary">Cancelar</button>
+                <button mat-button (click)="goBackFromUserRolesStep()">Anterior</button>
+            </div>
+        </div>
+        <form [formGroup]="addRoleFormGroup" *ngIf="!noContainerType">
+            <div class="form-body" fxLayout="column">
+                <div class="line" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+                    <div class="header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                        <mat-icon matPrefix fxLayout="row" fxLayoutAlign="center center" class="fa-lg" fontSet="fas"
+                            fontIcon="fa-user-tag">
+                        </mat-icon>
+                        <div class="info" fxLayout="column">
+                            <h4>Perfil del Actor ({{selectedOu?.name}})</h4>
+                            <h6>Completa los siguientes datos</h6>
+                        </div>
+                    </div>
+                </div>
+                <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+                    <mat-icon matPrefix fxLayout="row" fxLayoutAlign="center center" class="fa-lg" fontSet="fas"
+                        fontIcon="fa-theater-masks">
+                    </mat-icon>
+                    <mat-select formControlName="selectedRoleFrmCtrl" placeholder="Selecciona el Rol del Actor"
+                        (selectionChange)="setUserRole()">
+                        <mat-option *ngFor="let role of roles" [value]="role.id">
+                            {{role.name}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+                    <mat-icon matPrefix fxLayout="row" fxLayoutAlign="center center" class="fa-lg" fontSet="fas"
+                        fontIcon="fa-envelope">
+                    </mat-icon>
+                    <input formControlName="emailFrmCtrl" (blur)="checkUserMail()" (change)="changeMail()" matInput
+                        placeholder="Ingresa Correo Electrónico">
+                </mat-form-field>
+                <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+                    <mat-icon matPrefix fxLayout="row" fxLayoutAlign="center center" class="fa-lg" fontSet="fas"
+                        fontIcon="fa-user">
+                    </mat-icon>
+                    <input formControlName="lastNameFrmCtrl" matInput placeholder="Ingresa el Apellido">
+                </mat-form-field>
+                <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+                    <mat-icon matPrefix fxLayout="row" fxLayoutAlign="center center" class="fa-lg" fontSet="fas"
+                        fontIcon="fa-user">
+                    </mat-icon>
+                    <input formControlName="nameFrmCtrl" matInput placeholder="Ingresa el Nombre">
+                </mat-form-field>
+                <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow" *ngIf="useSaml">
+                    <mat-icon matPrefix fxLayout="row" fxLayoutAlign="center center" class="fa-lg" fontSet="fas"
+                        fontIcon="fa-id-badge">
+                    </mat-icon>
+                    <input formControlName="nickNameFrmCtrl" matInput placeholder="Ingresa la Identificación Delegada">
+                </mat-form-field>
+            </div>
+            <div class="form-actions">
+                <button [disabled]="!addRoleFormGroup.valid || !mailValidated" mat-raised-button
+                    (click)="goToFilterStep()" color="primary">Siguiente</button>
+                <button mat-button (click)="goBackFromUserRolesStep()">{{!selectedOu?.isRoot ? 'Anterior' :
+                    'Cancelar'}}</button>
+            </div>
+        </form>
+    </mat-step>
+
+    <!-- Selección de Filtros -->
+    <mat-step [stepControl]="selectFiltersFormGroup">
+        <mat-progress-bar mode="indeterminate" [style.display]="clickOnce ? 'block' : 'none'">
+        </mat-progress-bar>
+        <form [formGroup]="selectFiltersFormGroup" fxFlex="grow">
+            <div class="form-body" fxLayout="column">
+                <div class="line" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+                    <div class="header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                        <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+                            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-folder-open">
+                            </mat-icon>
+                            <mat-icon class="fa-lg complex" fontSet="fas" fontIcon="fa-filter">
+                            </mat-icon>
+                        </div>
+                        <div class="info" fxLayout="column">
+                            <h4 *ngIf="!filtersForCandidateAdmin">Selecciona los Filtros para Legajo</h4>
+                            <h4 *ngIf="filtersForCandidateAdmin">Selecciona los Filtros para Candidato</h4>
+                            <h6>{{selectedOu?.name}}</h6>
+                        </div>
+                    </div>
+                </div>
+                <mat-checkbox [checked]="allFilters" (change)="toggleAllFilters()">Habilitar Todos*
+                </mat-checkbox>
+                <ng-container *ngFor="let meta of metadataFilters">
+                    <app-autocomplete-chip [originalList]="meta.filters" [showIcons]="true" [iconName]="'fa-filter'"
+                        [placeHolderText]="meta.placeHolderDescription" (OnItemSelected)="selectMetadata($event, meta)"
+                        (OnRemoveItem)="removeMetadata($event, meta)" [selectedItemsList]="meta.selectedMetadatas"
+                        fxFlex="grow" fxLayout="row" fxLayoutAlign="start center" *ngIf="!allFilters" [listView]="true">
+                    </app-autocomplete-chip>
+                </ng-container>
+                <h6 *ngIf="!filtersForCandidateAdmin" class="hint" [ngClass]="{'all' : allFilters}">
+                    {{allFilters ? '*Quedan habilitados todos los Filtros para Legajo disponibles':'*Quedan habilitados
+                    sólo los Filtros para Legajo seleccionados'}}
+                </h6>
+                <h6 *ngIf="filtersForCandidateAdmin" class="hint" [ngClass]="{'all' : allFilters}">
+                    {{allFilters ? '*Quedan habilitados todos los Filtros para Candidatos disponibles':'*Quedan habilitados
+                    sólo los Filtros para Candidatos seleccionados'}}
+                </h6>
+            </div>
+            <div class="form-actions">
+                <button mat-raised-button (click)="goToDocOrSummary()" color="primary"
+                    [disabled]="selectedFilters.length == 0 && !allFilters">Siguiente</button>
+                <button mat-button (click)="goBackToRoleUserStep()">Anterior</button>
+            </div>
+        </form>
+    </mat-step>
+
+    <!-- Selección de Documentación -->
+    <mat-step [stepControl]="selectDocumentationFormGroup">
+        <mat-progress-bar mode="indeterminate" [style.display]="clickOnce ? 'block' : 'none'">
+        </mat-progress-bar>
+        <form [formGroup]="selectDocumentationFormGroup" fxFlex="grow">
+            <div class="form-body" fxLayout="column">
+                <div class="line" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+                    <div class="header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                        <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+                            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-file">
+                            </mat-icon>
+                            <mat-icon class="fa-lg complex" fontSet="fas" fontIcon="fa-filter">
+                            </mat-icon>
+                        </div>
+                        <div class="info" fxLayout="column">
+                            <h4>Selecciona los Filtros de Documentación</h4>
+                            <h6>{{selectedOu?.name}}</h6>
+                        </div>
+                    </div>
+                </div>
+                <mat-checkbox [checked]="allDocumentations" (change)="toggleAllDocumentations()">Habilitar Todos
+                </mat-checkbox>
+                <app-autocomplete-chip [showIcons]="true" [iconName]="'fa-file'" [originalList]="documentationTypes"
+                    [placeHolderText]="'Selecciona Tipos de Documentación'"
+                    [selectedItemsList]="selectedDocumentationTypes" (OnItemSelected)="selectDocumentationType($event)"
+                    (OnRemoveItem)="removeDocumentation($event)" fxFlex="grow" fxLayout="row"
+                    fxLayoutAlign="start center" *ngIf="!allDocumentations" [listView]="true">
+                </app-autocomplete-chip>
+                <h6 class="hint" [ngClass]="{'all' : allDocumentations}">
+                    {{allDocumentations ? '*Quedan habilitados todos los Filtros de Documentación disponibles':'*Quedan
+                    habilitados sólo los Filtros de Documentación seleccionados'}}
+                </h6>
+            </div>
+            <div class="form-actions">
+                <button mat-raised-button (click)="goToSummary()" color="primary"
+                    [disabled]="selectedDocumentationTypes.length == 0 && !allDocumentations">Ver
+                    Resumen</button>
+                <button mat-button (click)="goBackToFilterStep()">Anterior</button>
+            </div>
+        </form>
+    </mat-step>
+
+    <!-- Resumen -->
+    <mat-step>
+        <mat-progress-bar mode="indeterminate" [style.display]="clickOnce ? 'block' : 'none'">
+        </mat-progress-bar>
+        <div class="resume" fxFlex="grow">
+            <div class="form-body" fxLayout="column">
+                <div class="line head" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+                    <div class="header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                        <mat-icon matPrefix fxLayout="row" fxLayoutAlign="center center" class="fa-lg" fontSet="fas"
+                            fontIcon="fa-user-tag">
+                        </mat-icon>
+                        <div class="info" fxLayout="column">
+                            <h6>Vista previa</h6>
+                            <h4>Perfil del Actor</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="line" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+                    <div class="header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                        <mat-icon matPrefix fxLayout="row" fxLayoutAlign="center center" class="fa-lg" fontSet="fas"
+                            fontIcon="fa-industry-alt">
+                        </mat-icon>
+                        <div class="info" fxLayout="column">
+                            <h6>Origen</h6>
+                            <h4>{{selectedOu?.name}}</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="line" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+                    <div class="header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                        <mat-icon matPrefix fxLayout="row" fxLayoutAlign="center center" class="fa-lg" fontSet="fas"
+                            fontIcon="fa-theater-masks">
+                        </mat-icon>
+                        <div class="info" fxLayout="column">
+                            <h6>Rol</h6>
+                            <h4>{{role.name}}</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="line" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+                    <div class="header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                        <mat-icon matPrefix fxLayout="row" fxLayoutAlign="center center" class="fa-lg" fontSet="fas"
+                            fontIcon="fa-user">
+                        </mat-icon>
+                        <div class="info" fxLayout="column">
+                            <h6>Apellido y Nombre</h6>
+                            <h4>{{user.lastName}} {{user.firstName}}</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="line" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+                    <div class="header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                        <mat-icon matPrefix fxLayout="row" fxLayoutAlign="center center" class="fa-lg" fontSet="fas"
+                            fontIcon="fa-envelope">
+                        </mat-icon>
+                        <div class="info" fxLayout="column">
+                            <h6>Mail</h6>
+                            <h4>{{user.mail}}</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="line" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px"
+                    *ngIf="useSaml">
+                    <div class="header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                        <mat-icon matPrefix fxLayout="row" fxLayoutAlign="center center" class="fa-lg" fontSet="fas"
+                            fontIcon="fa-user">
+                        </mat-icon>
+                        <div class="info" fxLayout="column">
+                            <h6>Identificación Delegada</h6>
+                            <h4>{{user.delegatedSystemId}}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-body" fxLayout="column" *ngIf="canHaveFilters || filtersForCandidateAdmin || isSignerAdjetive">
+                <div class="line head" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+                    <div class="header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                        <mat-icon matPrefix fxLayout="row" fxLayoutAlign="center center" class="fa-lg" fontSet="fas"
+                            fontIcon="fa-folder-tree">
+                        </mat-icon>
+                        <div class="info" fxLayout="column">
+                            <h6>Vista previa</h6>
+                            <h4>Permisos y Documentación</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="line" fxLayout="column">
+                    <div class="header" fxLayout="row" fxLayoutGap="16px" *ngIf="!isSignerAdjetive">
+                        <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+                            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-folder-open">
+                            </mat-icon>
+                            <mat-icon class="fa-lg complex" fontSet="fas" fontIcon="fa-filter">
+                            </mat-icon>
+                        </div>
+                        <div class="info" fxLayout="column">
+                            <h6 *ngIf="!filtersForCandidateAdmin">Filtros para Legajo</h6>
+                            <h6 *ngIf="filtersForCandidateAdmin">Filtros para Candidato</h6>
+                            <h4 *ngIf="allFilters">Todos Habilitados</h4>
+                            <ng-container *ngIf="!allFilters">
+                                <ul *ngFor="let metaFilter of metadataFilters">
+                                    <li>
+                                        <h4>
+                                            {{metaFilter?.name}}
+                                        </h4>
+                                        <ul>
+                                            <li *ngFor="let meta of metaFilter.selectedMetadatas">
+                                                {{meta?.name}}
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </ng-container>
+                        </div>
+                    </div>
+                    <div class="header" fxLayout="row" fxLayoutGap="16px" *ngIf="!filtersForCandidateAdmin" >
+                        <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+                            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-file">
+                            </mat-icon>
+                            <mat-icon class="fa-lg complex" fontSet="fas" fontIcon="fa-filter">
+                            </mat-icon>
+                        </div>
+                        <div class="info" fxLayout="column">
+                            <h6>Filtros de Documentación</h6>
+                            <h4 *ngIf="allDocumentations">Todos Habilitados</h4>
+                            <ul *ngIf="!allDocumentations">
+                                <li *ngFor="let dt of selectedDocumentationTypes">
+                                    <h4>
+                                        {{dt?.name}}
+                                    </h4>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <h6 class="hint">
+                <b>Crea el Actor si los datos son correctos</b>, de no ser así, usa el botón "Anterior" para hacer las
+                correcciones necesarias sin perder tu progreso
+            </h6>
+            <div class="form-actions">
+                <button mat-raised-button [disabled]="clickOnce" (click)="save()" color="accent">Crear Actor</button>
+                <button mat-button [disabled]="clickOnce" (click)="goBackToDocumentationStep()">Anterior</button>
+            </div>
+        </div>
+    </mat-step>
+</mat-horizontal-stepper>

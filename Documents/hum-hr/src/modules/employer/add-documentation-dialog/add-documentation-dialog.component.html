@@ -1,0 +1,8 @@
+<div class="add-menu" fxLayout="column" fxFill>
+    <div class="document-template-container">
+        <div class="document-selection">
+            <app-add-documentation [showBack]="false" [isCandidate]="isCandidate" [selectedPerson]="selectedPerson" (cancelAddDocumentation)="closeDialog()" (backAddDocumentation)="closeDialog()" (finishAddDocumentation)="closeDialog()">
+            </app-add-documentation>
+        </div>
+    </div>
+</div>

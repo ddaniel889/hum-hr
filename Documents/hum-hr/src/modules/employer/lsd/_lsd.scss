@@ -1,0 +1,710 @@
+@import '../../../../assets/styles/img-management';
+
+app-lsd {
+    .main-overlay {
+        position: absolute;
+        bottom: 0;
+        height: 100%;
+        opacity: 0;
+        z-index: 2;
+
+        &.enabled {
+            width: 100% !important;
+            opacity: 1
+        }
+    }
+
+    .icon-complex {
+        position: relative;
+        height: 40px;
+        width: 40px;
+        padding: 0 !important;
+
+        mat-icon {
+            &.complex {
+                position: absolute;
+                bottom: 0;
+                right: 0;
+                font-size: 16px !important;
+                height: 20px !important;
+                width: 20px !important;
+                padding: 0 !important;
+            }
+        }
+    }
+
+    .work-space {
+
+        h5,
+        h6 {
+            font-weight: 500;
+        }
+
+        &.full-page {
+            .main {
+                .container {
+                    .content-scroll {
+                        .item {
+                            width: calc((100% / 4) - 16px);
+                        }
+                    }
+                }
+            }
+        }
+
+        .main {
+            position: relative;
+
+            .toolbar {
+                display: flex !important;
+                justify-content: space-between;
+
+                .search-container {
+                    flex: auto;
+                    max-width: 50%;
+                }
+            }
+
+            .load-window {
+                left: 0;
+                top: 0;
+                height: 100%;
+            }
+
+            &.side-open {
+                .container {
+                    .content-scroll {
+                        .item {
+                            width: calc((100% / 3) - 16px);
+                        }
+                    }
+                }
+            }
+
+            .container {
+                min-height: calc(100vh - 32px - 192px - 97px);
+                flex-grow: 1;
+                flex-shrink: 1;
+
+                .helper {
+                    width: calc(100% - 32px);
+
+                    mat-hint {
+                        width: 100%;
+                    }
+
+                    .actions {
+                        margin: 0 !important;
+
+                        button.mat-stroked-button {
+                            padding: 0 8px 0 16px;
+
+                            h4 {
+                                margin: 0 !important;
+                                line-height: 1.1 !important;
+                            }
+
+                            h6 {
+                                margin: 0 !important;
+                                line-height: 1.1 !important;
+                                color: rgba(0, 0, 0, .87) !important;
+                                font-weight: 400 !important;
+
+                            }
+                        }
+                    }
+                }
+
+                .content-scroll {
+                    display: flex;
+                    flex-direction: row;
+                    flex-wrap: wrap;
+                    overflow-y: scroll;
+                    max-height: calc(100% - 56px);
+                    box-sizing: border-box;
+                    padding: 8px 0 8px 8px;
+                }
+
+                .item {
+                    margin-top: 16px;
+                    padding: 16px;
+                    border-radius: 8px;
+                    width: calc((100% / 3) - 16px);
+                    margin: 8px;
+                    cursor: pointer;
+                    overflow: hidden;
+
+                    .info {
+                        padding: 0 0 16px 16px;
+
+                        h2 {
+                            font-weight: 400;
+                            margin: 0;
+                        }
+
+                        h3 {
+                            margin: 8px 0 0;
+                        }
+
+                        h4 {
+                            margin: 4px 0 0;
+                            font-weight: 400;
+                        }
+
+                        mat-icon {
+                            height: 40px !important;
+                            position: relative;
+
+                            span {
+                                width: 100%;
+                                height: 100%;
+                                position: absolute;
+                            }
+                        }
+                    }
+
+                    .status {
+                        padding: 16px;
+                        border-top: 1px solid rgba(0, 0, 0, .12);
+                        margin: 0 -16px -16px;
+
+                        h4 {
+                            margin: 0 !important;
+                            font-weight: 400;
+                        }
+
+                        .mat-icon {
+                            min-height: 40px;
+                        }
+                    }
+
+                    &.pending {
+                        .status {
+                            background: #FFECB3
+                        }
+                    }
+
+                    &.ok {
+                        .status {
+                            background: #C8E6C9
+                        }
+                    }
+
+                    &.not-ok {
+                        .status {
+                            background: #EF9A9A
+                        }
+                    }
+
+                    &.selected {
+                        cursor: default;
+                    }
+                }
+            }
+
+        }
+
+        .side {
+            height: 100%;
+
+            .edition-line {
+                border-radius: 8px;
+                padding: 16px;
+                margin: 16px 0;
+                position: relative;
+                overflow: hidden;
+
+                mat-progress-bar {
+                    bottom: 0;
+                    left: 0;
+                }
+            }
+
+            mat-form-field {
+                width: 100%;
+
+                &.mat-form-field-disabled {
+                    * {
+                        cursor: not-allowed;
+                    }
+
+                    .mat-form-field-underline {
+                        height: 2px !important;
+                    }
+                }
+
+                .mat-form-field-flex {
+                    border-radius: 4px 4px 0 0 !important;
+                    padding: 8px 8px 0 !important;
+                    min-height: 56px !important;
+                    align-items: unset !important;
+
+                    .mat-form-field-prefix {
+                        padding: 0 !important;
+                        display: flex;
+                        align-items: center;
+
+                    }
+                }
+            }
+
+            mat-checkbox {
+                align-items: center;
+                height: 56px;
+                display: flex;
+                margin-bottom: 16px;
+                border-radius: 4px;
+                padding: 0 8px;
+
+                .mat-checkbox-layout {
+                    width: 100%;
+                    justify-content: flex-start;
+                    height: 56px;
+                    align-items: center;
+
+                    .mat-checkbox-inner-container {
+                        margin: 12px;
+                    }
+
+                    .mat-checkbox-label {
+                        width: 100%;
+                        padding-left: 16px;
+                    }
+                }
+            }
+
+            .hint {
+                margin: 0 0 16px;
+                font-weight: 700;
+                width: 100%;
+                text-align: center;
+            }
+
+            .toolbar {
+                height: 112px;
+                padding: 16px 32px;
+
+                .header {
+                    width: 100%;
+
+                    h3 {
+                        margin: 0;
+                    }
+
+                    h5 {
+                        margin: 0;
+                    }
+                }
+            }
+
+            .container {
+                padding: 0 0 16px 8px;
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                overflow-y: scroll;
+                max-height: calc(100% - 112px);
+                box-sizing: border-box;
+
+                .doc-resume {
+                    width: calc(100% - 16px);
+                    padding: 16px;
+                    border-radius: 8px;
+                    margin: 0 8px;
+                    position: relative;
+
+
+                    .line {
+                        padding: 8px 16px;
+                        position: relative;
+                        border-radius: 4px;
+                        min-height: 56px;
+
+                        &.editable {
+                            pointer-events: none;
+
+                            &:hover {
+                                button {
+                                    opacity: 1
+                                }
+                            }
+
+                            button {
+                                opacity: 0;
+                                position: absolute;
+                                right: 16px;
+                                top: 4px;
+                            }
+                        }
+
+                        .header {
+                            width: 100%;
+
+                            .info {
+                                max-width: calc(100% - 40px - 16px - 16px);
+
+                                h4,
+                                h6 {
+                                    margin: 0;
+                                    overflow: hidden;
+                                    text-overflow: ellipsis;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                .section-title {
+                    width: 100%;
+                    height: 56px;
+                    margin: 8px;
+                    padding: 16px;
+
+                    h3 {
+                        margin: 0;
+                    }
+
+                    h5 {
+                        margin: 0;
+                        font-size: 18px;
+                        font-weight: 700;
+                    }
+                }
+
+                .section-resume {
+                    width: 100%;
+                    padding: 16px;
+                    border-radius: 8px;
+                    margin: 0 8px;
+                    max-width: calc(100% - 50px);
+
+                    &+.section-resume {
+                        margin-top: 16px !important;
+                    }
+
+                    .mat-subheader {
+                        min-height: 72px;
+                        padding: 16px 16px 0;
+
+                        &+.mat-list-item {
+                            margin-top: 16px;
+                        }
+                    }
+
+                    .mat-stroked-button.sign-docs {
+                        width: 100%;
+                        margin-top: 16px !important;
+
+                        .mat-button-wrapper {
+                            display: flex !important;
+                            width: 100%;
+                            align-items: center;
+                            justify-content: center;
+
+                            .mat-icon {
+                                margin-right: 8px
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+app-create-lsd {
+    .load-window {
+        position: relative;
+        top: 0;
+        padding: 20vh;
+        box-sizing: border-box;
+    }
+}
+
+.lsd-adv-search {
+    .list-align {
+        padding: 0;
+
+        &>div>div {
+            flex-wrap: wrap;
+
+            &>mat-form-field {
+                margin: 0 !important
+            }
+
+        }
+    }
+
+    .mat-form-field-suffix {
+        align-items: center;
+        display: flex;
+    }
+}
+
+
+
+@mixin lsd($bg-card, $bg-card-side, $bg-background, $bg-ripple-light, $scroll-body, $scroll-thumb, $primary, $accent, $divider, $text-main-solid, $text-main, $text-side, $text-sub, $text-main-inverse, $primary-text, $hover, $finished-ok, $row-odd, $row-even) {
+
+    *[color="success"] {
+        color: $finished-ok;
+    }
+
+    .primary {
+        color: $primary !important;
+    }
+
+    .accent {
+        color: $accent !important;
+    }
+
+    app-lsd {
+
+
+
+        .icon-complex {
+            mat-icon {
+                color: $text-side !important;
+
+                &.complex {
+                    color: $primary-text !important;
+                }
+            }
+        }
+
+        .work-space {
+            .main {
+                *::-webkit-scrollbar-track {
+                    background: $scroll-body !important;
+                }
+
+                .load-window {
+                    background: $bg-card !important;
+                }
+
+                &.side-open {
+                    border-right: 1px solid $divider;
+                }
+
+                .container {
+                    .item {
+                        background: $row-odd;
+                        border: 1px solid $divider;
+
+                        h5 {
+                            color: $text-sub;
+                        }
+
+                        h3 {
+                            color: $text-main-solid;
+                        }
+
+                        &:hover {
+                            background: $hover;
+                        }
+
+                        &.selected {
+                            background: $primary;
+                            color: $text-main-inverse !important;
+
+                            h3 {
+                                color: $text-main-inverse !important;
+                            }
+
+                            &.pending {
+                                .status {
+                                    background: $divider !important;
+                                    color: #ffe082;
+                                }
+                            }
+
+                            &.ok {
+                                .status {
+                                    background: $divider !important;
+                                    color: #a5d6a7;
+                                }
+                            }
+
+                            &.not-ok {
+                                .status {
+                                    background: $divider !important;
+                                    color: #e57373;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                .main-action {
+                    border-top: 1px solid $divider;
+                }
+            }
+
+            .side {
+                background: $bg-background;
+
+                .icon-complex {
+                    mat-icon {
+                        &.complex {
+                            text-shadow: -2px 0 0px $bg-background, 0 -2px 0px $bg-background, 2px 0 0px $bg-background, 0 2px 0px $bg-background, -2px -2px 0px $bg-background, 2px 2px 0px $bg-background, 2px -2px 0px $bg-background, -2px 2px 0px $bg-background;
+                        }
+                    }
+                }
+
+                *::-webkit-scrollbar-track {
+                    background: $scroll-body !important;
+                }
+
+                *::-webkit-scrollbar-thumb {
+                    background: $scroll-thumb;
+                }
+
+                .edition-line {
+                    background: $bg-card-side;
+                }
+
+                mat-form-field {
+                    &.mat-form-field-disabled {
+                        .mat-form-field-flex {
+                            background: $bg-background !important;
+
+                            .mat-form-field-prefix {
+                                color: $text-sub;
+                            }
+                        }
+                    }
+
+                    .mat-form-field-flex {
+                        background: $row-odd;
+                    }
+                }
+
+                mat-checkbox {
+                    &:hover {
+                        background: $hover !important;
+                    }
+                }
+
+                .hint {
+                    &.all {
+                        color: $accent;
+                    }
+                }
+
+                .toolbar {
+                    .header {
+                        color: $primary-text;
+
+                        h3 {
+                            color: $primary-text;
+                        }
+                    }
+                }
+
+                .container {
+                    .doc-resume {
+                        background: $primary;
+
+                        .line {
+                            color: $text-main;
+
+                            &.editable {
+                                &:hover {
+                                    background: $bg-ripple-light;
+                                }
+
+                                button {
+                                    background: $primary;
+                                }
+                            }
+                        }
+                    }
+
+                    .section-title {
+                        color: $primary-text;
+                    }
+
+                    .section-resume {
+                        background: $row-even;
+                        border: 1px solid $divider;
+
+                        .line {
+                            &.editable {
+                                &:hover {
+                                    background: $hover !important;
+
+                                    .icon-complex {
+                                        mat-icon {
+                                            &.complex {
+                                                text-shadow: -2px 0 0px $row-even, 0 -2px 0px $row-even, 2px 0 0px $row-even, 0 2px 0px $row-even, -2px -2px 0px $row-even, 2px 2px 0px $row-even, 2px -2px 0px $row-even, -2px 2px 0px $row-even !important;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                button {
+                                    background: $bg-background;
+                                }
+                            }
+
+                            .header {
+                                .icon-complex {
+                                    mat-icon {
+                                        color: $text-side !important;
+
+                                        &.complex {
+                                            color: $primary-text !important;
+                                        }
+                                    }
+                                }
+
+                                mat-icon:not(.complex) {
+                                    color: $text-side;
+                                }
+
+
+                                .info {
+                                    h4 {
+                                        color: $primary-text;
+                                    }
+                                }
+                            }
+
+                            ul {
+                                color: $primary-text;
+
+                            }
+
+                            &.head {
+                                background: $bg-card-side;
+
+                                mat-icon {
+                                    color: $accent;
+                                }
+
+                                h4 {
+                                    color: $text-main;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                &.edition {
+                    .toolbar {
+                        .header {
+                            color: $text-main;
+
+                            mat-icon {
+                                color: $accent;
+                            }
+
+                            h3 {
+                                color: $accent;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

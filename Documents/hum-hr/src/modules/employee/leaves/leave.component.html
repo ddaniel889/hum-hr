@@ -1,0 +1,185 @@
+<mat-toolbar class="mat-elevation-z1 app-toolbar" color="primary" fxFlex="grow">
+  <mat-toolbar-row></mat-toolbar-row>
+  <mat-toolbar-row></mat-toolbar-row>
+</mat-toolbar>
+<div class="floating-container" fxLayout="row" fxLayoutAlign="center center" fxFill>
+  <mat-card class="card-1-1">
+    <mat-sidenav-container fxLayout="row" fxFill mode="push">
+      <mat-sidenav-content fxFill>
+        <div fxLayout="row" fxFill>
+          <div class="inbox-container employee my-documents" fxFlex.lt-md="100" fxFlex.gt-sm="30" fxFill>
+            <mat-toolbar class="inbox-toolbar" color="grey" fxLayout="row" fxLayoutAlign="start center">
+              <mat-toolbar-row>
+                <div class="mat-avatar" fxLayout="row" fxLayoutAlign="space-between center">
+                  <div class="toolbar-line" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                    <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-calendar-alt">
+                    </mat-icon>
+                    <div class="title" fxLayout="column" fxLayoutAlign="center start">
+                      <h3 data-testid="myleave-tab" *ngIf="!isApprover">Mis Licencias</h3>
+                      <h3 *ngIf="isApprover">Licencias</h3>
+                    </div>
+                  </div>
+                </div>
+              <div class="container-filter" *ngIf="tabToApprover">
+                <button [ngClass]="{ 'filter-state': selectedLeaveStateFind != 5, 'filter-state-small': (selectedLeaveStateFind == 5 ||  selectedLeaveStateFind == 6)}" mat-stroked-button color="primary" [disabled]="isLoading">
+                  <mat-icon  style="display: contents;" class="fa-lg" fontSet="fas" fontIcon="fa-filter"></mat-icon>
+                  <mat-select class="invisible-item" #selectState (click)="$event.stopPropagation()" (keydown)="loadRequestToToApprovers()"
+                    [(ngModel)]="selectedLeaveStateFind">
+                    <mat-option *ngFor="let state of statesFilters" [value]="state.key" (click)="loadRequestToToApprovers()" (keydown)="loadRequestToToApprovers()">
+                      {{state?.value}}
+                    </mat-option>
+                  </mat-select>
+                </button>
+                </div>
+                <button mat-icon-button (click)="refresh()" [disabled]="isLoading" [routerLink]="['welcome']">
+                  <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-redo"></mat-icon>
+                </button>
+              </mat-toolbar-row>
+            </mat-toolbar>
+            <mat-divider class="false-divider" [inset]="true"></mat-divider>
+            <mat-tab-group #tabGroup mat-align-tabs="center" fxFill *ngIf="isApprover" (selectedTabChange)="isframeApprover($event)">
+              <mat-tab *ngIf="configLeaveEmployee"  label="Personales" fxLayout="column">
+              <div class="leave_container" [class]="selectedLeave ? 'visible' : ''" fxLayout="column">
+                <!-- Empty (app chapa) -->
+                <div class="window-spinner" *ngIf="isLoading">
+                  <mat-progress-spinner mode="indeterminate" color="primary">
+                  </mat-progress-spinner>
+                </div>
+                <app-chapa [className]="'info-empty'" [icon]="'fa-meh'"
+                  [text]="'Aún no has solicitado una licencia...'" *ngIf="(leaveRequests?.length < 1 ) && !isLoading">
+                </app-chapa>
+                <div class="leave_items" fxLayout="column" fxLayoutGap="16px"
+                  *ngIf="leaveRequests?.length > 0 && !isLoading">
+                  <span class="leave_items-item" *ngFor="let leave of leaveRequests"
+                    [ngClass]="getClassNameColor(leave.id)">
+                    <div class="content mat-card mat-elevation-z2"
+                      [ngClass]="{'selected' : leave?.id === selectedLeave?.id}" matRipple fxLayout="row"
+                      fxLayoutAlign="start center" (click)="selectLeave(leave)">
+                      <mat-icon class="leave_item-icon" [ngClass]="leave.loading ? 'fa-xs fa-spin' : 'fa-lg'" fontSet="fa"
+                        [fontIcon]="leave.loading ? 'fa-spinner-third':getTypeRequestIcon(leave.id)" fxLayout="row"
+                        fxLayoutAlign="center center">
+                      </mat-icon>
+                      <div class="item-data" fxLayout="column">
+                        <b [title]="'Solicitud de ' + getTypeRequestName(leave.id)" #listItem>
+                          {{'Solicitud de ' + getTypeRequestName(leave.id)}}
+                        </b>
+                        <span>
+                          {{ leave.daysConsumed + ' días ' + getName(leave.id) + ' el ' + (getDateRequets(leave.id) | date:'dd/MM/yyyy') }}
+                        </span>
+                      </div>
+                      <div class="leave_item-status_icon" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px"
+                        [title]="getStatusName(leave.id)">
+                        <mat-icon fontSet="fa" fontIcon={{getTypeRequestDetailIcon(leave.id)}}></mat-icon>
+                      </div>
+                    </div>
+                  </span>
+                </div>
+                <div class="main-action" fxLayout="row">
+                  <button mat-raised-button class="main-btn" color="accent" (click)="openAddRequestDialog()" [disabled]="isLoading || disabled">
+                    <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-plus">
+                    </mat-icon>
+                    Nueva Solicitud
+                  </button>
+                </div>
+              </div>
+            </mat-tab>
+            <mat-tab label="Mi Equipo" fxLayout="column" *ngIf="useWorkflowApprove">
+            <div class="leave_container" [class]="selectedLeave ? 'visible' : ''" fxLayout="column" style="height: 90% !important;">
+                <!-- Empty (app chapa) -->
+                <div class="window-spinner" *ngIf="isLoading">
+                  <mat-progress-spinner mode="indeterminate" color="primary">
+                  </mat-progress-spinner>
+                </div>
+                <app-chapa [className]="'info-empty'" [icon]="'fa-meh'"
+                  [text]="getTextChapa(selectedLeaveStateFind)" *ngIf="(leaveRequestsToApprover?.length < 1 ) && !isLoading">
+                </app-chapa>
+
+              <div class="leave_items" fxLayout="column" fxLayoutGap="16px"
+              *ngIf="leaveRequestsToApprover?.length > 0 && !isLoading">
+              <span class="leave_items-item" *ngFor="let leaveToApprover of leaveRequestsToApprover"
+                [ngClass]="getClassNameColor(leaveToApprover.id)">
+                <div class="content mat-card mat-elevation-z2"
+                  [ngClass]="{'selected' : leaveToApprover?.id === selectedLeave?.id}" matRipple fxLayout="row"
+                  fxLayoutAlign="start center" (click)="selectLeave(leaveToApprover)">
+                  <mat-icon class="leave_item-icon" [ngClass]="leaveToApprover.loading ? 'fa-xs fa-spin' : 'fa-lg'" fontSet="fa"
+                    [fontIcon]="leaveToApprover.loading ? 'fa-spinner-third':getTypeRequestIcon(leaveToApprover.id)" fxLayout="row"
+                    fxLayoutAlign="center center">
+                  </mat-icon>
+                  <div class="item-data" fxLayout="column">
+                    <b [title]="'Solicitud de ' + getTypeRequestName(leaveToApprover.id)" #listItem>
+                      {{'Solicitud de ' + getTypeRequestName(leaveToApprover.id)}}
+                    </b>
+                    <span>{{leaveToApprover.userName}} : {{ leaveToApprover.daysConsumed +
+                      ' días solicitados el '+
+                      (getDateRequets(leaveToApprover.id) | date:'dd/MM/yyyy')}}
+                    </span>
+                  </div>
+                  <div class="leave_item-status_icon" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px"
+                    [title]="getStatusName(leaveToApprover.id)">
+                    <mat-icon fontSet="fa" fontIcon={{getTypeRequestDetailIcon(leaveToApprover.id)}}></mat-icon>
+                  </div>
+                </div>
+              </span>
+            </div>
+            <div class="main-action" fxLayout="row">
+              <app-cs-paginator fxFill fxLayoutAlign="center center" [hidden]="leaveRequestsToApprover?.length == 0" [pageCount]="itemsCount" [(pageIndex)]="pageIndex"
+              (pageChanged)="selectedPageChanged($event)">
+            </app-cs-paginator>
+          </div>
+              </div>
+            </mat-tab>
+            </mat-tab-group>
+          <div class="leave_container" [class]="selectedLeave ? 'visible' : ''" fxLayout="column">
+            <!-- Empty (app chapa) -->
+            <div class="window-spinner" *ngIf="isLoading">
+              <mat-progress-spinner mode="indeterminate" color="primary">
+              </mat-progress-spinner>
+            </div>
+            <app-chapa [className]="'info-empty'" [icon]="'fa-meh'"
+              [text]="'Aún no has solicitado una licencia...'" *ngIf="(leaveRequests?.length < 1 ) && !isLoading">
+            </app-chapa>
+            <div class="leave_items" fxLayout="column" fxLayoutGap="16px"
+              *ngIf="leaveRequests?.length > 0 && !isLoading">
+              <span class="leave_items-item" *ngFor="let leave of leaveRequests"
+                [ngClass]="getClassNameColor(leave.id)">
+                <div class="content mat-card mat-elevation-z2"
+                  [ngClass]="{'selected' : leave?.id === selectedLeave?.id}" matRipple fxLayout="row"
+                  fxLayoutAlign="start center" (click)="selectLeave(leave)">
+                  <mat-icon class="leave_item-icon" [ngClass]="leave.loading ? 'fa-xs fa-spin' : 'fa-lg'" fontSet="fa"
+                    [fontIcon]="leave.loading ? 'fa-spinner-third':getTypeRequestIcon(leave.id)" fxLayout="row"
+                    fxLayoutAlign="center center">
+                  </mat-icon>
+                  <div class="item-data" fxLayout="column">
+                    <b [title]="'Solicitud de ' + getTypeRequestName(leave.id)" #listItem>
+                      {{'Solicitud de ' + getTypeRequestName(leave.id)}}
+                    </b>
+                    <span>{{ leave.daysConsumed +
+                      ' días '  + getTypeLeave(leave.id) + '  el '+
+                      (getDateRequets(leave.id) | date:'dd/MM/yyyy')}}
+                    </span>
+                  </div>
+                  <div class="leave_item-status_icon" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px"
+                    [title]="getStatusName(leave.id)">
+                    <mat-icon fontSet="fa" fontIcon={{getTypeRequestDetailIcon(leave.id)}}></mat-icon>
+                  </div>
+                </div>
+              </span>
+            </div>
+            <div class="main-action" fxLayout="row">
+              <button mat-raised-button class="main-btn" color="accent" (click)="openAddRequestDialog()" [disabled]="isLoading || disabled">
+                <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-plus">
+                </mat-icon>
+                Nueva Solicitud
+              </button>
+            </div>
+          </div>
+          </div>
+          <mat-divider [vertical]="true"></mat-divider>
+          <div class="detail" fxFlex.lt-md="100" fxFlex.gt-sm="70" fxFill>
+            <router-outlet (activate)="reloadLeaves($event)"> </router-outlet>
+          </div>
+        </div>
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+  </mat-card>
+</div>

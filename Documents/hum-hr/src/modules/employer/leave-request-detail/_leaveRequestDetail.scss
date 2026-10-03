@@ -1,0 +1,156 @@
+app-leave-request-detail {
+  height: 100%;
+
+  .load-window {
+    top: unset !important;
+    height: 100% !important;
+  }
+
+  form {
+    width: 100% !important;
+    height: 100%;
+    position: relative;
+
+    .leave_detail-container {
+      height: 100%;
+
+      .toolbar {
+        height: 112px;
+        padding: 16px 32px;
+
+        .header {
+          width: 100%;
+
+          h3 {
+            margin: 0;
+          }
+
+          h5 {
+            margin: 0;
+          }
+        }
+      }
+
+      .leave_detail-container-content {
+        padding: 0 0 16px 8px;
+        overflow-y: scroll;
+        height: calc(100% - 96px - 112px);
+        max-height: calc(100% - 112px);
+        box-sizing: border-box;
+
+        .leave_resume {
+          width: calc(100% - 16px);
+          padding: 16px;
+          border-radius: 8px;
+          margin: 0 8px;
+          position: relative;
+
+          .leave_resume-title {
+            padding: 0 16px;
+            margin: 0 0 16px;
+          }
+
+          .line {
+            padding: 8px 16px;
+            position: relative;
+            border-radius: 4px;
+            width: 100%;
+
+
+            h3,
+            h4,
+            h6 {
+              margin: 0;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+
+            h3 {
+              .line-side {
+                font-weight: 300;
+              }
+            }
+
+            h6 {
+              font-weight: 300;
+            }
+          }
+
+          mat-divider {
+            margin: 16px 0;
+          }
+        }
+      }
+
+      .actions {
+        padding: 16px;
+        height: 96px;
+        column-gap: 16px;
+
+        button {
+          height: 100%;
+          border-radius: 40px;
+        }
+      }
+    }
+  }
+}
+
+
+@mixin leaveRequestDetail($bg-card, $bg-background, $primary-text, $primary, $text-main, $row-even, $divider, $text-side, $leave-ok, $leave-not-ok,$leave-draft) {
+
+  app-leave-request-detail {
+    .load-window {
+      background: $bg-background;
+    }
+
+    form {
+      .leave_detail-container {
+        background: $bg-background;
+
+        .toolbar {
+          .header {
+            color: $primary-text;
+
+            .text {
+              h3 {
+                color: $primary-text;
+              }
+
+              h5 {
+                color: $text-side;
+              }
+            }
+          }
+        }
+
+        .leave_detail-container-content {
+          .leave_resume {
+            background: $bg-card;
+            border: 1px solid $divider;
+          }
+
+          .line {
+            h6 {
+              color: $text-side;
+            }
+          }
+        }
+
+        .actions {
+          button {
+
+            &.ok {
+              background: $leave-ok !important;
+              color: $text-main;
+            }
+
+            &.not-ok {
+              color: $leave-not-ok !important;
+            }
+          }
+        }
+      }
+    }
+  }
+}

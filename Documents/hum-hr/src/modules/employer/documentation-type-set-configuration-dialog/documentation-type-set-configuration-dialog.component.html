@@ -1,0 +1,130 @@
+<div class="dialog-content" fxLayout="column" fxFill>
+    <div class="document-template-container">
+        <div class="document-selection">
+            <!-- Loading -->
+            <div class="load-window fixed" *ngIf="loading">
+                <mat-progress-spinner style="z-index: 1" mode="indeterminate" color="primary">
+                </mat-progress-spinner>
+            </div>
+            <ng-container *ngIf="currentStep === 'list'">
+                <div class="title-description" fxLayout="row" fxLayoutAlign="space-between center">
+                    <div class="header" fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+                        <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+                            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-layer-group">
+                            </mat-icon>
+                            <mat-icon class="fa-lg complex" fontSet="fas" fontIcon="fa-cog">
+                            </mat-icon>
+                        </div>
+                        <div fxLayout="column">
+                            <h3>Configurar Sets</h3>
+                            <button mat-button title="Alternar visivilidad" (click)="changeShowDisabled()">
+                <div fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+                  <h5 *ngIf="showDisabled">Mostrando Inactivos</h5>
+                  <h5 *ngIf="!showDisabled">Mostrando Activos</h5>
+                  <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-caret-down">
+                  </mat-icon>
+                </div>
+              </button>
+                        </div>
+                    </div>
+                    <button mat-icon-button title="Cerrar" [mat-dialog-close]>
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-times">
+            </mat-icon>
+          </button>
+
+                </div>
+
+                <!-- sin configuracion -->
+                <app-chapa [className]="'info-empty'" [icon]="'fa-file-exclamation'" [text]="'Aun no has configurado un Set'" [subText]="'Crea un nuevo Set para Comenzar'" *ngIf="!loading && documentationTypeSets.length < 1" [actionIcon]="'fa-plus'" [actionText]="'Crear Set'"
+                    (actionClick)="addSet()">
+                </app-chapa>
+                <ng-container *ngIf="!loading && documentationTypeSets.length > 0">
+                    <mat-list *ngIf="!loading">
+                        <mat-list-item *ngFor="let dt of documentationTypeSets">
+                            <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center" mat-list-icon>
+                                <mat-icon fxLayout="row" fxLayoutAlign="center center" class="fa-lg" fontSet="fas" fontIcon="fa-layer-group">
+                                </mat-icon>
+                                <mat-icon class="fa-lg complex" fxLayout="row" fxLayoutAlign="center center" fontSet="fas" [fontIcon]="enabledStateIcon(dt)">
+                                </mat-icon>
+                            </div>
+                            <span mat-line><b>{{dt.name}}</b></span>
+                            <span mat-line>
+                <h5>{{dt.description}}</h5>
+                <h5>Id: {{dt.id}}</h5>
+              </span>
+                            <div class="floating-action" fxLayout="row" fxLayoutAlign="start center">
+                                <button mat-icon-button (click)="changeEnabledState(dt)">
+                  <mat-icon class="fa-lg" fontSet="fas" [title]="actionEnabledStateTitle(dt)"
+                    [fontIcon]="actionEnabledStateIcon(dt)">
+                  </mat-icon>
+                </button>
+                                <button mat-icon-button (click)="openEdit(dt)">
+                  <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-pen">
+                  </mat-icon>
+                </button>
+                            </div>
+                        </mat-list-item>
+                    </mat-list>
+                    <div class="main-action" fxLayout="row-reverse" fxLayoutGap="8px">
+                        <button mat-raised-button (click)="addSet()" color="primary" class="btn">Nuevo Set</button>
+                        <button mat-button [mat-dialog-close]> Cerrar </button>
+                    </div>
+                </ng-container>
+            </ng-container>
+            <ng-container *ngIf="currentStep === 'addForm'">
+                <div class="title-description" fxLayout="row" fxLayoutAlign="space-between center">
+                    <div class="header" fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+                        <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+                            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-layer-group">
+                            </mat-icon>
+                            <mat-icon class="fa-lg complex" fontSet="fas" fontIcon="fa-plus">
+                            </mat-icon>
+                        </div>
+                        <div fxLayout="column">
+                            <h3>Nuevo Set</h3>
+                            <h5>Completa los Datos</h5>
+                        </div>
+                    </div>
+                </div>
+                <form [formGroup]="addSetFormGroup" class="form-steped" *ngIf="!loading">
+                    <div class="form-steped-body" fxLayout="column">
+                        <div class="asisted-input" fxLayout="row-reverse" fxLayoutAlign="start center">
+                            <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+                                <input matInput autofocus placeholder="Nombre del Set" formControlName="nameFrmCtrl">
+                                <mat-error *ngIf="addSetFormGroup.invalid">Completa este campo</mat-error>
+                                <mat-hint *ngIf="!addSetFormGroup.invalid">ingresa un nombre descriptivo para el nuevo Set de documentos
+                                </mat-hint>
+                            </mat-form-field>
+                            <div class="indicator">
+                                <div class="guide top" hidden></div>
+                                <div class="bubble">1</div>
+                                <div class="guide bottom"></div>
+                            </div>
+                        </div>
+                        <div class="asisted-input" fxLayout="row-reverse" fxLayoutAlign="start center">
+                            <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+                                <textarea matInput cdkTextareaAutosize placeholder="Descripción (opcional)" formControlName="descriptionFrmCtrl"></textarea>
+                                <mat-hint>esta descripción servirá de ayuda en el menú de selección de Sets</mat-hint>
+                            </mat-form-field>
+                            <div class="indicator">
+                                <div class="guide top"></div>
+                                <div class="bubble">2</div>
+                                <div class="guide bottom" hidden></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="main-action" fxLayout="row-reverse" fxLayoutGap="8px">
+                        <button mat-raised-button (click)="createSet()" [disabled]="addSetFormGroup.invalid" color="primary" class="btn">Siguiente</button>
+                        <button mat-button (click)="closeEditSet()">
+              Cancelar
+            </button>
+                    </div>
+                </form>
+            </ng-container>
+            <ng-container *ngIf="!loading && currentStep === 'editOpen'">
+                <app-documentation-type-set-edit (closeEdition)="closeEditSet()" [documentationTypeSet]="selectDocumentationTypeSet">
+                </app-documentation-type-set-edit>
+            </ng-container>
+        </div>
+    </div>
+</div>

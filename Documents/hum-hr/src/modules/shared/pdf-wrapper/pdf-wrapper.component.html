@@ -1,0 +1,10 @@
+<div class="pdf-view-container" [ngClass]="(!signing && signable) ? 'not-signed' : 'signed'">
+    <div *ngIf="showControls">
+        <button mat-icon-button (click)="zoom(0.1)" title="Acercar">+</button>
+        <button mat-icon-button (click)="zoom(-0.1)" title="Alejar">-</button>
+        <button mat-icon-button (click)="printpdf()" title="Imprimir">print</button>
+        <button mat-icon-button (click)="saveFile()" title="Descargar">bajar</button>
+    </div>
+    <pdf-viewer [(page)]="page" [src]="pdfSrc" [show-all]="showAll" [render-text]="true" [autoresize]="true" [original-size]="false"
+        [zoom]="pdfZoom" [fit-to-page]="autoSize"  (after-load-complete)="afterLoadComplete($event)" (error)="onError($event)" #pdfViewer></pdf-viewer>
+</div>

@@ -1,0 +1,42 @@
+@import '../../../../assets/styles/img-management';
+
+
+  .dropzone {
+    @include display(f, c, u, c, c, u);
+    border-radius: 5px;
+    height: unset !important;
+    padding: 16px !important;
+    margin-bottom: 16px !important;
+    margin: 10px 0;
+    box-sizing: border-box;
+
+    h3,
+    h6 {
+      margin: 0;
+    }
+
+    .file {
+      @include display(f, c, u, u, c, u);
+    }
+  }
+
+  .sliding-actions.view {
+    display: none;
+  }
+
+@mixin fileDnd($bg-card, $bg-dark-blue, $bg-toolbar-dark, $text-disabled) {
+
+  .dropzone {
+    border: 2px dashed $bg-dark-blue;
+    background: $bg-toolbar-dark !important;
+
+    &.hovering {
+      border: 2px solid $bg-dark-blue;
+      color: $text-disabled !important;
+    }
+
+    button.mat-stroked-button {
+      background: $bg-card;
+    }
+  }
+}

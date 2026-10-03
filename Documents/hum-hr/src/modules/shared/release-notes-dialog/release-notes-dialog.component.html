@@ -1,0 +1,33 @@
+<div class="dialog-content" fxLayout="column" fxFill>
+  <mat-toolbar class="side-bar" color="grey">
+    <mat-toolbar-row class="mobile-height">
+      <div class="toolbar-line-container" fxLayout="row" fxLayoutAlign="space-between center" fxFill>
+        <div class="toolbar-line" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+          <div class="mat-avatar" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+            <mat-icon  class="fa-lg" fontSet="fa" fontIcon="fa-comment-alt-plus">
+            </mat-icon>
+            <div class="title" fxLayout="column" fxLayoutAlign="center start">
+              <h3 matLine>Notas de Lanzamiento</h3>
+              <h5 matLine>Novedades de la Versión</h5>
+            </div>
+          </div>
+        </div>
+        <!-- CERRAR DIALOGO -->
+        <button mat-icon-button [mat-dialog-close]="false" title="Cerrar">
+          <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+        </button>
+      </div>
+    </mat-toolbar-row>
+  </mat-toolbar>
+  <mat-divider></mat-divider>
+  <div class="scroller" fxLayout="column">
+    <div [innerHTML]="html"></div>
+  </div>
+  <mat-divider></mat-divider>
+  <div class="dialog-footer" fxLayout="row-reverse" fxLayoutGap="12px" fxLayoutAlign="space-between center">
+    <div fxLayout="row-reverse" fxLayoutGap="12px">
+      <button mat-raised-button color="accent" [mat-dialog-close]="false">Cerrar Notificación</button>
+      <button mat-button [mat-dialog-close]="true">No Volver a Mostrar</button>
+    </div>
+  </div>
+</div>

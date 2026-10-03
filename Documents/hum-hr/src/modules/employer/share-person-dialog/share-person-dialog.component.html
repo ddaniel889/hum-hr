@@ -1,0 +1,45 @@
+<div class="dialog-content" fxLayout="column" fxFill>
+    <div class="document-template-container auto-height">
+        <div class="document-selection">
+            <div class=" title-description accent-text " fxLayout="row " fxLayoutAlign="space-between center ">
+                <div class="header " fxLayout="row " fxLayoutGap="16px " fxLayoutAlign="start center ">
+                    <div class="icon-complex " fxLayout="row " fxLayoutAlign="center center ">
+                        <mat-icon fxLayout="row " fxLayoutAlign="center center " class="fa-lg " fontSet="fas " fontIcon="fa-user ">
+                        </mat-icon>
+                        <mat-icon fxLayout="row " fxLayoutAlign="center center " class="fa-lg complex " fontSet="fas " fontIcon="fa-share-alt ">
+                        </mat-icon>
+                    </div>
+                    <div fxLayout="column ">
+                        <h3>Compartir empleado</h3>
+                        <h5>Elige con qué Empresa compartirás la información del Empleado </h5>
+                    </div>
+                </div>
+                <button mat-icon-button (click)="closeSharePerson()">
+          <mat-icon class="fa-lg " fontSet="fas " fontIcon="fa-times ">
+          </mat-icon>
+        </button>
+            </div>
+
+            <form #formShare="ngForm" class="form-steped" [formGroup]="sharePersonForm">
+                <div class="form-steped-body" fxLayout="column">
+                    <div class="asisted-input aligned-icon" fxLayout="row-reverse" fxLayoutAlign="start center">
+                        <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+                            <mat-select placeholder="Empresa" formControlName="organizationalUnit">
+                                <mat-option *ngFor="let ou of organizationalUnits" [value]="ou.id">
+                                    {{ou.name}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <mat-icon  class="fa-lg" fontSet="fas" fontIcon="fa-industry-alt">
+                        </mat-icon>
+                    </div>
+                </div>
+                <div class="main-action" fxLayout="row-reverse">
+                    <button mat-raised-button (click)="sharePerson()" color="accent" [disabled]="loading || formShare.invalid">Compartir</button>
+                    <button mat-button (click)="closeSharePerson()">Cancelar</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,107 @@
+<div class="table-paginator-container">
+  <table mat-table [dataSource]="dataSource" class="mat-elevation-z0">
+    <!-- Date Column -->
+    <ng-container matColumnDef="date">
+      <th mat-header-cell *matHeaderCellDef>Fecha</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.created | date : "dd MMM yyyy" | uppercase }}
+      </td>
+    </ng-container>
+
+    <!-- Organization Unit Column -->
+    <ng-container matColumnDef="organizationalUnitName">
+      <th mat-header-cell *matHeaderCellDef>Empresa</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.customer?.customerName }}
+      </td>
+    </ng-container>
+
+    <!-- Document Type Name Column -->
+    <ng-container matColumnDef="documentTypeName">
+      <th mat-header-cell *matHeaderCellDef>Tipo de documentación</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element?.metadata | metadataDocName }}
+      </td>
+    </ng-container>
+
+    <!-- Process type Column -->
+    <ng-container matColumnDef="processType">
+      <th mat-header-cell *matHeaderCellDef>Proceso</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element?.type | processTypeName }}
+      </td>
+    </ng-container>
+
+    <!-- Total processed Column -->
+    <ng-container matColumnDef="totalProcessed">
+      <th mat-header-cell *matHeaderCellDef>Total procesado</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element?.totalProcessed | number }}
+      </td>
+    </ng-container>
+
+    <!-- Total Warnings Column -->
+    <ng-container matColumnDef="totalWarnings">
+      <th mat-header-cell *matHeaderCellDef>Acciones Pendientes</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element?.totalWarnings | number }}
+      </td>
+    </ng-container>
+
+    <!-- Total Errors Column -->
+    <ng-container matColumnDef="totalErrors">
+      <th mat-header-cell *matHeaderCellDef>Errores</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element?.totalErrors | number }}
+      </td>
+    </ng-container>
+
+    <!-- Created By Column -->
+    <ng-container matColumnDef="createdBy">
+      <th mat-header-cell *matHeaderCellDef>Creado por</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element?.createdByUserFullname || element?.createdByUserId }}
+      </td>
+    </ng-container>
+
+    <!-- State Column -->
+    <ng-container matColumnDef="state">
+      <th mat-header-cell *matHeaderCellDef>Estado</th>
+      <td mat-cell *matCellDef="let p">
+        <app-custom-chip
+          [text]="p?.groupedState | processGroupedStateName : p?.groupedStateName"
+          [customTheme]="p?.groupedState | processGroupedStateChipTheme"
+        ></app-custom-chip>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr
+      mat-row
+      *matRowDef="let row; columns: displayedColumns"
+      [routerLink]="[row.id]"
+      class="cursor-pointer"
+    ></tr>
+  </table>
+
+  <div class="progress-bar-container">
+    <mat-progress-bar
+      mode="indeterminate"
+      *ngIf="isLoading$ | async"
+    ></mat-progress-bar>
+  </div>
+
+  <!-- Paginator -->
+  <div class="paginator-container">
+    <mat-paginator
+      *ngIf="paginationInfo$ | async as paginationInfo"
+      class="bg-transparent"
+      [length]="paginationInfo.totalCount"
+      [pageSize]="paginationInfo.pageSize"
+      [pageSizeOptions]="[10, 25, 100]"
+      [pageIndex]="paginationInfo.currentPage - 1"
+      showFirstLastButtons
+      (page)="handlePageEvent($event)"
+    ></mat-paginator>
+  </div>
+</div>

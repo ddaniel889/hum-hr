@@ -1,0 +1,42 @@
+<mat-toolbar class="mat-elevation-z1 app-toolbar" color="primary" fxFlex="grow">
+    <mat-toolbar-row></mat-toolbar-row>
+    <mat-toolbar-row></mat-toolbar-row>
+</mat-toolbar>
+
+<div class="floating-container" fxLayout="row" fxLayoutAlign="center center" fxFill>
+    <mat-card class="card-1-1">
+        <mat-sidenav-container fxLayout="row" fxFill mode="push">
+            <mat-sidenav-content fxFill>
+                <div fxLayout="row" fxFill>
+                    <div class="inbox-container employee" fxFlex.lt-md="100" fxFlex.gt-sm="30" fxFill>
+                        <mat-toolbar class="inbox-toolbar" color="grey" fxLayout="row" fxLayoutAlign="start center">
+                            <mat-toolbar-row fxLayout="row" fxLayoutAlign="space-between center" fxFill>
+                                <div class="mat-avatar" fxLayout="row" fxLayoutAlign="space-between center">
+                                    <div class="toolbar-line" fxLayout="row" fxLayoutAlign="start center"
+                                        fxLayoutGap="16px">
+                                        <mat-icon  class="fa-lg"
+                                            fontSet="fa" fontIcon="fa-file"></mat-icon>
+                                        <div class="title" fxLayout="column">
+                                            <h3 *ngIf="hasRSD && hasLD">Recibos de Sueldo Históricos</h3>
+                                            <h3 *ngIf="hasRSD && !hasLD">Mis Recibos de Sueldo</h3>
+                                            <h5>Novedades</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button mat-icon-button (click)="refresh()">
+                                    <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-redo"></mat-icon>
+                                </button>
+                            </mat-toolbar-row>
+                        </mat-toolbar>
+                        <mat-divider [inset]="true"></mat-divider>
+                        <app-inbox></app-inbox>
+                    </div>
+                    <mat-divider [vertical]="true"></mat-divider>
+                    <div class="detail" fxFlex.lt-md="100" fxFlex.gt-sm="70" fxFill [ngClass]="{'is-open':isOpen}">
+                        <router-outlet (activate)=setIsOpen($event) (deactivate)=setIsOpen($event)></router-outlet>
+                    </div>
+                </div>
+            </mat-sidenav-content>
+        </mat-sidenav-container>
+    </mat-card>
+</div>

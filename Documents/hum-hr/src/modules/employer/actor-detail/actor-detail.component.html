@@ -1,0 +1,222 @@
+<form [formGroup]="editForm" (keydown.enter)="save()" (keydown.escape)="cancel()" fxFill fxFlex="100">
+  <div class="side">
+    <div class="toolbar" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+      <div class="header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-info-circle">
+        </mat-icon>
+        <h3>Detalle del Actor</h3>
+      </div>
+      <!-- cerrar detalles -->
+      <button mat-icon-button fxLayout="row" fxLayoutAlign="center center" (click)="close()">
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-times">
+        </mat-icon>
+      </button>
+    </div>
+    <!-- listado detalles -->
+    <div class="container">
+      <!-- cabecera detalles -->
+      <div class="role-resume" fxLayout="column">
+        <!-- name -->
+        <div class="line editable" fxLayout="row" fxLayoutAlign="space-between center"
+          *ngIf="selectedEditingControl !== 'fullName'">
+          <div class="header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-user">
+            </mat-icon>
+            <div class="info" fxLayout="column">
+              <h6>Nombre</h6>
+              <h4>{{actor?.firstName}} {{actor?.lastName}}</h4>
+            </div>
+          </div>
+          <button mat-icon-button fxLayout="row" fxLayoutAlign="center center" (click)="editControl('fullName')">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-pen">
+            </mat-icon>
+          </button>
+        </div>
+        <div class="edition-line" *ngIf="selectedEditingControl === 'fullName'">
+          <mat-form-field>
+            <mat-icon matPrefix fxLayout="row" fxLayoutAlign="center center" class="fa-lg" fontSet="fas"
+              fontIcon="fa-user">
+            </mat-icon>
+            <input matInput="matInput"
+              [placeholder]="editForm.controls['lastName'].hasError('required') ? 'Es un dato requerido' : 'Ingresa el nuevo apellido'"
+              formControlName="lastName" required [readOnly]="saving" />
+          </mat-form-field>
+          <mat-form-field>
+            <mat-icon matPrefix fxLayout="row" fxLayoutAlign="center center" class="fa-lg" fontSet="fas"
+              fontIcon="fa-user">
+            </mat-icon>
+            <input matInput="matInput"
+              [placeholder]="editForm.controls['firstName'].hasError('required') ? 'Es un dato requerido' : 'Ingresa el nuevo nombre'"
+              formControlName="firstName" required [readOnly]="saving" />
+          </mat-form-field>
+          <div class="actions" fxLayout="row-reverse" fxLayoutGap="8px">
+            <button mat-button color="accent" (click)="save()" [disabled]="saving">
+              Guardar
+            </button>
+            <button mat-button (click)="cancel()" [disabled]="saving">
+              Cancelar
+            </button>
+          </div>
+          <mat-progress-bar mode="indeterminate" *ngIf="saving"> </mat-progress-bar>
+        </div>
+         <!-- mail -->
+         <div class="line editable" fxLayout="row" fxLayoutAlign="space-between center" *ngIf="selectedEditingControl !== 'mail'">
+          <div class="header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-envelope">
+            </mat-icon>
+            <div class="info" fxLayout="column">
+              <h6>Correo Electrónico</h6>
+              <h4>{{actor?.mail}}</h4>
+            </div>
+          </div>
+          <button mat-icon-button fxLayout="row" fxLayoutAlign="center center" (click)="editControl('mail')">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-pen">
+            </mat-icon>
+          </button>
+        </div>
+        <div class="edition-line" *ngIf="selectedEditingControl === 'mail'">
+          <mat-form-field>
+            <mat-icon matPrefix fxLayout="row" fxLayoutAlign="center center" class="fa-lg" fontSet="fas"
+              fontIcon="fa-envelope">
+            </mat-icon>
+            <input matInput="matInput"
+              [placeholder]="editForm.controls['mail'].hasError('required') ? 'Es un dato requerido' : 'Ingresa el nuevo mail'"
+              formControlName="mail" required [readOnly]="saving" />
+          </mat-form-field>
+          <div class="actions" fxLayout="row-reverse" fxLayoutGap="8px">
+            <button mat-button color="accent" (click)="save()" [disabled]="saving">
+              Guardar
+            </button>
+            <button mat-button (click)="cancel()" [disabled]="saving">
+              Cancelar
+            </button>
+          </div>
+          <mat-progress-bar mode="indeterminate" *ngIf="saving"> </mat-progress-bar>
+        </div>
+        <!-- SAML - Identificación delegada -->
+        <div class="line editable" fxLayout="row" fxLayoutAlign="space-between center"
+          *ngIf="selectedEditingControl !== 'nickName' && useSaml">
+          <div class="header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-id-badge">
+            </mat-icon>
+            <div class="info" fxLayout="column">
+              <h6>Identificación Delegada</h6>
+              <h4>{{actor?.delegatedSystemId}}</h4>
+            </div>
+          </div>
+          <button mat-icon-button fxLayout="row" fxLayoutAlign="center center" (click)="editControl('nickName')"
+            *ngIf="useSaml">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-pen">
+            </mat-icon>
+          </button>
+        </div>
+        <div class="edition-line" *ngIf="selectedEditingControl === 'nickName'">
+          <mat-form-field>
+            <mat-icon matPrefix fxLayout="row" fxLayoutAlign="center center" class="fa-lg" fontSet="fas"
+              fontIcon="fa-id-badge">
+            </mat-icon>
+            <input matInput="matInput"
+              [placeholder]="editForm.controls['nickName'].hasError('required') ? 'Es un dato requerido' : 'Ingresa el nuevo nombre de usuario'"
+              formControlName="nickName" required [readOnly]="saving" />
+          </mat-form-field>
+          <div class="actions" fxLayout="row-reverse" fxLayoutGap="8px">
+            <button mat-button color="accent" (click)="save()" [disabled]="saving">
+              Guardar
+            </button>
+            <button mat-button (click)="cancel()" [disabled]="saving">
+              Cancelar
+            </button>
+          </div>
+          <mat-progress-bar mode="indeterminate" *ngIf="saving"> </mat-progress-bar>
+        </div>
+        <!-- SAML Toogle -->
+        <div class="line" fxLayout="row" fxLayoutAlign="space-between center" *ngIf="useSaml">
+          <div class="header" fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+            <mat-icon class="fa-lg" fontSet="fas" [fontIcon]="actor?.isSamlActive ? 'fa-hand-receiving' : 'fa-hands'">
+            </mat-icon>
+            <div class="info" fxLayout="column">
+              <h6>Autenticación Delegada</h6>
+              <h4>
+                SAML
+              </h4>
+            </div>
+          </div>
+          <mat-slide-toggle class="example-margin" (change)="changeSaml()" [(ngModel)]="actor.isSamlActive"
+            [ngModelOptions]="{standalone: true}">
+          </mat-slide-toggle>
+        </div>
+        <!-- Fecha de Creacion -->
+        <div class="line" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+          <div class="header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-clock">
+            </mat-icon>
+            <div class="info" fxLayout="column">
+              <h6>Fecha de creación</h6>
+              <h4>{{(actor?.creationDate == null) ? 'Sin registro' : actor.creationDate | date: 'dd/MM/yyyy HH:mm'}}
+              </h4>
+            </div>
+          </div>
+        </div>  
+        <!-- Último Ingreso -->
+        <div class="line" fxLayout="row" fxLayoutAlign="space-between center">
+          <div class="header" fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-clock">
+            </mat-icon>
+            <div class="info" fxLayout="column">
+              <h6>Último Ingreso</h6>
+              <h4>
+                {{(actor?.lastLoginDate == null) ? 'Sin registro' : actor.lastLoginDate | date: 'dd/MM/yyyy
+                HH:mm'}}
+              </h4>
+            </div>
+          </div>
+          <button *ngIf="actor && actor.locked" mat-icon-button (click)="unlock()" title="Desbloquear">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-lock">
+            </mat-icon>
+          </button>
+          <button mat-icon-button fxLayout="row" fxLayoutAlign="center center"
+            *ngIf="!welcomeSent && !actor?.lastLoginDate" (click)="sendWelcomeMail()">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-envelope">
+            </mat-icon>
+          </button>
+        </div>
+      </div>
+      <!-- otras secciones -->
+      <!-- titulo Roles -->
+      <div class="section-title" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px"
+        *ngIf="actor && actor.roles.length > 0">
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-theater-masks">
+        </mat-icon>
+        <h5>Roles</h5>
+      </div>
+      <!-- seccion Roles -->
+      <div class="section-resume" *ngIf="actor && actor.roles.length > 0">
+        <div *ngFor="let rol of actor?.roles" fxLayout="column">
+          <div class="line" fxLayout="row" fxLayoutAlign="space-between center">
+            <div class="header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+              <mat-icon class="fa-lg" fontSet="fas" [fontIcon]="rol.icon">
+              </mat-icon>
+              <div class="info" fxLayout="column">
+                <h6>Rol {{rol.enabled ? '(activo)' : '(inactivo)'}}</h6>
+                <h4>{{rol?.roleName}}</h4>
+                <h6>{{(rol?.creationDate == null) ? 'Sin registro' : 'Asignado el '+(actor.creationDate | date:
+                  'dd/MM/yyyy HH:mm')}}</h6>
+              </div>
+            </div>
+            <mat-slide-toggle class="example-margin" (change)="changeEnabled(rol)" [(ngModel)]="rol.toggleState"
+              [ngModelOptions]="{standalone: true}">
+            </mat-slide-toggle>
+          </div>
+          <!-- Adjetivacion -->
+          <div  class="adj-container" fxLayout="column">
+            <app-certificates *ngIf="rol != null && rol.roleName === 'FIRMANTE'" [userId]="rol.userId" [isRRHH]="true" [hasTitle]="false">
+            </app-certificates>
+            <ng-container *ngIf="rol != null || (rol.roleName === 'FIRMANTE' && isAdjetiveSigner)">
+              <app-role-adjetivation-detail [rol]="rol" [actor]="actor" [isAdjetiveSigner]="isAdjetiveSigner" [selectedOu]="selectedOu" [organizationalUnits]="organizationalUnits"></app-role-adjetivation-detail>
+            </ng-container>
+          </div>
+        </div>
+      </div> 
+    </div>
+  </div>
+</form>

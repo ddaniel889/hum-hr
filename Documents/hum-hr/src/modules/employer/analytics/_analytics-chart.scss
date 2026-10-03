@@ -1,0 +1,38 @@
+.dash-container {
+  height: calc(100% - 64px) !important;
+  justify-content: center;
+  align-items: center;
+
+  .content-chart {
+    width: 50%;
+    min-width: 400px;
+
+    app-cs-charts-control {
+      width: 100%;
+      display: block;
+    }
+  }
+}
+
+app-analytics {
+  .toolbar {
+    .module-title {
+      &.selectable {
+        width: 100%;
+
+        .info {
+          width: 100%;
+          margin-right: 0 !important;
+
+          .info-text {
+            width: 100%;
+
+            &+mat-icon {
+              margin-right: 0 !important;
+            }
+          }
+        }
+      }
+    }
+  }
+}

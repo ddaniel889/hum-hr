@@ -1,0 +1,101 @@
+@supports (-ms-ime-align:auto) {
+  .mat-list .mat-list-item .floating-actions .mat-icon {
+    background: transparent !important;
+  }
+
+  .document-search-sub-toolbar >div {
+    width: 300px;
+  }
+
+  mat-toolbar {
+    &.inbox-toolbar {
+      .mat-avatar {
+        display: block !important;
+      }
+    }
+
+    .document-search-sub-toolbar {
+      mat-form-field {
+        width: 180px;
+      }
+    }
+  }
+
+  app-file-document-sign-massive-dialog {
+
+    .cycle-content-action {
+      mat-form-field {
+        display: block !important;
+        width: 250px !important;
+        flex-grow: unset !important;
+        flex-shrink: unset !important;
+        flex-basis: unset !important;
+      }
+    }
+
+    .img-container {
+      max-width: 200px;
+
+      img {
+        width: 100%;
+      }
+    }
+  }
+
+  app-employee-detail .employee_detail-container .employee_detail-scrollable,
+  app-employee-rrhh-detail .employee_detail-container .employee_detail-scrollable {
+    padding-right: 0 !important;
+    padding-top: 1px !important;
+    margin-top: -2px !important;
+  }
+
+  mat-horizontal-stepper {
+    width: 100%;
+  }
+
+  .mat-basic-chip {
+    min-width: auto;
+  }
+
+  mat-chip-list {
+    .mat-chip-list-wrapper {
+      .mat-basic-chip {
+        min-width: auto;
+      }
+    }
+  }
+
+  app-employee-detail,
+  app-employee-rrhh-detail {
+    .employee_detail-container {
+      &.is-editing {
+        .edition-line {
+          width: 100%;
+        }
+      }
+
+      .detail_head-body {
+        .head_body-title {
+          .body_title-name {
+            width: 100%;
+          }
+
+          .body_title-user {
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+
+  .side-nav {
+    .side-nav-container {
+      .actions {
+        button {
+          width: 100%;
+        }
+      }
+    }
+  }
+
+}

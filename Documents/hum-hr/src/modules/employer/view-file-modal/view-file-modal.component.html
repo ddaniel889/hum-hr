@@ -1,0 +1,79 @@
+<div class="dialog-content" fxLayout="column" *ngIf="!isZip">
+    <mat-toolbar class="view-toolbar">
+        <mat-toolbar-row fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="56px">
+            <!-- document-selected-header-info -->
+            <div class="view-description" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                <mat-icon fxLayout="row" fxLayoutAlign="center center" class="fa-lg primary" fontSet="fa"
+                    fontIcon="fa-eye">
+                </mat-icon>
+                <div class="view-description-text" fxLayout="column" fxLayoutAlign="center start">
+                    <h3 class="primary" matLine>Vista Previa</h3>
+                    <h5 matLine>{{fileName | titlecase}}</h5>
+                </div>
+            </div>
+            <div class="view-actions">
+                <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                    <!-- PDF-controls -->
+                    <app-pdf-wrapper-controls [pdfWrapper]="pdfWrapper" [showPrint]="false" [showSave]="true"
+                        [showZoomIn]="true" [showZoomOut]="true" [showRemove]="false">
+                    </app-pdf-wrapper-controls>
+                    <button mat-icon-button title="Cancelar" (click)="close()">
+                        <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times">
+                        </mat-icon>
+                    </button>
+                </div>
+            </div>
+        </mat-toolbar-row>
+    </mat-toolbar>
+    <div class="dialog-container" fxLayout="row">
+        <div class="view-container">
+            <!-- PDF-viewer -->
+            <app-pdf-wrapper [showControls]="false" #pdfWrapper [file]="fileBase64" [fileName]="fileName" [fileId]="fileId" [autoView]="false">
+            </app-pdf-wrapper>
+            <div class="preview-container" *ngIf="isZip">
+                <ng-template #elseBlock>
+                    <h4>El formato del archivo seleccionado no puede ser previsualizado, pero se cargará
+                        correctamente</h4>
+                </ng-template>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="dialog-content" fxLayout="column" *ngIf="isZip">
+  <mat-toolbar class="view-toolbar">
+      <mat-toolbar-row fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="56px">
+          <!-- document-selected-header-info -->
+          <div class="view-description" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+              <mat-icon fxLayout="row" fxLayoutAlign="center center" class="fa-lg primary" fontSet="fa"
+                  fontIcon="fa-eye">
+              </mat-icon>
+              <div class="view-description-text" fxLayout="column" fxLayoutAlign="center start">
+                  <h3 class="primary" matLine>Vista Previa</h3>
+                  <h5 matLine>{{fileName | titlecase}}</h5>
+              </div>
+          </div>
+          <div class="view-actions">
+              <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                  <!-- PDF-controls -->
+                  <app-pdf-wrapper-controls [showPrint]="false" [pdfWrapper]="pdfWrapper" [showSave]="true"
+                  [showZoomIn]="false" [showZoomOut]="false" [showRemove]="false">
+                  </app-pdf-wrapper-controls>
+                  <button mat-icon-button title="Cancelar" (click)="close()">
+                      <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times">
+                      </mat-icon>
+                  </button>
+              </div>
+          </div>
+      </mat-toolbar-row>
+  </mat-toolbar>
+    <div class="dialog-container" fxLayout="column" fxLayoutAlign="center center" style="text-align:center; width:100%; min-width:32em; min-height:18em;">
+    <div style="display:flex; justify-content:center; width:100%; margin-top:1.2em;">
+        <mat-icon fontSet="fa" fontIcon="fa-exclamation-triangle" style="font-size:5em; color:#a0a0a0;"></mat-icon>
+    </div>
+    <div style="height:1.5em;"></div>
+        <h4 style="font-size:1.4em; color:#a0a0a0; margin:0; width:90%;"> El formato del archivo seleccionado<br>no puede ser previsualizado,<br> pero se descargará correctamente.</h4>
+    </div>
+  <app-pdf-wrapper [showControls]="false" #pdfWrapper [file]="fileBase64" [fileName]="fileName" [fileId]="fileId"
+    [autoView]="false">
+  </app-pdf-wrapper>
+</div>

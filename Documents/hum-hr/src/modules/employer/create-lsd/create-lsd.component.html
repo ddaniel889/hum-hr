@@ -1,0 +1,130 @@
+<!-- Loading -->
+<div class="load-window" *ngIf="loading">
+    <mat-progress-spinner style="z-index: 1" mode="indeterminate" color="primary">
+    </mat-progress-spinner>
+</div>
+<form [formGroup]="mainFormGroup" class="dialog-content" fxLayout="column" *ngIf="!loading">
+    <mat-toolbar class="view-toolbar">
+        <mat-toolbar-row fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="56px">
+            <!-- document-selected-header-info -->
+            <div class="view-description" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                <mat-icon fxLayout="row" fxLayoutAlign="center center" class="fa-lg accent" fontSet="fa"
+                    fontIcon="fa-plus">
+                </mat-icon>
+                <div class="view-description-text" fxLayout="column" fxLayoutAlign="center start">
+                    <h3 class="accent" matLine>Nueva Presentación</h3>
+                    <h5 matLine>{{ showingFile ? 'Vista Previa: '+(fileName | titlecase):'Completa los datos' }}</h5>
+                </div>
+            </div>
+            <div class="view-actions">
+                <div fxLayout="row" fxLayoutAlign="start center">
+                </div>
+                <button mat-icon-button title="Cancelar" (click)="close()">
+                    <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times">
+                    </mat-icon>
+                </button>
+            </div>
+        </mat-toolbar-row>
+    </mat-toolbar>
+    <div class="dialog-container" fxLayout="row">
+        <div class="document-template-container">
+            <div class="document-selection new" fxLayout="column">
+                <ng-container *ngIf="canSelectOu">
+                    <div class="asisted-input" fxLayout="row-reverse" fxLayoutAlign="start center">
+                        <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+                            <mat-select placeholder="Selecciona la Empresa" formControlName="organizationalUnitCtrl" required>
+                              <mat-option *ngFor="let ou of organizationalUnits" [value]="ou.id">
+                                {{ou.name}}
+                              </mat-option>
+                            </mat-select>
+                          </mat-form-field>
+                        <div class="indicator">
+                            <div class="guide top" hidden></div>
+                            <div class="bubble"> 1 </div>
+                            <div class="guide bottom"></div>
+                        </div>
+                    </div>
+                </ng-container>
+                <div class="asisted-input" fxLayout="row-reverse" fxLayoutAlign="start center"
+                    *ngIf="haveMultipleNominaOptions">
+                    <mat-form-field fxFlex="grow">
+                        <mat-select placeholder="Tipo Nómina" formControlName="typeNomina" required fxLayout="column">
+                            <mat-option *ngFor="let opt of tNominaOptions" [value]="opt.key">
+                                {{ opt.value }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <div class="indicator">
+                        <div class="guide top"  [hidden]="!canSelectOu"></div>
+                        <div class="bubble">{{ canSelectOu ? 2 : 1 }}</div>
+                        <div class="guide bottom"></div>
+                    </div>
+                </div>
+                <ng-container *ngFor="let meta of metadatas, let i=index">
+                    <app-custom-control [metadata]="meta" [aditionalsmetadatas]="metadatas"
+                        [class]="{'first-field' : !haveMultipleNominaOptions && !canSelectOu && i === 0 }"
+                        [isAssisted]="true" (valueSet)="updateMetadata($event)"
+                        [assistedIndex]='(haveMultipleNominaOptions && !canSelectOu) || (!haveMultipleNominaOptions && canSelectOu) ? 2 + i : haveMultipleNominaOptions && canSelectOu ? 3 + i : 1 + i'>
+                    </app-custom-control>
+                </ng-container>
+                <div class="asisted-input big" fxLayout="row-reverse" fxLayoutAlign="start center">
+                    <mat-tab-group class="tabs-options" (selectedIndexChange)="changeTab()">
+                        <mat-tab [label]="'Firmables ('+files.length+')'">
+                            <app-upload-form [canViewFile]="true" [canRemove]="true" [multipleSelection]="true"
+                                acceptedExtensions=".pdf" [maxFile]="maxFiles" [files]="files"
+                                (fileSelected)="onSelectedFile($event, null)" (filesChanged)="onFilesChanged($event)"
+                                (seeFileDefault)="onSelectedFile($event, true)">
+                            </app-upload-form>
+                        </mat-tab>
+                        <mat-tab [label]="'Anexos ('+attachedFiles.length+')'">
+                            <app-upload-form [canViewFile]="true" [canRemove]="true" [multipleSelection]="true"
+                                [acceptedExtensions]="aceptedExtensions" [maxFile]="maxFiles" [files]="attachedFiles"
+                                (fileSelected)="onSelectedFile($event, null)"
+                                (filesChanged)="onFilesChanged($event, true)"
+                                (seeFileDefault)="onSelectedFile($event, true)">
+                            </app-upload-form>
+                        </mat-tab>
+                    </mat-tab-group>
+                    <div class="indicator">
+                        <div class="guide top"></div>
+                        <div class="bubble">{{(haveMultipleNominaOptions && !canSelectOu) || (!haveMultipleNominaOptions && canSelectOu) ? metadatas.length + 2 : haveMultipleNominaOptions && canSelectOu ? 3 + metadatas.length : metadatas.length + 1}}
+                        </div>
+                        <div class="guide bottom" hidden></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- loader -->
+        <div class="view-container" *ngIf="false">
+            <div class="load-window new">
+                <mat-progress-spinner mode="indeterminate" color="primary">
+                </mat-progress-spinner>
+            </div>
+        </div>
+        <div class="view-container" *ngIf="showingFile" [hidden]="!showingFile">
+            <!-- PDF-controls -->
+            <app-pdf-wrapper-controls [hidden]="fileImage || isZip" [pdfWrapper]="pdfWrapper" [showPrint]="false"
+                [showSave]="false" [showZoomIn]="true" [showZoomOut]="true" [showRemove]="false">
+            </app-pdf-wrapper-controls>
+
+            <!-- PDF-viewer -->
+            <app-pdf-wrapper #pdfWrapper [showControls]="false" [file]="fileBase64" [fileName]="fileName"
+                [autoView]="false" [hidden]="fileImage || isZip">
+            </app-pdf-wrapper>
+            <div class="preview-container" *ngIf="fileImage || isZip">
+                <div class="preview-container" *ngIf="fileImage else elseBlock">
+                    <img src="{{fileImage}}" />
+                </div>
+                <ng-template #elseBlock>
+                    <h4>El formato del archivo seleccionado no puede ser previsualizado, pero se cargará
+                        correctamente</h4>
+                </ng-template>
+            </div>
+        </div>
+    </div>
+    <div class="form-actions" fxLayout="row-reverse" fxLayoutAlign="start center" fxLayoutGap="16px">
+        <button mat-raised-button color="accent" (click)="save()"
+            [disabled]="mainFormGroup.invalid || isProcessing">Finalizar Presentación</button>
+        <button mat-button (click)="close()">Cancelar</button>
+    </div>
+</form>

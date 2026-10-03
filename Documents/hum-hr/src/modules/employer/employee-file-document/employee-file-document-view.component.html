@@ -1,0 +1,149 @@
+<mat-sidenav-container fxLayout="row" fxFill mode="push">
+  <mat-sidenav-content fxFill>
+    <mat-toolbar class="inbox-toolbar" color="grey" fxLayout="row" fxLayoutAlign="start center">
+      <mat-toolbar-row fxLayout="row" fxLayoutAlign="space-between center" fxFill>
+        <div class="mat-avatar" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+          <div class="toolbar-line container-ou" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+            <button mat-icon-button (click)="goEmployeeDetail()" title="Volver">
+              <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-arrow-left"></mat-icon>
+            </button>
+            <div class="title" fxLayout="column" fxLayoutAlign="center start">
+              <h3>{{emp?.lastName}}, {{emp?.name}}</h3>
+              <h5>ID Fiscal: {{emp?.cuil | mask: empFiscalIdMask}}</h5>
+            </div>
+            <button class="notification-alert" *ngIf="hasNotificationPending && showButtonPending" mat-stroked-button
+              (click)="notifToEmployee()">
+              <span fxLayout="row" fxLayoutAlign="start center">
+                <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-comment-alt-exclamation"></mat-icon>
+                <span>Notificar Pendientes</span>
+              </span>
+            </button>
+          </div>
+        </div>
+        <button mat-icon-button (click)="refreshDocuments(this.selectedPeriod)" title="Actualizar">
+          <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-redo"></mat-icon>
+        </button>
+      </mat-toolbar-row>
+    </mat-toolbar>
+    <mat-divider [inset]="true"></mat-divider>
+    <div class="view-employee-files-container" fxLayout="row">
+      <div class="inbox-container" fxFlex.lt-md="100" fxFlex.gt-sm="30" fxFill>
+        <!-- LOADER -->
+        <div class="window-spinner" *ngIf="!loaded">
+          <mat-progress-spinner mode="indeterminate" color="primary">
+          </mat-progress-spinner>
+        </div>
+
+        <mat-toolbar class="inbox-toolbar" color="grey" fxLayout="row" fxLayoutAlign="start center">
+          <mat-toolbar-row fxLayout="row" fxLayoutAlign="space-between center" fxFill>
+            <div class="mat-avatar two-icons" fxLayout="row" fxLayoutAlign="space-between center"
+              *ngIf="configs?.length == 1">
+              <div class="toolbar-line" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                <mat-icon class="fa-lg not-mobile" fontSet="fa" fontIcon="fa-folder-open"></mat-icon>
+                <div class="title" fxLayout="column" fxLayoutAlign="center start">
+                  <h3>{{selectedInboxConfig?.name}}</h3>
+                  <h5 *ngIf="filteredTypes?.length < 1">Todos los documentos</h5>
+                  <h5 *ngIf="filteredTypes?.length >= 1">Aplicando {{ filteredTypes?.length }}
+                    filtro{{filteredTypes?.length > 1 ? "s" : ""}}</h5>
+                </div>
+              </div>
+            </div>
+            <div class="mat-avatar two-icons" fxLayout="row" fxLayoutAlign="space-between center"
+              *ngIf="configs?.length > 1">
+              <div class="toolbar-line inbox-selector" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px"
+                (click)='selectInbox.open()' matRipple>
+                <mat-icon class="fa-lg not-mobile" fontSet="fa" fontIcon="fa-folder-open"></mat-icon>
+                <div class="invisible-container" fxLayout="row" fxLayoutAlign="start center">
+                  <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                    <div fxLayout="column" fxLayoutAlign="center start">
+                      <h3><b>{{selectedInboxConfig?.name}}</b></h3>
+                      <h5 *ngIf="!selectedInboxConfig?.isDefaultConfig" [title]="dtNames?.length <= 2 ? '': dtNames">
+                        {{selectedInboxConfig?.documentationTypes.length <=2 ? dtNames :
+                          selectedInboxConfig?.documentationTypes.length + ' Tipos de Documentacion' }} </h5>
+                          <h5 *ngIf="filteredTypes?.length < 1 && selectedInboxConfig?.isDefaultConfig">Todos los
+                            documentos
+                          </h5>
+                          <h5 *ngIf="filteredTypes?.length >= 1 && selectedInboxConfig?.isDefaultConfig">
+                            Aplicando {{ filteredTypes?.length }} filtro{{filteredTypes?.length > 1 ? "s" : ""}}
+                          </h5>
+                    </div>
+                    <mat-select class="invisible-item" #selectInbox (click)="$event.stopPropagation()"
+                      [(ngModel)]="selectedInboxConfig">
+                      <mat-option *ngFor="let config of configs" [value]="config"
+                        (click)="refreshDocuments(this.selectedPeriod)">
+                        <b>{{config?.name}}</b>
+                        <span>{{documentationTypes?.name}}</span>
+                      </mat-option>
+                    </mat-select>
+                  </div>
+                  <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-caret-down" title="Cambiar Vista">
+                  </mat-icon>
+                </div>
+              </div>
+            </div>
+
+            <button mat-icon-button (click)="toggleFilter()" title="Filtrar"
+              *ngIf="selectedInboxConfig?.documentationTypeIds?.length < 1">
+              <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-filter"></mat-icon>
+            </button>
+          </mat-toolbar-row>
+        </mat-toolbar>
+        <mat-divider [inset]="true"></mat-divider>
+        <mat-accordion>
+          <app-file-document-inbox-block-calendar [expanded]="selectedPeriod == grupoPeriodo.Actual" [totalItems]="totalItems"
+            [progressBarDisplay]="loadingPeriod && this.selectedPeriod== grupoPeriodo.Actual" title="Actualmente"
+            [activeRow]="this.activeRow" [blockValue]="grupoPeriodo.Actual" [documentationTypes]="documentationTypes"
+            [items]="items" (click)="changeExpander(grupoPeriodo.Actual)" (openDocument)="openDocument($event)"
+            [showSmallChips]=true></app-file-document-inbox-block-calendar>
+          <app-file-document-inbox-block-calendar [expanded]="selectedPeriod == grupoPeriodo.Pasado"
+            [activeRow]="this.activeRow" [totalItems]="totalItems"
+            [progressBarDisplay]="loadingPeriod && this.selectedPeriod== grupoPeriodo.Pasado" title="El año pasado"
+            [blockValue]="grupoPeriodo.Pasado" [documentationTypes]="documentationTypes" [items]="items"
+            (click)="changeExpander(grupoPeriodo.Pasado)" (openDocument)="openDocument($event)" [showSmallChips]=true>
+          </app-file-document-inbox-block-calendar>
+          <app-file-document-inbox-block-calendar [expanded]="selectedPeriod == grupoPeriodo.Anterior"
+            [activeRow]="this.activeRow" [totalItems]="totalItems"
+            [progressBarDisplay]="loadingPeriod && this.selectedPeriod== grupoPeriodo.Anterior" title="Anteriormente"
+            [blockValue]="grupoPeriodo.Anterior" [documentationTypes]="documentationTypes" [items]="items"
+            (click)="changeExpander(grupoPeriodo.Anterior)" (openDocument)="openDocument($event)" [showSmallChips]=true>
+          </app-file-document-inbox-block-calendar>
+        </mat-accordion>
+      </div>
+      <mat-divider [vertical]="true"></mat-divider>
+      <div class="detail" fxFlex.lt-md="100" fxFlex.gt-sm="70" fxFill [ngClass]="{'is-open':isOpen}">
+        <div class="window-spinner" *ngIf="loadingDocument">
+          <mat-progress-spinner mode="indeterminate" color="primary">
+          </mat-progress-spinner>
+        </div>
+        <app-file-document-detail [doc]="selectedDoc" (finishCancelEvent)="refreshDocuments(this.selectedPeriod)"
+          [showWelcome]=true [showCancel]=true [fileName]="fileName" [filePdf]="filePdf" [showQuery]="selectedDoc?.hasMessage && showQueries"
+          [showPrint]="!selectedDoc?.isUploadPending()" [showSave]="!selectedDoc?.isUploadPending()" (closedQuery)="closeQueryDocument($event)">
+        </app-file-document-detail>
+      </div>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
+
+<div class="catcher clear" *ngIf="isFilterOpen" (click)="toggleFilter()">
+  <div class="catcher-positioner">
+    <div class="card-filter mat-elevation-z3" fxLayout="column" fxLayoutGap="12px" (click)="$event.stopPropagation()">
+      <div fxLayout="row" fxLayoutAlign="space-between center">
+        <h4>Filtros de visualización</h4>
+        <button mat-icon-button (click)="toggleFilter()" title="Cerrar">
+          <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+        </button>
+      </div>
+      <app-autocomplete-chip [originalList]="documentationTypes" [placeHolderText]="'Tipos de documentación'"
+        (OnItemSelected)="selectedDocumentationType($event)" [selectedItemsList]="tmpFilter" fxFlex="grow"
+        fxLayout="row" fxLayoutAlign="start center">
+      </app-autocomplete-chip>
+
+      <div class="filter-footer" fxLayout="row-reverse" fxLayoutGap="12px">
+        <button mat-raised-button color="primary" class="btn" (click)="filter()">Filtrar</button>
+        <button mat-button (click)="clearFilter()">
+          Limpiar filtro
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

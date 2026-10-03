@@ -1,0 +1,166 @@
+.config_leave-container {
+  .config_leave-container-title {}
+
+  .year-selector {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    width: 200px;
+
+    &.compact {
+      margin: 0;
+    }
+
+    .year-button {
+      background-color: #f0f0ff;
+      border-radius: 24px;
+      border: 1px solid #e0e0ff;
+      padding: 0 12px;
+      height: 40px;
+      width: 100%;
+
+      .button-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        .year-text {
+          color: #536dfe;
+          font-weight: 500;
+          font-size: 15px;
+        }
+
+        .dropdown-icon {
+          color: #536dfe;
+          font-size: 14px;
+          height: 14px;
+          width: 14px;
+          line-height: 14px;
+          margin-left: 8px;
+        }
+      }
+
+      &:hover {
+        background-color: #e6e6ff;
+      }
+    }
+    // Estilo para el menú de años
+    .year-drop {
+      &[id^="mat-menu-panel-"] {
+        max-width: 100px !important;
+        min-width: 100px !important;
+      }
+    }
+  }
+  .status-container {
+      margin-left: 8px;  /* Espacio adicional entre el selector y el estado */
+  }
+  .compact-spacing {
+    margin-top: -12px;
+    margin-bottom: -12px;
+  }
+  .config_leave-card {
+    padding: 16px;
+    border-radius: 8px;
+
+    .config_leave-card_title {}
+
+    .config_leave-card_subtitle {}
+
+    .config_leave-card_item {}
+
+    .config_leave-card_item-edit {}
+
+    .config_leave-auto_chip {
+      mat-form-field {
+        width: 100%;
+
+        &.mat-form-field-disabled {
+          * {
+            cursor: not-allowed;
+          }
+
+          .mat-form-field-underline {
+            height: 2px !important;
+          }
+        }
+
+        .mat-form-field-flex {
+          border-radius: 4px 4px 0 0 !important;
+          padding: 8px 8px 0 !important;
+          min-height: 56px !important;
+          align-items: unset !important;
+
+          .mat-form-field-prefix {
+            padding: 0 !important;
+            display: flex;
+            align-items: center;
+          }
+        }
+      }
+    }
+
+    mat-divider {}
+  }
+
+  .year-active-indicator {
+    width: 6em;
+    height: 2em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+.year-inactive-indicator {
+    color: #AB8513;
+    background-color: #ffd99c;
+    width: 6em;
+    height: 2em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 1em;
+  }
+}
+
+
+@mixin leaveConfigEmploye($bg-card, $bg-background, $primary-text, $primary, $text-main, $row-even, $divider, $text-side, $leave-ok, $leave-not-ok,$leave-draft, $text-sub, $row-odd) {
+  .config_leave-container {
+    .config_leave-container-title {}
+
+    .config_leave-card {
+      background: $bg-card;
+      border: 1px solid $divider;
+
+      .config_leave-card_title {}
+
+      .config_leave-card_subtitle {}
+
+      .config_leave-card_item {}
+
+      .config_leave-card_item-edit {}
+
+      mat-divider {}
+
+      .config_leave-auto_chip{
+        mat-form-field {
+          &.mat-form-field-disabled {
+            .mat-form-field-flex {
+              background: $bg-background !important;
+
+              .mat-form-field-prefix {
+                color: $text-sub;
+              }
+            }
+          }
+
+          .mat-form-field-flex {
+            background: $row-odd;
+          }
+        }
+      }
+    }
+  }
+}

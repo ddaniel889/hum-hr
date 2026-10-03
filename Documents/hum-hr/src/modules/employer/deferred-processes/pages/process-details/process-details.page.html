@@ -1,0 +1,173 @@
+<div class="deferred-process-details" fxLayout="column" fxLayoutGap="16px" fxFill>
+  <!-- Header -->
+  <div class="header" fxLayout="row" fxLayoutGap="20px" fxLayoutAlign="space-between center">
+    <a class="back-link" routerLink="./../">
+      <mat-icon
+        class="fa-lg"
+        fontSet="fa"
+        fontIcon="fa-angle-left"
+        color="primary"
+      ></mat-icon>
+      <span>Volver</span>
+    </a>
+
+    <button mat-icon-button [matTooltip]="'Actualizar'" aria-label="Actualizar" (click)="refreshAll()">
+      <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-redo"></mat-icon>
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div class="load-window new" *ngIf="(isLoading$ | async) && !(process$ | async)">
+    <mat-progress-spinner mode="indeterminate" color="primary">
+    </mat-progress-spinner>
+  </div>
+
+  <ng-container *ngIf="process$ | async as process">
+    <!-- Process Details Card -->
+    <mat-card class="process-card-detail mat-elevation-z0">
+      <mat-card-title>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="24px">
+          <div>{{ process?.metadata | metadataDocName }}</div>
+          <app-custom-chip
+            [text]="process?.groupedState | processGroupedStateName : process?.groupedStateName"
+            [customTheme]="process?.groupedState | processGroupedStateChipTheme"
+          ></app-custom-chip>
+        </div>
+        <div class="action-buttons"> 
+         <button 
+          *ngIf="isPending"
+          mat-stroked-button 
+          class="download-btn"
+          matTooltip="Descargar pendientes"
+          aria-label="Descargar pendientes"
+          (click)="downloadDocuments('pending')"
+          color="primary">
+           <mat-icon 
+            fontSet="fa" 
+            fontIcon="fa-download"
+          ></mat-icon> 
+          Descargar pendientes
+         </button>
+
+        <button
+         *ngIf="isReprocessable"
+         mat-stroked-button 
+         class="reprocess-btn"
+         matTooltip="Reprocesar"
+         (click)="reprocessDocumentsByProcess()"
+         color="primary"
+         > <mat-icon fontSet="fa" fontIcon="fa-rotate"></mat-icon> 
+         Volver a Procesar
+        </button>
+        
+        <button
+          mat-flat-button
+          class="delete-btn"
+          matTooltip="Borrar documetos"
+          aria-label="Borrar documetos"
+          color="warn"
+          *ngIf="isDeletable"
+          [disabled]="isDeleteInProgress"  
+          (click)="onDeleteDocuments()"
+        >
+          <mat-icon 
+            fontSet="fa" 
+            fontIcon="fa-trash-can"
+          ></mat-icon>
+          Borrar documentos
+        </button>
+        </div>
+      </mat-card-title>
+      <mat-card-subtitle>
+        <div class="info-extra-list">
+          <span class="item" *ngFor="let m of infoExtra$ | async">
+            <span>{{ m.label }} </span>
+            <b *ngIf="!m.isMonth && !m.isDay">{{ m.value }} </b>
+            <b *ngIf="m.isMonth">{{ m.value | date: 'MMMM yyyy' | titlecase }} </b>
+            <b *ngIf="m.isDay">{{ m.value | date: 'dd/MM/yyyy' }} </b>
+          </span>
+        </div>
+      </mat-card-subtitle>
+      <mat-card-content>
+        <div fxLayout="column" fxLayout.gt-xs="row" fxLayoutGap="16">
+          <div *ngIf="process.createdByUserId" class="created-by" fxLayoutAlign="start center" fxLayoutGap="8">
+            <mat-icon
+              fontSet="fa"
+              fontIcon="fa-user-circle"
+              color="primary"
+            ></mat-icon>
+            <span>Creado por {{ process.createdByUserFullname ?? process.createdByUserId }}</span>
+          </div>
+          <div class="date" fxLayoutAlign="start center" fxLayoutGap="8">
+            <mat-icon
+              fontSet="fa"
+              fontIcon="fa-calendar-day"
+              color="primary"
+            ></mat-icon>
+            <span>{{ process.created | date: 'dd MMM yyyy - H:mm' | uppercase }} hs</span>
+          </div>
+          <div *ngIf="isDownloadle" class="download">  
+          <div class="date" fxLayoutAlign="start center" fxLayoutGap="8">
+            <mat-icon
+              fontSet="fa"
+              fontIcon="fa-file"
+              color="primary"
+            ></mat-icon>
+            <span>{{filename}}</span>
+          </div>
+          <div class="date" fxLayoutAlign="start center" fxLayoutGap="8">
+            <span> <a mat-button class="download-link"  color="primary"  (click)="downloadDocuments('documents')">Descargar</a></span>
+          </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Process Stage History -->
+     <app-process-stage-history-card [process]="process"></app-process-stage-history-card>
+
+    <!-- Identification details -->
+    <ng-container *ngIf="processDetail$ | async as processDetail">
+      <section class="details">
+        <div
+          class="details-header"
+          fxLayout="column"
+          fxLayout.gt-md="row"
+          fxLayoutAlign.gt-md="space-between center"
+        >
+          <h4>Detalle de identificación</h4>
+
+          <form class="form-group" fxLayout="row wrap" fxLayoutGap="16px" [formGroup]="paramsForm">
+
+            <mat-form-field class="form-item" appearance="fill" >
+              <mat-label>Estado</mat-label>
+              <mat-select formControlName="state" multiple (selectionChange)="refreshTable()">
+                <mat-option *ngFor="let choice of stateChoices" [value]="choice.id">{{
+                  choice.name
+                }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <div class="search-container">
+              <app-custom-search-input [height]="'59px'" [width]="'380px'" [placeholder]="'Buscar'" [control]="paramsForm.get('queryFilter')" [debounceTime]="700" (onSearch)="refreshTable()"></app-custom-search-input>
+            </div>
+          </form>
+        </div>
+        <app-process-employee-details-table [data]="processDetail" [processId]="id" *ngIf="processDetail.length > 0; else noData">
+        </app-process-employee-details-table>
+        <ng-template #noData>
+          <ng-container *ngIf="isLoading$ | async; else noDataContent">
+            <div class="load-window new" *ngIf="(isLoading$ | async); else noDataContent">
+              <mat-progress-spinner mode="indeterminate" color="primary">
+              </mat-progress-spinner>
+            </div>
+          </ng-container>
+          <ng-template #noDataContent>
+            <app-chapa [className]="'info-empty'" [icon]="'fa-meh'" [text]="'¡Ups! No hay datos de identificación aquí...'"
+            [subText]="'Intenta hacer otra búsqueda o prueba con otros filtros'"></app-chapa>
+          </ng-template>
+        </ng-template>
+      </section>
+    </ng-container>
+  </ng-container>
+</div>

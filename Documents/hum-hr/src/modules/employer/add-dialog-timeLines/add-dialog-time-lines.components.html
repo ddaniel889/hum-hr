@@ -1,0 +1,51 @@
+<div class="new_leave_modal">
+  <div class="new_leave_modal-toolbar" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+    <div class="new_leave_modal-title" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+      <mat-icon class="fa-lg primary" fontSet="fa" fontIcon="fa-plus"></mat-icon>
+      <div class="new_leave_modal-title_content" fxLayout="column">
+        <!-- titulo -->
+        <h2 class="primary"></h2>
+        <h4>Nueva Vigencia</h4>
+      </div>
+    </div>
+    <!-- cerrar modal -->
+    <button mat-icon-button mat-dialog-close>
+      <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times" fxLayout="row" fxLayoutAlign="center center">
+      </mat-icon>
+    </button>
+  </div>
+    <form class="new_leave_modal-form" [formGroup]="menuFormLeaveTimeLine" fxLayout="column" fxLayoutAlign="start center" fxLayoutGap="10px" style="width: 520px !important;padding-bottom: 20px;">
+      <mat-form-field class="new_leave_modal-field" appearance="fill" fxFill>
+        <mat-label>Año</mat-label>
+        <input matInput [value]="data.selectedYear.year" readonly />
+      </mat-form-field>
+    <mat-form-field class="new_leave_modal-field" appearance="fill" fxFill>
+      <mat-label>{{labelDesc}}</mat-label>
+      <input matInput maxlength="40" placeholder="Descripción"  formControlName="description" (input)="validateDescription()"/>
+      <mat-label *ngIf="error !=''">  Campo Inválido</mat-label>
+    </mat-form-field>
+
+    <mat-form-field class="new_leave_modal-field" appearance="fill" fxFill>
+      <mat-label>Fecha Desde</mat-label>
+      <input readonly matInput [min]="MinDate" [max]="MaxDate" [matDatepicker]="fechaInicia"
+        formControlName="StartDate" (dateChange)="setHastaMinDate($event)">
+      <mat-datepicker-toggle matIconSuffix [for]="fechaInicia">
+        <mat-datepicker #fechaInicia></mat-datepicker>
+      </mat-datepicker-toggle>
+    </mat-form-field>
+
+    <mat-form-field class="new_leave_modal-field" appearance="fill" fxFill>
+      <mat-label>Fecha Hasta</mat-label>
+      <input readonly matInput [min]="HastaMinDate" [max]="MaxDate" [matDatepicker]="fechaFin"
+        formControlName="EndDate">
+      <mat-datepicker-toggle matIconSuffix [for]="fechaFin">
+        <mat-datepicker #fechaFin></mat-datepicker>
+      </mat-datepicker-toggle>
+    </mat-form-field>
+
+    <div class="new_leave_modal-actions"  fxLayout="row-reverse" fxLayout="end center" fxLayoutGap="16px">
+      <button mat-raised-button color="primary" (click)="save()" [disabled]="menuFormLeaveTimeLine.get('description').invalid || ButtonEnable() || loading">Aceptar</button>
+      <button mat-button mat-dialog-close>Cancelar</button>
+    </div>
+  </form>
+</div>

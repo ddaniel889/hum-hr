@@ -1,0 +1,44 @@
+<mat-horizontal-stepper #stepper class="new help-stepper" [class]="{'image-opened' : zoomedImg}">
+  <mat-step *ngFor="let item of model; let i = index;">
+    <mat-card fxLayout="column" class="help-card">
+      <mat-card-content>
+        <span class="help-header" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px" fxFlex="grow">
+          <span fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+            <button mat-icon-button (click)="back()" *ngIf="i > 0" title="Atrás">
+              <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-arrow-left"></mat-icon>
+            </button>
+            <mat-icon color="accent" *ngIf="i < 1" fxLayout="row" fxLayoutAlign="center center" class="fa-lg"
+              fontSet="fa" fontIcon="fa-question-circle">
+            </mat-icon>
+            <span fxLayout="column">
+              <h3>{{ item?.title }}</h3>
+              <h4 [innerHTML]="item?.description">
+              </h4>
+            </span>
+          </span>
+
+        </span>
+        <span class="help-content" fxLayout="column" fxLayoutGap="16px"
+          *ngIf="item?.itemTextDescription || item?.itemListDescription" fxFlex="grow">
+          <img *ngIf="item?.image" [src]="item.image" (click)="zoomedImg = !zoomedImg"
+            [title]="zoomedImg ? 'Click para Achicar':'Click para Agrandar'">
+          <ul class="description" *ngIf="item?.itemListDescription">
+            <li *ngFor="let li of item?.itemListDescription" [innerHTML]="li"></li>
+          </ul>
+          <span class="description" *ngIf="item?.itemTextDescription" [innerHTML]="item?.itemTextDescription"></span>
+          <div class="aditional-info" *ngIf="item?.itemDescriptionAditional"
+            [innerHTML]="item?.itemDescriptionAditional"></div>
+        </span>
+      </mat-card-content>
+      <mat-card-footer fxLayout="row-reverse" fxLayoutGap="12px">
+        <button mat-raised-button color="accent" (click)="next()" *ngIf="i < 1">Iniciar tutorial</button>
+        <button mat-stroked-button color="accent" (click)="next()"
+          *ngIf="i < (model?.length - 1) && i > 0">Siguiente</button>
+        <button mat-raised-button color="accent" (click)="close()" *ngIf="i === (model?.length - 1)">Finalizar
+          Tutorial</button>
+        <button mat-stroked-button (click)="start()" *ngIf="i === (model?.length - 1)">Volver al Inicio</button>
+        <button mat-button (click)="close()" *ngIf="i < 1">Omitir</button>
+      </mat-card-footer>
+    </mat-card>
+  </mat-step>
+</mat-horizontal-stepper>

@@ -1,0 +1,24 @@
+<mat-toolbar color="grey">
+    <mat-toolbar-row>
+        <div class="toolbar-line" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+            <div class="title" fxLayout="column" fxLayoutAlign="center start">
+                <h3>Agregar opción para {{data.metadataLabel}}</h3>
+            </div>
+            <button mat-icon-button (click)="cancel()" title="Cerrar">
+        <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+      </button>
+        </div>
+    </mat-toolbar-row>
+</mat-toolbar>
+<mat-divider></mat-divider>
+<form [formGroup]="valueFormGroup">
+    <div class="add-menu-form-body">
+        <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+            <input matInput placeholder="Ingresa la descripción para la nueva opción" formControlName="valueFrmCtrl">
+        </mat-form-field>
+    </div>
+    <div class="add-menu-form-actions">
+        <button mat-raised-button color="primary" class="btn" [disabled]="clickOnce || valueFormGroup.invalid" (click)="save()">Agregar</button>
+        <button mat-button (click)="cancel()">Cancelar</button>
+    </div>
+</form>

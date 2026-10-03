@@ -1,0 +1,111 @@
+.deferred-process-details {
+  padding: 24px 24px 12px 24px;
+  overflow-y: scroll;
+
+  .header {
+    .back-link {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 18px;
+      font-weight: 700;
+      padding-right: 8px;
+
+      &:hover,
+      &:focus,
+      &:active {
+        text-decoration: none;
+      }
+    }
+  }
+
+  mat-card.process-card-detail,
+  mat-card.process-card-stages {
+    border-radius: 10px;
+    box-sizing: border-box;
+
+    mat-card-subtitle {
+      .info-extra-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 24px;
+        row-gap: 8px;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 17px;
+        b {
+          font-weight: 700;
+        }
+      }
+    }
+
+    mat-card-title {
+      width: 100%;
+      display: inline-flex;
+      font-size: 24px;
+      font-weight: 700;
+      justify-content: space-between;
+      line-height: 24px;
+      padding-bottom: 12px;
+
+    .action-buttons {
+      display: flex;
+      gap: 12px; 
+      align-items: center;
+     }
+
+      .download-btn, .reprocess-btn {
+        padding: 6px 20px;
+        background-color: #fff;
+        
+        mat-icon.mat-icon {
+          display: inline-block;
+          margin-right: 8px;
+        }
+      }
+
+      .delete-btn {
+        padding: 6px 20px;
+        mat-icon.mat-icon {
+          display: inline-block;
+          margin-right: 8px;
+        }
+      }
+    }
+  }
+
+  mat-card.process-card-detail {
+    mat-card-content {
+      mat-icon {
+        font-size: 24px;
+        min-width: unset;
+      }
+      .download{
+         display: flex;
+          .download-link {
+          &:hover,
+          &:focus,
+          &:active {
+          text-decoration: none;
+      }
+    }
+      }
+    }
+  }
+}
+
+section.details {
+  display: flex;
+  flex-direction: column;
+
+  .details-header {
+    margin-bottom: 8px;
+  }
+
+  h4 {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 25px;
+    margin-bottom: 0;
+  }
+}

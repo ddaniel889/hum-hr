@@ -1,0 +1,225 @@
+<ng-container [ngSwitch]="metadata.metadataType">
+  <!-- Texto -->
+  <div class="asisted-input" fxLayout="row-reverse" fxLayoutAlign="start center" *ngSwitchCase="'text'">
+    <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+      <input matInput placeholder="{{metaDef.metadataLabel}}" [ngModel]='getValue()' (ngModelChange)="setValue($event)"
+        name="{{metadata.metadataId}}"
+        mask="{{translateStringNullToNull(metaDef.metadataMask) !=null ? metaDef.metadataMask : ''}}"
+        #textFormControl="ngModel" [disabled]="isDisabled" [required]="metaDef.isRequired">
+      <mat-error *ngIf="textFormControl.hasError('required')">
+        {{metaDef.metadataLabel}} es un campo <strong>requerido</strong>
+      </mat-error>
+    </mat-form-field>
+    <div class="indicator" *ngIf="isAssisted">
+      <div class="guide top"></div>
+      <div class="bubble">{{assistedIndex}}</div>
+      <div class="guide bottom"></div>
+    </div>
+  </div>
+  <!-- PhoneNumber -->
+  <div class="asisted-input" fxLayout="row-reverse" fxLayoutAlign="start center" *ngSwitchCase="'phoneNumber'">
+    <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+      <input matInput placeholder="{{metaDef.metadataLabel}}" [ngModel]='getValue()' (ngModelChange)="setValue($event)"
+        name="{{metadata.metadataId}}"
+        mask="{{translateStringNullToNull(metaDef.metadataMask) !=null ? metaDef.metadataMask : ''}}"
+        #phoneNumberFormControl="ngModel" [disabled]="isDisabled" [required]="metaDef.isRequired"
+        pattern="^\+[0-9]?()[0-9](\s|\S)(\d[0-9]{8,9})$">
+      <mat-hint>Cod País + Teléfono (+541125455441)</mat-hint>
+      <mat-error *ngIf="phoneNumberFormControl.hasError('required')">
+        {{metaDef.metadataLabel}} es un campo <strong>requerido</strong>
+      </mat-error>
+      <mat-error *ngIf="phoneNumberFormControl.hasError('pattern')">
+        Por favor, ingrese teléfono movil válido
+      </mat-error>
+    </mat-form-field>
+    <div class="indicator" *ngIf="isAssisted">
+      <div class="guide top"></div>
+      <div class="bubble">{{assistedIndex}}</div>
+      <div class="guide bottom"></div>
+    </div>
+  </div>
+  <!-- Número -->
+  <div class="asisted-input" fxLayout="row-reverse" fxLayoutAlign="start center" *ngSwitchCase="'number'">
+    <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+      <input matInput type="number" placeholder="{{metaDef.metadataLabel}}" [ngModel]='getValue()'
+        (ngModelChange)="setValue($event)" name="{{metadata.metadataId}}" #numberFormControl="ngModel"
+        [disabled]="isDisabled" [required]="metaDef.isRequired">
+      <mat-error *ngIf="numberFormControl.hasError('required')">
+        {{metaDef.metadataLabel}} es un campo <strong>requerido</strong>
+      </mat-error>
+    </mat-form-field>
+    <div class="indicator" *ngIf="isAssisted">
+      <div class="guide top"></div>
+      <div class="bubble">{{assistedIndex}}</div>
+      <div class="guide bottom"></div>
+    </div>
+  </div>
+  <!-- Mail -->
+  <div class="asisted-input" fxLayout="row-reverse" fxLayoutAlign="start center" *ngSwitchCase="'email'">
+    <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+      <input matInput placeholder="{{metaDef.metadataLabel}}" [ngModel]='getValue()' (ngModelChange)="setValue($event)"
+        pattern="^[a-zA-Z0-9_\-.]+@[a-zA-Z0-9\-]+\.[a-zA-Z0-9\-.]+$" name="emailFormControl" #emailFormControl="ngModel"
+        [disabled]="isDisabled" [required]="metaDef.isRequired">
+      <mat-error *ngIf="emailFormControl.hasError('pattern') && !emailFormControl.hasError('required')">
+        Por favor ingrese un mail válido
+      </mat-error>
+      <mat-error *ngIf="emailFormControl.hasError('required')">
+        {{metaDef.metadataLabel}} es un campo <strong>requerido</strong>
+      </mat-error>
+    </mat-form-field>
+    <div class="indicator" *ngIf="isAssisted">
+      <div class="guide top"></div>
+      <div class="bubble">{{assistedIndex}}</div>
+      <div class="guide bottom"></div>
+    </div>
+  </div>
+  <!-- Fecha -->
+  <div class="asisted-input" fxLayout="row-reverse" fxLayoutAlign="start center" *ngSwitchCase="'date'">
+    <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+      <mat-label>{{metaDef.metadataLabel}} dd/mm/aaaa</mat-label>
+      <input matInput [matDatepicker]="picker" [ngModel]='getValue()' (dateChange)="setValue($event)"
+        name="{{metadata.metadataId}}" #dateFormControl="ngModel" [disabled]="isDisabled"
+        [required]="metaDef.isRequired">
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+      <mat-error *ngIf="dateFormControl.hasError('required')">
+        {{metaDef.metadataLabel}} es un campo <strong>requerido</strong>
+      </mat-error>
+    </mat-form-field>
+    <div class="indicator" *ngIf="isAssisted">
+      <div class="guide top"></div>
+      <div class="bubble">{{assistedIndex}}</div>
+      <div class="guide bottom"></div>
+    </div>
+  </div>
+  <!-- Período -->
+  <div class="asisted-input" fxLayout="row-reverse" fxLayoutAlign="start center" *ngSwitchCase="'period'">
+    <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+      <input matInput placeholder="{{metaDef.metadataLabel}} (AAAA/MM)" [ngModel]='getValue()'
+        (ngModelChange)="setValue($event)" name="{{metadata.metadataId}}" #periodFormControl="ngModel"
+        [disabled]="isDisabled" mask="0000/00" pattern="([12][0-9][0-9][0-9](0[1-9]|1[0-2]))"
+        [required]="metaDef.isRequired">
+      <mat-error *ngIf="periodFormControl.hasError('required')">
+        {{metaDef.metadataLabel}} es un campo <strong>requerido</strong>
+      </mat-error>
+      <mat-error *ngIf="periodFormControl.hasError('pattern') && !periodFormControl.hasError('required')">
+        Por favor ingrese un periodo válido
+      </mat-error>
+    </mat-form-field>
+    <div class="indicator" *ngIf="isAssisted">
+      <div class="guide top"></div>
+      <div class="bubble">{{assistedIndex}}</div>
+      <div class="guide bottom"></div>
+    </div>
+  </div>
+  <!-- Combo -->
+  <ng-container *ngIf="metadata.metadataType === 'comboKV' || metadata.metadataType === 'combo'">
+    <ng-container *ngIf="!metaDef.isMultivalue">
+      <div class="asisted-input" fxLayout="row-reverse" fxLayoutAlign="start center" *ngSwitchCase="'comboKV'">
+        <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+          <mat-select placeholder="{{metaDef.metadataLabel}}" [ngModel]='getValue()' [value]='getValue()'
+            (selectionChange)="setValue($event)" [required]="metaDef.isRequired" [disabled]="isDisabled"
+            #comboKVFrmCtrl>
+            <mat-option *ngIf="!metaDef.isRequired" [value]=" "></mat-option>
+            <mat-option *ngFor="let option of metaDef.optionValues" [value]="option.value">
+              <div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+                <span class="option-text">{{option.description}}</span>
+                <!-- editar valor -->
+                <button *ngIf="isRRHHManagment && metaDef.isUpdateable && showAdd" mat-icon-button
+                  (click)="$event.stopPropagation(); openEditMetadataValue(option)" title="Editar Descripción">
+                  <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-pen"></mat-icon>
+                </button>
+              </div>
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="comboKVFrmCtrl.errorState">
+            {{metaDef.metadataLabel}} es un campo <strong>requerido</strong>
+          </mat-error>
+          <!-- agregar valor -->
+          <button *ngIf="isRRHHManagment && metaDef.isUpdateable && showAdd" [disabled]="isDisabled" mat-icon-button
+            color="accent" matSuffix (click)="$event.stopPropagation(); openAddMetadataValue()"
+            title="{{'Agregar Opción para '+ metaDef.metadataLabel}}">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-plus"></mat-icon>
+          </button>
+        </mat-form-field>
+        <div class="indicator" *ngIf="isAssisted">
+          <div class="guide top"></div>
+          <div class="bubble">{{assistedIndex}}</div>
+          <div class="guide bottom"></div>
+        </div>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="metaDef.isMultivalue">
+      <div class="asisted-input" fxLayout="row-reverse" fxLayoutAlign="start center" *ngSwitchCase="'comboKV'">
+        <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+          <mat-select placeholder="{{metaDef.metadataLabel}}" [ngModel]='getValue()' [value]='getValue()'
+            (selectionChange)="setValue($event)" multiple [required]="metaDef.isRequired" [disabled]="isDisabled"
+            #multivalueComboKVFrmCtrl>
+            <mat-option *ngIf="!metaDef.isRequired"></mat-option>
+            <mat-option *ngFor="let option of metaDef.optionValues" [value]="option.value">
+              <div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+                <span class="option-text">{{option.description}}</span>
+                <!-- editar valor -->
+                <button *ngIf="isRRHHManagment && metaDef.isUpdateable && showAdd" mat-icon-button
+                  (click)="$event.stopPropagation(); openEditMetadataValue(option)" title="Editar Descripción">
+                  <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-pen"></mat-icon>
+                </button>
+              </div>
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="multivalueComboKVFrmCtrl.errorState">
+            {{metaDef.metadataLabel}} es un campo <strong>requerido</strong>
+          </mat-error>
+          <!-- agregar valor -->
+          <button *ngIf="isRRHHManagment && metaDef.isUpdateable && showAdd" [disabled]="isDisabled" mat-icon-button
+            color="accent" matSuffix (click)="$event.stopPropagation(); openAddMetadataValue()"
+            title="{{'Agregar Opción para '+ metaDef.metadataLabel}}">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-plus"></mat-icon>
+          </button>
+        </mat-form-field>
+        <div class="indicator" *ngIf="isAssisted">
+          <div class="guide top"></div>
+          <div class="bubble">{{assistedIndex}}</div>
+          <div class="guide bottom"></div>
+        </div>
+      </div>
+    </ng-container>
+    <div class="asisted-input" fxLayout="row-reverse" fxLayoutAlign="start center" *ngSwitchCase="'combo'">
+      <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+        <mat-select placeholder="{{metaDef.metadataLabel}}" [value]='getValue()' (selectionChange)="setValue($event)"
+          *ngIf="!metaDef.isMultivalue; else multipleCombo" [required]="metaDef.isRequired" [disabled]="isDisabled">
+          <mat-option *ngIf="!metaDef.isRequired" [value]=" "></mat-option>
+          <mat-option *ngFor="let option of metaDef.optionValues" [value]="option.value">{{option.value}}
+          </mat-option>
+        </mat-select>
+        <ng-template #multipleCombo>
+          <mat-select placeholder="{{metaDef.metadataLabel}}" [value]='getValue()' (selectionChange)="setValue($event)"
+            multiple [required]="metaDef.isRequired" [disabled]="isDisabled">
+            <mat-option *ngIf="!metaDef.isRequired" [value]=" "></mat-option>
+            <mat-option *ngFor="let option of metaDef.optionValues" [value]="option.value">
+              <div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+                <span class="option-text">{{option.value}}</span>
+                <!-- editar valor -->
+                <button *ngIf="isRRHHManagment && metaDef.isUpdateable && showAdd" mat-icon-button
+                  (click)="$event.stopPropagation(); openEditMetadataValue(option)" title="Editar Descripción">
+                  <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-pen"></mat-icon>
+                </button>
+              </div>
+            </mat-option>
+          </mat-select>
+        </ng-template>
+        <!-- agregar valor -->
+        <button *ngIf="isRRHHManagment && metaDef.isUpdateable && showAdd" [disabled]="isDisabled" mat-icon-button
+          color="accent" matSuffix (click)="$event.stopPropagation(); openAddMetadataValue()"
+          title="{{'Agregar Opción para '+ metaDef.metadataLabel}}">
+          <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-plus"></mat-icon>
+        </button>
+      </mat-form-field>
+      <div class="indicator" *ngIf="isAssisted">
+        <div class="guide top"></div>
+        <div class="bubble">{{assistedIndex}}</div>
+        <div class="guide bottom"></div>
+      </div>
+    </div>
+  </ng-container>
+</ng-container>

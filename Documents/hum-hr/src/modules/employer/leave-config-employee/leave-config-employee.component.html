@@ -1,0 +1,303 @@
+<!-- titulo general -->
+<div class="config_leave-container" fxLayout="column" fxLayoutGap="16px" *ngIf="!isCandidate && !loading">
+  <div class="config_leave-container-title primary" fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+    <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-calendar-alt">
+    </mat-icon>
+    <h3 class="text">
+      Licencias
+    </h3>
+  </div>
+
+  <div class="config_leave-card" fxLayout="column" fxLayoutGap="32px">
+    <div class="config_leave-card_title primary" fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+      <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-umbrella-beach">
+      </mat-icon>
+      <div class="text-main">
+        Vacaciones
+      </div>
+    </div>
+    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+      <div class="card_item-info" fxLayout="column">
+        <h2 class="card_item-data accent">
+          {{getDaysText(totalAvailableDays).daysText}}
+        </h2>
+        <h5 class="config_leave-card_subtitle">
+          {{getDaysText(totalAvailableDays).availableText}} en {{getDaysText(totalAvailableDays).totalText | lowercase}}
+        </h5>
+      </div>
+    </div>
+    <mat-divider style="margin-top: 10px; margin-bottom: 50px;"></mat-divider>
+    <div class="year-selector-container" fxLayout="column" fxLayoutGap="12px">
+          <div class="year-selector"
+              fxLayout="row"
+              fxLayoutAlign="start center"
+              fxLayoutGap="12px"
+              *ngIf="selectedYear && availableYears?.length">
+            <h3>Detalle por Año:</h3>
+          </div>
+
+          <div class="year-selector"
+              fxLayout="row"
+              fxLayoutAlign="start"
+              fxLayoutGap="12px"
+              *ngIf="selectedYear && availableYears?.length">
+            <button mat-button [matMenuTriggerFor]="yearsMenu" class="year-button">
+              <div class="button-content" fxLayout="row" fxLayoutAlign="start center">
+                <span class="year-text">{{ selectedYear?.year }}</span>
+                <mat-icon class="dropdown-icon" fontSet="fa" fontIcon="fa-caret-down"></mat-icon>
+              </div>
+            </button>
+
+            <mat-menu #yearsMenu="matMenu" class="year-drop">
+              <button mat-menu-item *ngFor="let year of availableYears" (click)="selectYear(year)">
+                {{ year?.year }}
+              </button>
+            </mat-menu>
+
+            <div fxLayout="row"  fxLayoutAlign="start center" fxLayoutGap="12px">
+              <span style="font-weight: 300;"
+                  [ngClass]="{'year-active-indicator': selectedYearActive, 'year-inactive-indicator': !selectedYearActive }">
+                  {{ selectedYearActive ? '' : 'Inactivo' }}
+              </span>
+            </div>
+          </div>
+    </div>
+    <div class="compact-spacing" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="12px" *ngIf="leaveConfig && isConfigLoaded">
+      <h4 style="margin-left: 5px; color: rgb(0, 0, 0) !important; font-weight: 300;">
+        {{ getLeaveDaysText() }}
+      </h4>
+    </div>
+
+
+    <!-- card licencia sin config -->
+    <div fxLayout="column" fxLayoutGap="16px" *ngIf="configLeaveEmployee.length==0 || !isConfigLoaded">
+      <!-- item card licencia sin Config-->
+      <div class="config_leave-card_item" *ngIf="!editing">
+        <div class="card_item-info" fxLayout="column">
+          <mat-error *ngIf="availableTimeLines?.length > 0 && !isLeaveConfig && !isLeaveApprove && !isValidator">No
+            tiene permisos para configurar licencias.</mat-error>
+          <div class="edit_actions" fxLayout="row-reverse" fxLayoutGap="12px">
+            <button mat-raised-button color="accent" (click)="addConfig()"
+              [disabled]="!isActiveEmployee || !isLeaveConfig || availableTimeLines.length === 0">
+              Agregar configuración de vacaciones
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- edit card licencia sin config -->
+      <div class="config_leave-card_item-edit" *ngIf="editing">
+        <form [formGroup]="baseConfigForm">
+          <mat-form-field appearance="fill" fxFill>
+            <mat-label>Ingresa días base</mat-label>
+            <input matInput="matInput" formControlName="baseDaysForm" type="number" min="1" />
+            <mat-error>Días base deben ser como minimo 1</mat-error>
+          </mat-form-field>
+          <ng-container>
+            <app-autocomplete-chip [showIcons]="true" [iconName]="'fa-filter'" [originalList]="availableTimeLines"
+              title="'Ingrese Tipo de Vigencia'" [placeHolderText]="'Ingrese Tipo de Vigencia'" [listView]="true"
+              [selectedItemsList]="selectedTimeLines" (OnRemoveItem)="itemRemovedTimelines($event)"
+              (OnItemSelected)="selectTimeLines($event)" fxLayout="row" fxLayoutAlign="start center"
+              *ngIf="availableTimeLines?.length > 0" class="config_leave-auto_chip">
+            </app-autocomplete-chip>
+            <mat-error *ngIf="selectedTimeLines.length == 0 && availableTimeLines?.length > 0">La vigencia es
+              requerida</mat-error>
+          </ng-container>
+          <div class="edit_actions" fxLayout="row-reverse" fxLayoutGap="12px">
+            <button mat-raised-button color="accent" (click)="save()"
+              [disabled]="isDisabledSaveConfigTimeLines() || !isLeaveConfig">
+              Guardar
+            </button>
+            <button mat-stroked-button (click)="cancel()">
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <!-- card licencia -->
+    <div fxLayout="column" fxLayoutGap="16px" *ngIf="leaveConfig && isConfigLoaded">
+      <!-- subtitulo card licencia -->
+      <div class="config_leave-card_subtitle" fxLayout="row" fxLayoutAlign="space-between center">
+        <h3>
+          Configuración Básica
+        </h3>
+        <button mat-icon-button title="Editar" *ngIf="!isValidator" (click)="editBaseDays()"
+          [disabled]="!isActiveEmployee || !isLeaveConfig">
+          <mat-icon class="fa-xs" fontSet="fa" fontIcon="fa-pen"></mat-icon>
+        </button>
+      </div>
+      <!-- item card licencia -->
+      <div class="config_leave-card_item" *ngIf="!editing && leaveConfig!=[]">
+        <div class="card_item-info" fxLayout="column">
+          <h5 class="config_leave-card_subtitle">Días Básicos</h5>
+          <h3 class="card_item-data accent">
+            {{leaveConfig?.baseDays < 2 ? leaveConfig?.baseDays + ' día ' : leaveConfig?.baseDays + ' días ' }} </h3>
+              <h6 class="card_item-comment" *ngIf="leaveConfig?.leaveType.id == 1 ">
+                "Se renuevan anualmente"
+              </h6>
+        </div>
+        <div class="card_item-info" fxLayout="column" style="margin-top: 15px;">
+          <h5 class="config_leave-card_subtitle">
+            Vigencias
+          </h5>
+          <div *ngFor="let timeLine of selectedTimeLines" style="margin-top: 5px; display: flex; align-items: center;">
+            <h3 class="card_item-data accent" style="padding-right: 5px;">
+              {{timeLine?.description ?? ''}}
+            </h3>
+            <h5 class="card_item-comment" *ngIf="selectedTimeLines.length > 0 ">
+              {{' - '+timeLine?.dateFrom+' - '+timeLine?.dateTo ?? ''}}
+            </h5>
+          </div>
+          <h3 class="card_item-comment accent" *ngIf="selectedTimeLines.length == 0 ">
+            No hay vigencias asociadas
+          </h3>
+          <mat-error *ngIf="!isLeaveConfig && !isLeaveApprove && !isValidator"
+            style="padding-top: 2px; font-weight: bold;">No tiene permisos para configurar licencias.</mat-error>
+        </div>
+      </div>
+
+      <!-- edit card licencia -->
+      <div class="config_leave-card_item-edit edition-line" *ngIf="editing">
+        <form [formGroup]="baseConfigForm">
+          <mat-form-field appearance="fill" fxFill>
+            <mat-label>Ingresa días base</mat-label>
+            <input matInput="matInput" formControlName="baseDaysForm" type="number" min="1" />
+            <mat-error>Días base deben ser como minimo 1</mat-error>
+          </mat-form-field>
+          <ng-container>
+            <app-autocomplete-chip [originalList]="availableTimeLines" title="'Ingrese Tipo de Vigencia*'"
+              [placeHolderText]="'Ingrese Tipo de Vigencia*'" [listView]="true" [selectedItemsList]="selectedTimeLines"
+              (OnRemoveItem)="itemRemovedTimelines($event)" (OnItemSelected)="selectTimeLines($event)" fxLayout="row"
+              fxLayoutAlign="start center" *ngIf="availableTimeLines?.length > 0" class="config_leave-auto_chip">
+            </app-autocomplete-chip>
+            <mat-error *ngIf="selectedTimeLines.length == 0 && availableTimeLines?.length > 0">La vigencia es
+              requerida</mat-error>
+            <mat-error *ngIf="availableTimeLines?.length > 0 && !isLeaveConfig && !isLeaveApprove && !isValidator">No
+              tiene permisos para configurar licencias.</mat-error>
+          </ng-container>
+          <div class="edit_actions" fxLayout="row-reverse" fxLayoutGap="12px">
+            <button mat-raised-button color="accent" (click)="save()" [disabled]="isDisabledSaveConfigTimeLines()">
+              Guardar
+            </button>
+            <button mat-stroked-button (click)="cancel()">
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </div>
+      <!-- adicional card licencia -->
+      <ng-container *ngIf="leaveConfig.leaveType.id == 1">
+        <!-- adicional subtitulo card licencia -->
+        <div class="config_leave-card_subtitle" fxLayout="row" fxLayoutAlign="space-between center">
+          <h3>
+            Días Adicionales
+          </h3>
+          <h6 class="card_item-comment" *ngIf="leaveConfig.additionalDays.length==0 && !editingAdditionalDays">
+            No tiene días adicionales configurados
+          </h6>
+          <button mat-icon-button title="Agregar días" *ngIf="isLeaveConfig && !isValidator"
+            (click)="addAdditionalDay()" [disabled]="!isActiveEmployee ">
+            <mat-icon class="fa-xs" fontSet="fa" fontIcon="fa-plus"></mat-icon>
+          </button>
+        </div>
+        <!-- adicional edit card licencia -->
+        <div class="config_leave-card_item-edit" *ngIf="editingAdditionalDays">
+          <form [formGroup]="additionalDaysForm">
+            <mat-form-field appearance="fill" fxFill>
+              <mat-label>Ingresa días Adicionales</mat-label>
+              <input matInput="matInput" formControlName="additionalDayForm" type="number" min="1" />
+              <mat-error>Días Adicionales deben ser como minimo 1</mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="fill" fxFill>
+              <mat-label>Ingresa Comentario</mat-label>
+              <input matInput="matInput" formControlName="additionalDayCommentForm" type="text" />
+              <mat-error>Debes completar este campo</mat-error>
+            </mat-form-field>
+            <div class="edit_actions" fxLayout="row-reverse" fxLayoutGap="12px">
+              <button mat-raised-button color="accent" (click)="saveAdditionalDays(leaveConfig.id)"
+                [disabled]="isDisabledSaveAdditionalDay()">
+                Guardar
+              </button>
+              <button mat-stroked-button (click)="cancelAdditionalDay()">
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </div>
+        <!-- adicional item card licencia -->
+        <div class="config_leave-card_item" fxLayout="row" fxLayoutAlign="space-between center"
+          *ngFor="let additionalDay of leaveConfig.additionalDays; let j = index">
+          <div class="card_item-info" fxLayout="column">
+            <h3 class="card_item-data accent">
+              {{additionalDay.days}}
+            </h3>
+            <h6 class="card_item-comment">
+              {{'"' + additionalDay.description + '"'}}
+            </h6>
+          </div>
+          <button mat-icon-button title="borrar" *ngIf="isLeaveConfig" (click)="deleteAdditionalDay(additionalDay.id)"
+            [disabled]="!isActiveEmployee">
+            <mat-icon class="fa-xs" fontSet="fa" fontIcon="fa-trash"></mat-icon>
+          </button>
+        </div>
+      </ng-container>
+      <mat-divider></mat-divider>
+      <!-- Aprobadores -->
+      <div class="config_leave-card_subtitle"  *ngIf="workflowApproveType.id !== 2" fxLayout="row" fxLayoutAlign="space-between center">
+          <h3 class="config_leave-card_subtitle">
+            Aprobadores
+          </h3>
+          <button mat-icon-button title="Editar" *ngIf="!isValidator" (click)="editApprovers()"
+            [disabled]="!isActiveEmployee || !isLeaveConfig">
+            <mat-icon class="fa-xs" fontSet="fa" fontIcon="fa-pen"></mat-icon>
+          </button>
+      </div>
+      <div class="config_leave-card_item" *ngIf="!editingApprovers && leaveConfig!=[] && workflowApproveType.id !== 2">
+        <div class="card_item-info" fxLayout="column">
+              <div *ngFor="let approver of selectedApprovers" style="display: flex; align-items: center;">
+                  <h3 class="card_item-data accent">
+                    {{ (approver?.firstName ? approver.firstName : '') + ' ' + (approver?.lastName ? approver.lastName : '')
+                    }}
+                  </h3>
+                  <h5 class="card_item-comment">
+                    {{ ' - ' + (approver?.noLegajo ? approver.noLegajo : '') }}
+                  </h5>
+              </div>
+              <h3 class="card_item-comment accent" *ngIf="selectedApprovers.length == 0">
+                No hay aprobadores asociados
+              </h3>
+              <mat-error *ngIf="!isLeaveConfig && !isLeaveApprove && !isValidator"
+              style="padding-top: 5px; font-weight: bold;">No tiene permisos para configurar licencias.</mat-error>
+        </div>
+      </div>
+      <div class="config_leave-card_item-edit edition-line" *ngIf="editingApprovers && workflowApproveType.id !== 2">
+          <form [formGroup]="baseConfigForm">
+          <ng-container>
+                <app-autocomplete-chip [originalList]="approversOu"
+                  title="'Ingrese los Aprobadores,&#013;Escribe 3 caracteres para buscar el aprobador.'"
+                  (OnActiveList)="filterApprovers($event)" [placeHolderText]="'Ingrese los Aprobadores'" [listView]="true"
+                  [selectedItemsList]="selectedApprovers" (OnRemoveItem)="itemRemovedApprovers($event)"
+                  (OnItemSelected)="selectApprovers($event)" fxLayout="row" fxLayoutAlign="start center"
+                  *ngIf="!loading && workflowApproveType.id !== 2" class="config_leave-auto_chip">
+                </app-autocomplete-chip>
+                <mat-error *ngIf="!isLeaveConfig && !isLeaveApprove && !isValidator">No tiene permisos para configurar
+                  licencias.</mat-error>
+              </ng-container>
+              <div class="edit_actions" fxLayout="row-reverse" fxLayoutGap="12px">
+                <button mat-raised-button color="accent" (click)="saveApprovers()" [disabled]="approverSaveBtn">
+                  Guardar
+                </button>
+                <button mat-stroked-button (click)="cancelApprovers()">
+                  Cancelar
+                </button>
+              </div>
+          </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- LOADER -->
+<div class="load-window new" *ngIf="loading">
+  <mat-progress-spinner mode="indeterminate" color="primary">
+  </mat-progress-spinner>
+</div>

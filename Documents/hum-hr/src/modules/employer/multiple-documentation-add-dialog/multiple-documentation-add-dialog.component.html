@@ -1,0 +1,236 @@
+<div class="dialog-content" fxLayout="column" fxFill>
+  <!-- Loading -->
+  <div class="load-window fixed" *ngIf="loading">
+    <mat-progress-spinner style="z-index: 1" mode="indeterminate" color="primary">
+    </mat-progress-spinner>
+  </div>
+  <!-- upload w/template -->
+  <div fxLayout="row" class="document-template-container expanded" *ngIf="!loading">
+    <!-- template -->
+    <div class="document-selection"
+      *ngIf="!loading && documentationTypeSet.documentationTypeSetItem?.length > 0 && !isEdittingSet">
+      <!-- template list -->
+      <div class="title-description" fxLayout="row" fxLayoutAlign="space-between center">
+        <div class="header" fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+          <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-layer-group">
+          </mat-icon>
+          <div fxLayout="column">
+            <h5>Set</h5>
+            <h3>{{documentationTypeSet.name}}</h3>
+          </div>
+        </div>
+        <button mat-icon-button aria-label="Editar Set" (click)="openEditSet()">
+          <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-pen">
+          </mat-icon>
+        </button>
+      </div>
+      <!-- template active list -->
+      <mat-list class="reactive">
+        <mat-list-item *ngFor="let dt of documentationTypeSet.documentationTypeSetItem"
+          (click)="addDocumentationType(dt)" matRipple>
+          <mat-icon mat-list-icon fxLayout="row" fxLayoutAlign="center center" class="fa-lg" fontSet="fas"
+            [fontIcon]="dt.order > 0 ? 'fa-star':'fa-file'">
+          </mat-icon>
+          <div mat-line>
+            <b>{{dt.description}}{{dt.required?'*':''}}</b>
+          </div>
+          <div mat-line *ngIf="dt.required">
+            Obligatorio
+          </div>
+          <div mat-line *ngIf="dt.documentationTypeSetItemFiles && dt.documentationTypeSetItemFiles.length > 0">
+            <small fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+              <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-paperclip">
+              </mat-icon>
+              <span>{{dt.documentationTypeSetItemFiles[0].name}}</span>
+            </small>
+          </div>
+          <div class="floating-action" fxLayout="row" fxLayoutAlign="start center">
+            <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+              <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-file">
+              </mat-icon>
+              <mat-icon class="fa-lg complex" fontSet="fas" fontIcon="fa-share">
+              </mat-icon>
+            </div>
+          </div>
+        </mat-list-item>
+      </mat-list>
+      <!-- add all -->
+      <div class="main-action" fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start stretch">
+        <button mat-raised-button color="accent" class="btn" (click)="addAll()">
+          Agregar Todos
+        </button>
+      </div>
+    </div>
+    <!-- template edition -->
+    <div class="document-selection" *ngIf="!loading && isEdittingSet">
+      <app-documentation-type-set-edit (closeEdition)="closeEditSet()" [documentationTypeSet]="documentationTypeSet"
+        [SelectedSetITemList]="selectedSetItems">
+      </app-documentation-type-set-edit>
+    </div>
+    <!-- documentation edition empty -->
+    <div class="add-docs-drop" *ngIf="!currentDocumentationType" fxLayout="column" fxFill fxLayoutAlign="start stretch">
+      <button class="modal-close" mat-icon-button mat-dialog-close title="Cerrar">
+        <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+      </button>
+      <!-- overlay 4 template edition-->
+      <div class="catcher" *ngIf="isEdittingSet"></div>
+      <!-- chapa empty-->
+      <app-chapa [className]="'info-empty'" [icon]="'fa-file-times'" [text]="'Aun no has agregado ningun documento'"
+        [subText]="'comienza eligiendo alguno del Set'"
+        *ngIf="documentationTypeSet.documentationTypeSetItem?.length > 0"></app-chapa>
+      <app-chapa [className]="'info-empty'" [icon]="'fa-file-exclamation'" [text]="'Aun no has configurado el Set'"
+        [subText]="'Presiona Editar Set para agregar la documentación'" (actionClick)="openEditSet()"
+        [actionText]="'Editar Set'" *ngIf="documentationTypeSet.documentationTypeSetItem?.length < 1"></app-chapa>
+    </div>
+    <!-- documentation edition empty -->
+    <form class="add-docs-drop" [formGroup]="documentForm" *ngIf="currentDocumentationType">
+      <!-- overlay 4 template edition-->
+      <div class="catcher" *ngIf="isEdittingSet"></div>
+      <div fxLayout="column" fxFill fxLayoutAlign="start stretch">
+        <!-- documentation Count -->
+        <div class="template-selection-indicator" *ngIf="selectedSetItems.length > 0" fxLayout="row" fxLayoutGap="16px"
+          fxLayoutAlign="start center">
+          <mat-chip-list aria-label="Documentos a crear">
+            <mat-chip *ngFor="let item of selectedSetItems; let i = index" [removable]="true" [selectable]="true"
+              [color]="currentIndex === i ? 'accent' : item.isFinished ? 'primary' : 'undefined'"
+              (removed)="removeDocumentationType(item)"
+              [ngClass]="currentIndex === i || item.isFinished ? '':'mat-disabled'">
+              <div fxLayout="row" fxLayoutAlign="space-between center" selected>
+                <div class="header" fxLayout="row" fxLayoutGap="8px" fxLayoutAlign="start center">
+                  <mat-icon class="fa-lg" fontSet="fas"
+                    [fontIcon]="currentIndex === i ? 'fa-file-exclamation' : item.isFinished ? 'fa-file-check' : 'fa-file-minus'">
+                  </mat-icon>
+                  <div fxLayout="column">
+                    <h3 [title]="item.description">{{item.description}}</h3>
+                    <h5>
+                      {{currentIndex === i ? 'Documentación Activa' : item.isFinished ? 'Documentación Enviada' :
+                      'Documentación Pendiente'}}
+                    </h5>
+                  </div>
+                </div>
+                <mat-icon matChipRemove class="fa-lg" fontSet="fa" fontIcon="fa-trash-alt" *ngIf="!item.isFinished">
+                </mat-icon>
+              </div>
+            </mat-chip>
+          </mat-chip-list>
+        </div>
+        <div class="docs-drop-preview" fxLayout="row">
+          <!-- data input -->
+          <div class="add-menu-form-body" fxLayout="column" fxLayoutAlign="center stretch">
+            <div class="title-description" fxLayout="row" fxLayoutAlign="space-between center">
+              <div class="header" fxLayout="column">
+                <h5>Completa la información</h5>
+                <h3 [title]="selectedSetItems[this.currentIndex]?.description">
+                  {{selectedSetItems[this.currentIndex]?.description}}
+                </h3>
+              </div>
+            </div>
+            <div class="scroller">
+              <!-- main data -->
+              <mat-form-field>
+                <mat-select placeholder="Secuencia" formControlName="sequence"  (selectionChange)="selectionSquence($event)" [(NgModel)]="sequence" required> 
+                  <mat-option *ngFor="let sec of sequences" [value]="sec.documentationSequence">
+                    {{sec.documentationSequence.name}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field *ngIf="!hasPeriod">
+                <input matInput [matDatepicker]="picker" [max]="maxDate" placeholder="Fecha dd/mm/aaaa"
+                  formControlName="documentationDate">
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+              </mat-form-field>
+              <button class="full-btn" mat-raised-button [color]="rrhhUploadFile ? 'warn' : 'primary'"
+                (click)="toogleCompleteFormio()" *ngIf="showOptionalFormComplete && rrhhUploadFile">
+                {{rrhhUploadFile ? 'No completar formulario' : 'Completar formulario'}}
+              </button>
+              <!-- upload box -->
+              <ng-container
+                *ngIf="rrhhUploadFile && (!usingFormio || (usingFormio && !isExternalFormOnly)) && showFileUploader">
+                <h5>Adjuntar Documentación</h5>
+                <app-upload-form canViewFile="false" canRemove="true" [multipleSelection]="true"
+                  acceptedExtensions="{{aceptedExtensions}}" [files]="files" [maxFile]="maxFiles"
+                  (fileSelected)="onSelectedFile($event, null)" (filesChanged)="onFilesChanged($event)"
+                  (seeFileDefault)="onSelectedFile($event, true)" (fileNotAllowed)="onFilesNotAlloewdAdded($event)">
+                </app-upload-form>
+              </ng-container>
+              <ng-container *ngIf="!showFileUploader">
+                <button mat-raised-button color="warn" (click)="showFileUploader = true;">
+                  Modificar archivo
+                </button>
+              </ng-container>
+              <!-- additional data -->
+              <div *ngIf="adittionalsMetadatas.length > 0">
+                <h5>Datos Adicionales</h5>
+                <div *ngFor="let meta of adittionalsMetadatas">
+                  <app-custom-control [metadata]="meta" [aditionalsmetadatas]="adittionalsMetadatas"
+                    (valueSet)="updateAditionalMetadata($event)">
+                  </app-custom-control>
+                </div>
+              </div>
+              <!-- Document Required -->
+              <ng-container *ngIf=featureFlag fxLayout="row">
+                <mat-slide-toggle [checked]="true"  (change)="changeNotify()"  fxLayout="row" *ngIf="sequence && sequence.id != 1" >
+                  Enviar Mail de Notificacion
+                </mat-slide-toggle>
+                <mat-slide-toggle  fxLayout="row" [checked]="selectedSetItems[this.currentIndex].required"
+                  (change)="requiredDocument()">
+                  Obligatorio
+                </mat-slide-toggle>
+              </ng-container>
+            </div>
+          </div>
+          <!-- Formio disponible para completar-->
+          <app-chapa [className]="'info-empty'" [icon]="'fa-info'"
+            [text]="'El Formulario lo completará quien lo reciba'"
+            [subText]="'Tambien tenés la opción completarlo antes de enviarlo'"
+            *ngIf="showOptionalFormComplete && !this.rrhhUploadFile" [actionText]="'Completar Formulario'"
+            (actionClick)="toogleCompleteFormio()"></app-chapa>
+          <!-- chapa empty-->
+          <app-chapa [className]="'info-empty'" [icon]="'fa-eye-slash'" [text]="'¡Ups! Nada por aquí...'"
+            [subText]="'Tu selección no tiene vista previa'" [style.display]="(rrhhUploadFile && usingFormio && !((files != null && files.length) || fileBlob != null)) ||
+      (fileImage || isZip) ||
+      (((!fileImage && !isZip && files != null && files.length) || fileBlob != null)) ? 'none' : 'block'"
+            *ngIf="!showOptionalFormComplete"></app-chapa>
+          <!-- Formio viewer -->
+          <app-formio-cardinal [haveCloseAction]="false"
+            *ngIf="rrhhUploadFile && usingFormio && !((files != null && files.length) || fileBlob != null)"
+            (submitted)="onSubmitFormio($event)" [formName]="formName" [fileDocument]="documentation">
+          </app-formio-cardinal>
+          <!-- IMG viewer -->
+          <div class="preview-container" *ngIf="fileImage || isZip">
+            <div class="preview-container" *ngIf="fileValidPreview(); else elseBlock">
+              <img src="{{fileImage}}" />
+            </div>
+            <ng-template #elseBlock>
+              <h4>El formato del archivo seleccionado no puede ser previsualizado, pero se cargará correctamente
+              </h4>
+            </ng-template>
+          </div>
+
+          <!-- PDF viewer -->
+          <app-file-document-detail [showDelete]="false" [showFileDocumentHeader]="false" [doc]="documentation"
+            [filePdf]="fileBase64" [showMetadatas]="false" [showWelcome]="false" [showPrint]="false"
+            [fileBlob]="fileBlob" [showSave]="false" [showAll]="false"
+            *ngIf="((!fileImage && !isZip && files != null && files.length) || fileBlob != null)">
+          </app-file-document-detail>
+        </div>
+        <div class="preview-action" fxLayout="row-reverse" fxLayoutGap="8px" fxLayoutAlign="start center">
+          <mat-progress-bar mode="indeterminate" *ngIf="loadingDefaultFile || loadingMetadatas"></mat-progress-bar>
+          <button mat-raised-button [color]="currentIndex == selectedSetItems.length -1 ? 'primary' : 'accent' "
+            (click)="enviar()" [disabled]="inProcess">
+            {{ currentIndex == selectedSetItems.length -1 ? 'Enviar y Finalizar' : 'Enviar y Continuar' }}
+          </button>
+          <button mat-button (click)="closeDialog()">Cancelar</button>
+        </div>
+      </div>
+      <!-- complete message-->
+      <div class="load-window message" *ngIf="inProcess">
+        <mat-progress-spinner style="z-index: 1" mode="indeterminate" color="primary">
+        </mat-progress-spinner>
+        <h3 class="primary-text">Estamos cargando los documentos.</h3>
+        <span>No cierres esta pantalla, esto podría demorar unos instantes.</span>
+      </div>
+    </form>
+  </div>
+</div>

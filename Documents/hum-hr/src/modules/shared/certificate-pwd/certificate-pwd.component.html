@@ -1,0 +1,30 @@
+<div class="login" fxLayout="row" fxLayoutAlign="center center" fxFill>
+  <img class="login-bg" [src]="backgroundSrc" alt="/">
+    <mat-card class="login-card" fxLayout="column" fxFlex.xl="20" fxFlex.lg="30" fxFlex.md="40" fxFlex.sm="70" fxFlex.xs="90">
+        <mat-card-header>
+            <mat-card-title fxLayout="column" fxLayoutGap="12px">
+              <div class="brand" fxLayout="column" fxLayoutAlign="center center" style="min-height: 150px;">
+                <img *ngIf="logoSrc" [src]="logoSrc" alt="/">
+                </div>
+                <div class="description" *ngIf="!withLogin"><b>Ingresá tu contraseña para la Firma.</b><br> Te recomendamos guardarla de forma segura para utilizarla al firmar tus documentos.</div>
+                <div class="description" *ngIf="withLogin"><b>Confirmá tu Firma ingresando la clave de ingreso al sistema.</b><br> Usarás esta clave al firmar tus documentos.</div>
+            </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <form [formGroup]="requestFormGroup" fxLayout="column" fxflex="grow">
+                <mat-form-field fxFlex="grow">
+                    <input matInput placeholder="Ingresá tu contraseña" type="password" formControlName="password" required autofocus>
+                </mat-form-field>
+                <mat-form-field fxFlex="grow" *ngIf="!withLogin">
+                    <input matInput placeholder="Confirmá tu contraseña" type="password" formControlName="repeatPassword" required>
+                </mat-form-field>
+                <mat-card-footer fxLayout="row-reverse " fxLayoutGap="12px">
+                    <button mat-raised-button (click)="save()" color="primary" class="btn">{{ !withLogin ? 'Guardar contraseña' : 'Confirmar contraseña' }}</button>
+                </mat-card-footer>
+            </form>
+        </mat-card-content>
+        <mat-progress-bar mode="indeterminate" [style.display]="isLoading ? 'block' : 'none'">
+        </mat-progress-bar>
+    </mat-card>
+    <img *ngIf="logoSrc && subdomain" class="humanage-icon" [src]="humanageSrc" alt="/">
+</div>

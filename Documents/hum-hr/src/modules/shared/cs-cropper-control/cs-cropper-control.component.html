@@ -1,0 +1,14 @@
+<div class="cropper-area" fxLayout="column" fxFlex="grow" fxLayoutGap="16px">
+    <image-cropper
+        [imageChangedEvent]="imageChangedEvent" 
+        [imageBase64]="fileBase64"
+        [maintainAspectRatio]="mantainAspectRatio"
+        [aspectRatio]="aspectRatio"
+        [resizeToWidth]="resizeToWidth" [resizeToHeight]="resizeToHeight"
+        format="png"
+        (imageCropped)="imageCropped($event)"></image-cropper>
+    <div class="actions" fxLayout="row-reverse" fxLayoutGap="12px">
+      <button mat-raised-button color="primary" *ngIf="croppedImage" (click)="uploadFile()">{{saveButtonName}}</button>
+      <button mat-button *ngIf="croppedImage" (click)="cancel()">{{cancelButtonName}}</button>
+    </div>
+  </div>

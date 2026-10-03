@@ -1,0 +1,32 @@
+<div class="new_leave_modal" style="max-width: 520px !important;">
+  <div class="new_leave_modal-toolbar" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+    <div class="new_leave_modal-title" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+      <div class="new_leave_modal-title_content" fxLayout="column">
+        <!-- titulo -->
+        <h4 style="font-weight: bold;color: #3f51b5;">Proceso en Ejecución. Aguarde un Instante</h4>
+      </div>
+    </div>
+    <!-- cerrar modal -->
+    <button mat-icon-button mat-dialog-close>
+      <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times" fxLayout="row" fxLayoutAlign="center center">
+      </mat-icon>
+    </button>   
+  </div>
+  <div class="new_leave_modal-form" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="10px" style="width: 520px !important;padding-bottom: 20px;">
+    <span>{{percent}}%</span> 
+</div>
+  <div class="new_leave_modal-form" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="10px" style="width: 520px !important;padding-bottom: 20px;">
+   
+   
+    <mat-progress-bar fxLayout="row"  style="width: 450px;height: 10px;border-radius: 50px; margin-top: 30px;" mode="determinate" value="{{percent}}">
+    </mat-progress-bar>
+</div>
+<div class="new_leave_modal-form" fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="10px" style="width: 520px !important;padding-bottom: 20px;">
+  <span>Puedes cancelar el proceso si así lo deseas</span>
+  <button mat-button mat-dialog-close>Cancelar</button>
+</div>
+<div class="new_leave_modal-form" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="10px" style="width: 520px !important;padding-bottom: 20px;">  
+  <mat-progress-bar fxLayout="row"  style="width: 450px;height: 10px;border-radius: 50px; margin-top: 30px;" mode="buffer">
+  </mat-progress-bar>
+</div>
+  </div>

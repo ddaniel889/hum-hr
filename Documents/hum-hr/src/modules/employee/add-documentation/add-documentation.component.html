@@ -1,0 +1,110 @@
+<mat-toolbar class="mat-elevation-z1 app-toolbar" color="primary" fxFlex="grow">
+    <mat-toolbar-row></mat-toolbar-row>
+    <mat-toolbar-row></mat-toolbar-row>
+</mat-toolbar>
+<div class="floating-container" fxLayout="row" fxLayoutAlign="center center" fxFill>
+    <mat-card class="card-1-1">
+        <mat-sidenav-container fxLayout="row" fxFill mode="push">
+            <mat-sidenav-content fxFill>
+                <div class="employee-add-documentation" fxLayout="row" fxFill>
+                    <div class="inbox-container employee my-documents" fxFlex.lt-md="100" fxFlex.gt-sm="30" fxFill>
+                        <!-- LOADER -->
+                        <div class="window-spinner" *ngIf="!loaded">
+                            <mat-progress-spinner mode="indeterminate" color="primary">
+                            </mat-progress-spinner>
+                        </div>
+                        <mat-toolbar class="inbox-toolbar" color="grey" fxLayout="row" fxLayoutAlign="start center">
+                            <mat-toolbar-row fxLayout="row" fxLayoutAlign="space-between center" fxFill>
+                                <div class="mat-avatar two-icons" fxLayout="row" fxLayoutAlign="space-between center">
+                                    <div class="toolbar-line" fxLayout="row" fxLayoutAlign="start center"
+                                        fxLayoutGap="16px">
+                                        <mat-icon  class="fa-lg"
+                                            fontSet="fa" fontIcon="fa-file-plus"></mat-icon>
+                                        <div class="title" fxLayout="column">
+                                            <h3>Nuevo Documento</h3>
+                                            <h5>Elige un tipo de Documentación</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                            </mat-toolbar-row>
+                        </mat-toolbar>
+                        <mat-divider class="false-divider" [inset]="true"></mat-divider>
+                        <mat-tab-group mat-align-tabs="center">
+                            <mat-tab [disabled]="archiveDocumentationTypes.length < 1">
+                                <ng-template mat-tab-label>
+                                    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px"
+                                        [title]="archiveDocumentationTypes.length < 1 ? 'No tenés archivos asociados' : ''">
+                                        <mat-icon  class="fa-lg"
+                                            fontSet="fa" fontIcon="fa-file-upload"></mat-icon>
+                                        <span>Archivo</span>
+                                    </div>
+                                </ng-template>
+                                <div class="pending-container">
+                                    <div class="pending-items" fxLayout="column" fxLayoutGap="16px">
+                                        <span class="pending-item" *ngFor="let dt of archiveDocumentationTypes">
+                                            <div class="mat-card content mat-elevation-z2" matRipple
+                                                (click)="selectDocumentationType(dt)"
+                                                [ngClass]="{'selected' : selectedDocumentationType == dt}"
+                                                fxLayout="row" fxLayoutAlign="start center">
+                                                <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-file-upload"
+                                                    fxLayout="row" fxLayoutAlign="center center">
+                                                </mat-icon>
+                                                <div class="item-data" fxLayout="column">
+                                                    <b title="{{dt.description}}" #listItem>{{dt.description}}</b>
+                                                    <span>
+                                                        Adjuntar Documentación
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </span>
+                                    </div>
+                                </div>
+                            </mat-tab>
+                            <mat-tab [disabled]="formioDocumentationTypes.length < 1">
+                                <ng-template mat-tab-label>
+                                    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px"
+                                        [title]="formioDocumentationTypes.length < 1 ? 'No tenés formularios asociados' : ''">
+                                        <mat-icon  class="fa-lg"
+                                            fontSet="fa" fontIcon="fa-file-alt"></mat-icon>
+                                        <span>Formulario</span>
+                                    </div>
+                                </ng-template>
+                                <div class="pending-container">
+                                    <div class="pending-items" fxLayout="column" fxLayoutGap="16px">
+                                        <span class="pending-item" *ngFor="let dt of formioDocumentationTypes">
+                                            <div class="mat-card content mat-elevation-z2" matRipple
+                                                (click)="selectDocumentationType(dt)"
+                                                [ngClass]="{'selected' : selectedDocumentationType == dt}"
+                                                fxLayout="row" fxLayoutAlign="start center">
+                                                <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-file-alt"
+                                                    fxLayout="row" fxLayoutAlign="center center">
+                                                </mat-icon>
+                                                <div class="item-data" fxLayout="column">
+                                                    <b title="{{dt.description}}" #listItem>{{dt.description}}</b>
+                                                    <span>
+                                                        Completar Formulario
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </span>
+                                    </div>
+                                </div>
+                            </mat-tab>
+                        </mat-tab-group>
+                    </div>
+                    <mat-divider [vertical]="true"></mat-divider>
+                    <div class="detail" fxFlex.lt-md="100" fxFlex.gt-sm="70" fxFill [ngClass]="detailClass()">
+                        <app-file-document-view *ngIf="!hideFileDocumentView" [doc]="newDoc" [isNewDocument]="true"
+                            [allowMultipleUploadFiles]="true"
+                            [documentationType]="selectedDocumentationType?.documentationType" [signEnabled]="false"
+                            [showDocumentStateBottom]="false" (mobileCloseEvent)="setIsOpen(false)" [autoView]="true"
+                            [showWelcome]="true" [showSpinner]="true" [uploadEnabled]="true" [showPrint]="false"
+                            [showSave]="true" (submitFormioEvent)="documentCreated($event)"
+                            (refreshDocEvent)="documentCreated($event)">
+                        </app-file-document-view>
+                    </div>
+                </div>
+            </mat-sidenav-content>
+        </mat-sidenav-container>
+    </mat-card>
+</div>

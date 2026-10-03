@@ -1,0 +1,130 @@
+<mat-progress-spinner mode="indeterminate" color="primary" *ngIf="loading">
+</mat-progress-spinner>
+
+<ng-container *ngIf="!loading">
+  <div class="separator" fxLayout="row" fxLayoutAlign="start center">
+    <div class="subtitle" fxLayoutAlign="start center" fxLayoutGap="16px">
+      <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-users">
+      </mat-icon>
+      <div class="text" fxLayout="column">
+        <h5>Perfil Personas</h5>
+        <h6>Configura los parámetros disponibles</h6>
+      </div>
+    </div>
+  </div>
+  <div class="permission-settings-cards" fxLayout="column" fxLayoutGap="16px">
+    <div fxLayout="row" fxLayoutGap="16px">
+      <!-- Empleados  -->
+      <div *ngIf="isRRHH" class="card mat-elevation-z3" fxLayout="column">
+        <div class="subtitle" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+          <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-user">
+          </mat-icon>
+          <h5>Opciones de Empleados</h5>
+        </div>
+        <div class="slide-group" fxLayoutAlign="start stretch" fxLayout="column">
+
+          <mat-slide-toggle color="primary" [(ngModel)]="ouAccessConfigEmployeeModel.canEditProfile"
+            name="canEditProfile"
+            (change)="onChangePerson($event.source.name,$event.checked,false, ouAccessConfigEmployeeModel)">
+            El perfil puede ser modificado
+          </mat-slide-toggle>
+
+          <div *ngIf="ouAccessConfigEmployeeModel.canEditProfile" class="slide-sub-group">
+            <mat-slide-toggle [(ngModel)]="ouAccessConfigEmployeeModel.canEditPersonalInformation"
+              name="canEditPersonalInformation"
+              (change)="onChangePerson($event.source.name,$event.checked,false, ouAccessConfigEmployeeModel)">
+              Puede editar su información personal
+            </mat-slide-toggle>
+            <!-- PRIMERA VERSION NO MOSTRAR SUB-MENU -->
+            <div *ngIf="ouAccessConfigEmployeeModel.canEditPersonalInformation && false" class="slide-sub-group">
+              <mat-slide-toggle [(ngModel)]="ouAccessConfigEmployeeModel.canEditFullName" name="canEditFullName"
+                (change)="onChangePerson($event.source.name,$event.checked,false, ouAccessConfigEmployeeModel)">
+                Cambiar Nombre y Apellido
+              </mat-slide-toggle>
+              <mat-slide-toggle [(ngModel)]="ouAccessConfigEmployeeModel.canEditEmail" name="canEditEmail"
+                (change)="onChangePerson($event.source.name,$event.checked,false, ouAccessConfigEmployeeModel)">
+                Cambiar Correo Electrónico
+              </mat-slide-toggle>
+              <mat-slide-toggle [(ngModel)]="ouAccessConfigEmployeeModel.canEditUserName" name="canEditUserName"
+                (change)="onChangePerson($event.source.name,$event.checked,false, ouAccessConfigEmployeeModel)">
+                Cambiar Usuario
+              </mat-slide-toggle>
+              <mat-slide-toggle [(ngModel)]="ouAccessConfigEmployeeModel.canEditPhoneNumber" name="canEditPhoneNumber"
+                (change)="onChangePerson($event.source.name,$event.checked,false, ouAccessConfigEmployeeModel)">
+                Puede editar su teléfono movil
+              </mat-slide-toggle>
+            </div>
+
+            <mat-slide-toggle [(ngModel)]="ouAccessConfigEmployeeModel.canEditAvatar" name="canEditAvatar"
+              (change)="onChangePerson($event.source.name,$event.checked,false, ouAccessConfigEmployeeModel)">
+              Puede editar su Avatar
+            </mat-slide-toggle>
+
+            <mat-slide-toggle [(ngModel)]="ouAccessConfigEmployeeModel.canEditSignature" name="canEditSignature"
+              (change)="onChangePerson($event.source.name,$event.checked,false, ouAccessConfigEmployeeModel)">
+              Puede editar su firma ológrafa
+            </mat-slide-toggle>
+
+          </div>
+        </div>
+      </div>
+      <!-- Candidatos  -->
+      <div class="card mat-elevation-z3" fxLayout="column">
+        <div class="subtitle" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+          <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-alien">
+          </mat-icon>
+          <h5>Opciones de Candidatos</h5>
+        </div>
+        <div class="slide-group" fxLayoutAlign="start stretch" fxLayout="column">
+          <mat-slide-toggle color="primary" [(ngModel)]="ouAccessConfigCandidateModel.canEditProfile"
+            name="canEditProfile"
+            (change)="onChangePerson($event.source.name,$event.checked, true, ouAccessConfigCandidateModel)">
+            El perfil puede ser modificado
+          </mat-slide-toggle>
+
+          <div *ngIf="ouAccessConfigCandidateModel.canEditProfile " class="slide-sub-group">
+            <mat-slide-toggle [(ngModel)]="ouAccessConfigCandidateModel.canEditPersonalInformation"
+              name="canEditPersonalInformation"
+              (change)="onChangePerson($event.source.name,$event.checked,true, ouAccessConfigCandidateModel)">
+              Puede editar su información personal
+            </mat-slide-toggle>
+
+            <!-- PRIMERA VERSION NO MOSTRAR SUB-MENU -->
+
+            <div *ngIf="ouAccessConfigCandidateModel.canEditPersonalInformation && false" class="slide-sub-group">
+              <mat-slide-toggle [(ngModel)]="ouAccessConfigCandidateModel.canEditFullName" name="canEditFullName"
+                (change)="onChangePerson($event.source.name,$event.checked, ouAccessConfigCandidateModel)">
+                Cambiar Nombre y Apellido
+              </mat-slide-toggle>
+              <mat-slide-toggle [(ngModel)]="ouAccessConfigCandidateModel.canEditEmail" name="canEditEmail"
+                (change)="onChangePerson($event.source.name,$event.checked,true, ouAccessConfigCandidateModel)">
+                Cambiar Correo Electrónico
+              </mat-slide-toggle>
+              <mat-slide-toggle [(ngModel)]="ouAccessConfigCandidateModel.canEditUserName" name="canEditUserName"
+                (change)="onChangePerson($event.source.name,$event.checked,true, ouAccessConfigCandidateModel)">
+                Cambiar Usuario
+              </mat-slide-toggle>
+              <mat-slide-toggle [(ngModel)]="ouAccessConfigCandidateModel.canEditPhoneNumber" name="canEditPhoneNumber"
+                (change)="onChangePerson($event.source.name,$event.checked,true, ouAccessConfigCandidateModel)">
+                Puede editar su teléfono movil
+              </mat-slide-toggle>
+            </div>
+            <mat-slide-toggle [(ngModel)]="ouAccessConfigCandidateModel.canEditAvatar" name="canEditAvatar"
+              (change)="onChangePerson($event.source.name,$event.checked,true, ouAccessConfigCandidateModel)">
+              Puede editar su Avatar
+            </mat-slide-toggle>
+
+            <mat-slide-toggle [(ngModel)]="ouAccessConfigCandidateModel.canEditSignature" name="canEditSignature"
+              (change)="onChangePerson($event.source.name,$event.checked,true, ouAccessConfigCandidateModel)">
+              Puede editar su firma ológrafa
+            </mat-slide-toggle>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="confirm" fxLayout="row-reverse" *ngIf="isDirty" fxFlex="grow" fxLayoutGap="12px">
+      <button mat-raised-button color="primary" (click)="save()" [disabled]="saving">Guardar Configuración</button>
+      <button mat-raised-button (click)="cancel()">Cancelar</button>
+    </div>
+  </div>
+</ng-container>

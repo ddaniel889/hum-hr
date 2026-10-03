@@ -1,0 +1,124 @@
+<mat-card
+  *ngIf="process.stageHistory?.length > 0"
+  class="process-card-stages mat-elevation-z0"
+>
+  <mat-card-title> Estado del proceso </mat-card-title>
+  <mat-card-content>
+    <div
+      fxFill
+      class="stages-container"
+      [fxLayout]="isSmall ? 'column' : 'row'"
+      fxLayoutGap="24"
+      fxLayout.lt-md="column"
+      fxLayoutGap.gt-sm="16"
+    >
+      <ng-container *ngFor="let stage of process.stageHistory; let last = last">
+        <div
+          class="stage"
+          fxLayout="column"
+          fxLayoutAlign="space-between none"
+          [fxFlex.gt-sm]="100 / process.stageHistory.length + '%'"
+          fxLayoutGap="8"
+          [ngClass]="{
+            completed: stage.isFinished,
+            'on-going': stage.started && !stage.isFinished,
+            pending: !stage.started && !stage.isFinished,
+            'has-error': stage.totalErrors
+          }"
+        >
+          <div
+            fxLayout="row"
+            fxLayout.gt-sm="column"
+            fxLayoutGap="12"
+            fxLayoutGap.gt-sm="4"
+            fxLayoutAlign.lt-md="start center"
+          >
+            <div 
+              [fxLayout]="isSmall ? 'row' : 'column'"
+              fxLayout.lt-md="row"
+              fxLayoutGap="8"
+            >
+              <div
+                fxLayout="row"
+                fxLayoutAlign="start center"
+                class="icon-and-line"
+              >
+                <div class="icon-container">
+                  <mat-icon
+                    fontSet="fa"
+                    [fontIcon]="
+                      stage.started && !stage.isFinished
+                        ? 'fa-hourglass-end'
+                        : stage.totalErrors
+                        ? 'fa-times'
+                        : 'fa-check'
+                    "
+                    [ngClass]="{
+                      'fa-fade': stage.started && !stage.isFinished
+                    }"
+                  ></mat-icon>
+                </div>
+  
+                <!-- Line -->
+                <div *ngIf="!last && !isSmall" ngClass.gt-sm="line"></div>
+              </div>
+  
+              <div>
+                <div class="stage-title">
+                  <div
+                    class="truncate-two-lines"
+                    [matTooltip]="stage.code | processStageName : process.type"
+                  >
+                    {{ stage.code | processStageName : process.type }}
+                  </div>
+                </div>
+  
+                <div class="stage-description">
+
+                  <ng-container *ngIf="stage.started && !stage.isFinished && stage.totalToBeProcessed; else totalProcessedTemplate">
+                    <div>
+                      <span class="activity-count">{{ stage.totalProcessed || 0 }}</span>
+                      <span class="slash-total">/{{ stage.totalToBeProcessed}}</span>
+                      {{ stage.totalProcessed > 1 ? "finalizados" : "finalizado" }}
+                    </div>
+                  </ng-container>
+
+                  <ng-template #totalProcessedTemplate>
+                    <div *ngIf="stage.totalProcessed as total">
+                      <span class="activity-count">{{ total }}</span>
+                      {{ total > 1 ? "finalizados" : "finalizado" }}
+                    </div>
+                  </ng-template>
+      
+                  <div *ngIf="stage.totalErrors as total">
+                    <span class="activity-count">{{ total }}</span>
+                    {{ total > 1 ? "errores" : "error" }}
+                  </div>
+
+                  <div *ngIf="stage.started && !stage.isFinished && stage.estimateRemainingSec">
+                   <span class="estimated-time">
+                   Quedan {{ stage.estimateRemainingSec | ceil }} segundos
+                   </span> 
+                  </div>
+      
+                  <div *ngIf="stage.totalWarnings as total">
+                    <span class="activity-count">{{ total }}</span>
+                    {{ total > 1 ? "acciones pendientes" : "acción pendiente" }}
+                  </div>
+      
+                  <a
+                    *ngIf="stage.relatedProcessId"
+                    class="button-link"
+                    (click)="onViewRelatedProcess(stage.relatedProcessId)"
+                  >
+                    <span>Ver proceso</span>
+                  </a>
+                </div>
+            </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </mat-card-content>
+</mat-card>

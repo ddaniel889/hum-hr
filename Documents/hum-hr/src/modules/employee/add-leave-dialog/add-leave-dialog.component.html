@@ -1,0 +1,207 @@
+<div class="new_leave_modal">
+  <div class="new_leave_modal-toolbar" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+    <div class="new_leave_modal-title" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+      <mat-icon class="fa-lg primary" fontSet="fa" fontIcon="fa-calendar-plus"></mat-icon>
+      <div class="new_leave_modal-title_content" fxLayout="column">
+        <!-- titulo -->
+        <h2 class="primary">
+          {{ stepper?.selectedIndex === 0 ? 'Solicitar Licencia': (
+          stepper?.selectedIndex === 1 ? 'Solicitar días de Vacaciones': (
+          stepper?.selectedIndex === 2 ? 'Resumen de la Solicitud' : ''
+          ))}}
+        </h2>
+        <h4 *ngIf="stepper?.selectedIndex === 0">
+          Elige una opción
+        </h4>
+        <ng-container *ngIf="stepper?.selectedIndex === 1">
+          <h4>
+            Completa la información necesaria
+          </h4>
+          <h6>
+            Para fechas de períodos de vacaciones futuros contactarse con el área de Recursos Humanos
+          </h6>
+        </ng-container>
+        <h4 *ngIf="stepper?.selectedIndex === 2 ">
+          Confirma los datos ingresados
+        </h4>
+      </div>
+    </div>
+    <!-- cerrar modal -->
+    <button mat-icon-button mat-dialog-close [disabled]="isLoading">
+      <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times" fxLayout="row" fxLayoutAlign="center center">
+      </mat-icon>
+    </button>
+  </div>
+
+  <!-- loading -->
+  <div class="new_leave_modal-loading" *ngIf="isLoading" fxLayout="row" fxLayoutAlign="center center">
+    <mat-progress-spinner mode="indeterminate" color="primary">
+    </mat-progress-spinner>
+  </div>
+
+  <!-- pasos licencias -->
+  <mat-horizontal-stepper class="new_leave_modal-steps" #stepper [hidden]="isLoading">
+    <!-- paso 1 - tipo  -->
+    <mat-step class="new_leave_modal-step">
+      <form class="new_leave_modal-form" [formGroup]="menuFormLeave">
+
+        <mat-radio-group class="new_leave_modal-options" fxLayout="column" fxLayoutGap="16px"
+          formControlName="selectedMenuLeave">
+
+          <mat-radio-button value="AddVacation">
+            <div [ngClass]="{'accent' :menuFormLeave.controls['selectedMenuLeave'].value =='AddVacation'}"
+              fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+              <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-umbrella-beach"></mat-icon>
+              <div class="new_leave_modal-title_content" fxLayout="column">
+                <h3 class="main-text">
+                  Solicitar días de Vacaciones
+                </h3>
+                <p class="side-text">
+                  {{ 'Tenés ' + AvailableDays }}
+                  {{AvailableDays == 1 ? ' día disponible' : ' días disponibles'}}
+                </p>
+                <i class="side-text muted">
+                  "Solicitá los días que vas a tomarte"
+                </i>
+              </div>
+            </div>
+          </mat-radio-button>
+
+          <!-- <mat-radio-button value="AddSettlement" disabled title="aún no está disponible">
+            <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px"
+              [ngClass]="{'accent' : menuFormLeave.controls['selectedMenuLeave'].value == 'AddSettlement'}">
+              <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-money-check"></mat-icon>
+              <div fxLayout="column">
+                <h3 class="main-text">
+                  Solicitar días de Vacaciones vencidas
+                </h3>
+                <p class="side-text">
+                  {{ 'Tenés ' + AvailableDebth }}
+                  {{AvailableDebth == 1 ? ' día disponible' : ' días disponibles'}}
+                </p>
+                <i class="side-text muted">
+                  "Solicitá que se procesen los días acumulados de períodos anteriores"
+                </i>
+              </div>
+            </div>
+          </mat-radio-button> -->
+        </mat-radio-group>
+
+        <!-- paso 1 acciones -->
+        <div class="new_leave_modal-actions" fxLayout="row-reverse" fxLayoutAlign="start center" fxLayoutGap="12px"
+          fxFill>
+          <button mat-raised-button matStepperNext color="primary">Siguiente</button>
+          <button mat-button mat-dialog-close>Cancelar</button>
+        </div>
+      </form>
+    </mat-step>
+
+    <!-- paso 2 - carga -->
+    <mat-step class="new_leave_modal-step">
+      <ng-container *ngIf="menuFormLeave.controls['selectedMenuLeave'].value ==='AddVacation'">
+        <form class="new_leave_modal-form" [formGroup]="durationFormLeave" fxLayout="column"
+          fxLayoutAlign="center start" fxLayoutGap="16px">
+          <mat-form-field class="new_leave_modal-field" appearance="fill" fxFill>
+            <input #inputDays
+                   matInput
+                   type="number"
+                   min="1"
+                   placeholder="Ingrese los días a consumir"
+                   (input)="validateInteger()"
+                   (focusout)="focusOutFunction(inputDays)"
+                   (change)="setEndDate()"
+                   formControlName="DaysConsumed">
+            <mat-label *ngIf="error !=''">  {{error}}</mat-label>
+          </mat-form-field>
+
+          <mat-form-field class="new_leave_modal-field" appearance="fill" fxFill>
+            <mat-label>Fecha Inicio</mat-label>
+            <input readonly matInput  [matDatepicker]="fechaInicia" [matDatepickerFilter]="FilterEfectiveTimes" [disabled]="error !=''"
+              (dateChange)="setEndDate()" formControlName="StartDate" >
+            <mat-datepicker-toggle matIconSuffix [for]="fechaInicia" id="fechaInicioCalendar">
+              <mat-datepicker  #fechaInicia></mat-datepicker>
+            </mat-datepicker-toggle>
+
+          </mat-form-field>
+
+          <mat-form-field class="new_leave_modal-field" appearance="fill" fxFill>
+            <mat-label>Fecha Fin</mat-label>
+            <input disabled readonly matInput [matDatepicker]="fechaFin" [matDatepickerFilter]="FilterEfectiveTimes"
+              formControlName="EndDate">
+            <mat-datepicker-toggle matIconSuffix [for]="fechaFin" id="fechaFinCalendar">
+              <mat-datepicker #fechaFin></mat-datepicker>
+            </mat-datepicker-toggle>
+          </mat-form-field>
+          <div class="info-container" *ngIf="menuFormLeave.controls['selectedMenuLeave'].value === 'AddVacation'">
+            <mat-icon fontSet="fa" fontIcon="fa-square-info"></mat-icon>
+            <span class="info-text">Las vacaciones se calculan en días {{rules?.useConsecutiveDays ? "corridos" : "hábiles"}}.</span>
+          </div>
+
+          <!-- paso 2a acciones -->
+          <div class="new_leave_modal-actions" fxLayout="row-reverse" fxLayoutAlign="start center" fxLayoutGap="12px"
+            fxFill>
+            <button mat-raised-button (click)="goToSummaryVacation()" color="primary">Siguiente</button>
+            <button mat-button matStepperPrevious>Anterior</button>
+          </div>
+        </form>
+      </ng-container>
+
+      <ng-container *ngIf="menuFormLeave.controls['selectedMenuLeave'].value === 'AddSettlement'">
+        <form class="new_leave_modal-form" [formGroup]="daysFormLeave" fxLayout="column" fxLayoutAlign="center start"
+          fxLayoutGap="16px">
+          <mat-form-field class="new_leave_modal-field" appearance="fill" fxFill>
+            <mat-label>Dias a Procesar</mat-label>
+            <input matInput formControlName="DaysConsumed" mdInput type="number" id="DaysConsumed" min="1"
+              [max]="AvailableDebth">
+          </mat-form-field>
+
+          <!-- paso 2b acciones -->
+          <div class="new_leave_modal-actions" fxLayout="row-reverse" fxLayoutAlign="start center" fxLayoutGap="12px"
+            fxFill>
+            <button mat-raised-button (click)="goToSummarySettlement()" color="primary">Siguiente</button>
+            <button mat-button matStepperPrevious>Anterior</button>
+          </div>
+        </form>
+      </ng-container>
+    </mat-step>
+
+    <!-- paso 3 - resumen -->
+    <mat-step class="new_leave_modal-step">
+      <form class="new_leave_modal-form" fxLayout="column" fxLayoutAlign="center start" fxLayoutGap="16px">
+        <div class="new_leave_modal-resume_line" *ngIf="daysRequestsNow || diasConsumidos" fxLayout="column" fxFill>
+          <span class="side">
+            Días Solicitados
+          </span>
+          <b class="main accent">
+            {{ diasConsumidos }}
+          </b>
+        </div>
+        <div class="new_leave_modal-resume_line" *ngIf="fechaInicio" fxLayout="column" fxFill>
+          <span class="side">
+            Fecha Inicio
+          </span>
+          <b class="main accent">
+            {{ fechaInicio | date:'dd/MM/yyyy' }}
+          </b>
+        </div>
+        <div class="new_leave_modal-resume_line" *ngIf="fechaFin" fxLayout="column" fxFill>
+          <span class="side">
+            Fecha Fin
+          </span>
+          <b class="main accent">
+            {{ fechaFin | date:'dd/MM/yyyy' }}
+          </b>
+        </div>
+
+        <!-- paso 3 acciones -->
+        <div class="new_leave_modal-actions" fxLayout="row-reverse" fxLayoutAlign="start center" fxLayoutGap="12px"
+          fxFill>
+          <button mat-raised-button (click)="sendFormData()" color="accent" [disabled]="isLoading">
+            Enviar Solicitud
+          </button>
+          <button mat-button matStepperPrevious [disabled]="isLoading">Anterior</button>
+        </div>
+      </form>
+    </mat-step>
+  </mat-horizontal-stepper>
+</div>

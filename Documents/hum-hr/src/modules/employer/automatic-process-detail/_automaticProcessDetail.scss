@@ -1,0 +1,422 @@
+@import "../../../../assets/styles/img-management";
+
+.detail {
+  app-process-detail,
+  app-automatic-process-detail {
+    .detail-toolbar {
+      .mat-avatar {
+        h3,
+        h5,
+        h3 b {
+          width: 100% !important;
+          overflow: hidden !important;
+          text-overflow: ellipsis !important;
+        }
+
+        .toolbar-line {
+          &.container-ou {
+            padding-right: 16px !important;
+            display: grid !important;
+            grid-template-rows: 1fr;
+            grid-template-columns: repeat(2, auto);
+            grid-column-gap: 0px;
+            grid-row-gap: 0px;
+
+            .invisible-container {
+              &.ou-selector {
+                width: 100% !important;
+                overflow: hidden !important;
+                padding-right: 16px !important;
+
+                & > div {
+                  width: 100% !important;
+                }
+
+                & + div {
+                  overflow: hidden;
+
+                  .title {
+                    width: calc(100% - 48px) !important;
+                  }
+                }
+              }
+
+              .title {
+                width: calc(100% - 48px) !important;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  app-automatic-process-detail {
+    app-chapa {
+      transition: all 0.2s ease;
+
+      &.minimize {
+        height: 40px;
+        position: absolute;
+        top: 12px;
+        right: 72px;
+        z-index: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: auto;
+        padding: 0 16px;
+        border-radius: 20px;
+        transition: all 0.2s ease;
+
+        &::before {
+          content: "\f04c";
+          margin-right: 8px;
+        }
+
+        &::after {
+          font-family: roboto;
+          content: "Proceso en Pausa";
+          font-weight: bold;
+        }
+
+        &.purged {
+          &::before {
+            content: "\f7e4";
+          }
+
+          &::after {
+            content: "Proceso Vencido" !important;
+          }
+        }
+
+        .upload-warning {
+          display: none;
+        }
+      }
+    }
+  }
+
+  app-process-detail {
+    app-chapa {
+      transition: all 0.2s ease;
+      &.minimize {
+        height: 40px;
+        position: absolute;
+        top: 12px;
+        right: 16px;
+        z-index: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: auto;
+        padding: 0 16px;
+        border-radius: 20px;
+        transition: all 0.2s ease;
+
+        &::before {
+          content: "\f04c";
+          margin-right: 8px;
+        }
+
+        &::after {
+          font-family: roboto;
+          content: "Proceso en Pausa";
+          font-weight: bold;
+        }
+
+        &.purged {
+          &::before {
+            content: "\f7e4";
+          }
+
+          &::after {
+            content: "Proceso Vencido" !important;
+          }
+        }
+
+        .upload-warning {
+          display: none;
+        }
+      }
+    }
+  }
+  .new-table.automatic-processes {
+    height: calc(100% - 65px - 92px - 96px - 56px);
+    min-height: calc(100% - 65px - 92px - 96px - 56px);
+  }
+
+  .processes-status {
+    height: 152px;
+    padding: 16px;
+
+    .status-title {
+      height: 30px;
+      margin-bottom: 16px;
+      font-weight: bold;
+    }
+
+    .status-bar {
+      height: 64px;
+
+      .bar-header {
+        h1,
+        h6 {
+          margin: 0;
+        }
+      }
+
+      .bar-graph {
+        height: 20px;
+        transition: all 0.2s ease 0.8s;
+        border-radius: 20px;
+        overflow: hidden;
+
+        .graph-ok {
+          height: 100%;
+          transition: all 0.2s ease 0.8s;
+        }
+
+        .graph-not-ok {
+          height: 100%;
+          transition: all 0.2s ease 0.8s;
+        }
+      }
+    }
+
+    .status-resume {
+      height: 48px;
+
+      b {
+        height: 30px;
+        line-height: 30px;
+        border-radius: 15px;
+        min-width: 30px;
+        text-align: center;
+        padding: 0 8px;
+        box-sizing: border-box;
+      }
+    }
+  }
+
+  &.finished-process-inbox,
+  &.in-process-inbox,
+  &.erased-process-inbox,
+  &.error-process-inbox {
+    .fake-intro {
+      display: none;
+    }
+  }
+}
+
+.options-menu {
+  .mat-menu-content {
+    padding: 0 !important;
+  }
+}
+
+@mixin automaticProcessDetail(
+  $bg-toolbar-dark,
+  $text-main,
+  $running,
+  $finished-ok,
+  $finished-not-ok,
+  $bk-running,
+  $bk-finished-ok,
+  $bk-finished-not-ok,
+  $erased,
+  $bk_erased
+) {
+  .detail {
+    app-automatic-process-detail,
+    app-process-detail {
+      app-chapa {
+        &.minimize {
+          background: $running !important;
+          &.purged {
+            background: $bk_erased !important;
+          }
+        }
+      }
+    }
+
+    .detail-toolbar {
+      background: $bg-toolbar-dark;
+    }
+
+    .processes-status {
+      .status-bar {
+        .bar-graph {
+          background-color: $running;
+
+          .graph-ok {
+            background-color: $finished-ok;
+          }
+
+          .graph-not-ok {
+            background-color: $finished-not-ok;
+          }
+        }
+      }
+
+      .status-resume {
+        b {
+          color: rgba(0, 0, 0, 0.87);
+        }
+
+        .resume-total b {
+          background-color: $running;
+        }
+
+        .resume-ok b {
+          background-color: $finished-ok;
+        }
+
+        .resume-not-ok b {
+          background-color: $finished-not-ok;
+        }
+      }
+    }
+
+    .detail-toolbar .mat-avatar {
+      h3,
+      h5 {
+        color: rgba(0, 0, 0, 0.87);
+      }
+
+      .toolbar-line {
+        &.container-ou {
+          color: rgba(0, 0, 0, 0.87);
+
+          .ou-selector {
+            color: rgba(0, 0, 0, 0.87);
+
+            .mat-icon {
+              color: rgba(0, 0, 0, 0.87);
+            }
+          }
+
+          .mat-icon {
+            color: rgba(0, 0, 0, 0.87);
+          }
+        }
+
+        .mat-icon {
+          color: $text-main;
+        }
+      }
+    }
+
+    &.finished-process-inbox {
+      .detail-toolbar {
+        .mat-avatar {
+          .toolbar-line {
+            &.container-ou {
+              background: $finished-ok !important;
+
+              .ou-selector {
+                background: $bk-finished-ok !important;
+
+                .mat-icon {
+                  background: $bk-finished-ok !important;
+                }
+              }
+
+              .mat-icon {
+                background: $finished-ok !important;
+              }
+            }
+
+            .mat-icon {
+              background: $bk-finished-ok !important;
+            }
+          }
+        }
+      }
+    }
+
+    &.erased-process-inbox {
+      .detail-toolbar {
+        .mat-avatar {
+          .toolbar-line {
+            &.container-ou {
+              background: $erased !important;
+
+              .ou-selector {
+                background: $bk-erased !important;
+
+                .mat-icon {
+                  background: $bk-erased !important;
+                }
+              }
+
+              .mat-icon {
+                background: $erased !important;
+              }
+            }
+
+            .mat-icon {
+              background: $bk-finished-ok !important;
+            }
+          }
+        }
+      }
+    }
+
+    &.in-process-inbox {
+      .detail-toolbar {
+        .mat-avatar {
+          .toolbar-line {
+            &.container-ou {
+              background: $running !important;
+
+              .ou-selector {
+                background: $bk-running !important;
+
+                .mat-icon {
+                  background: $bk-running !important;
+                }
+              }
+
+              .mat-icon {
+                background: $running !important;
+              }
+            }
+
+            .mat-icon {
+              background: $bk-running !important;
+            }
+          }
+        }
+      }
+    }
+
+    &.error-process-inbox {
+      .detail-toolbar {
+        .mat-avatar {
+          .toolbar-line {
+            &.container-ou {
+              background: $finished-not-ok !important;
+
+              .ou-selector {
+                background: $bk-finished-not-ok !important;
+
+                .mat-icon {
+                  background: $bk-finished-not-ok !important;
+                }
+              }
+
+              .mat-icon {
+                background: $finished-not-ok !important;
+              }
+            }
+
+            .mat-icon {
+              background: $bk-finished-not-ok !important;
+            }
+          }
+        }
+      }
+    }
+  }
+}

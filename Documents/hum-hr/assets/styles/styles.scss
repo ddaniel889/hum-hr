@@ -1,0 +1,161 @@
+///////////////////////////////
+@use '@angular/material' as mat;
+//main definitions import
+///////////////////////////////
+@import 'global';
+
+//Default theme (primary, accent, warning, theme schema)
+
+//////base-indigo//////
+@include themeMixer(mat.$indigo-palette, 500, mat.$pink-palette, 500, mat.$red-palette, 500, 'light');
+
+.indigo-pink.dark {
+  @include themeMixer(mat.$indigo-palette, 200, mat.$pink-palette, 200, mat.$red-palette, 300, 'dark');
+}
+
+//alternate theme
+.indigo-purple {
+  @include themeMixer(mat.$indigo-palette, 500, mat.$purple-palette, 500, mat.$red-palette, 500, 'light');
+}
+.indigo-purple.dark {
+  @include themeMixer(mat.$indigo-palette, 200, mat.$purple-palette, 200, mat.$red-palette, 300, 'dark');
+}
+
+//alternate theme
+.indigo-amber{
+    @include themeMixer(mat.$indigo-palette, 500, mat.$amber-palette, 500, mat.$red-palette, 500, 'light');
+}
+.indigo-amber.dark {
+  @include themeMixer(mat.$indigo-palette, 200, mat.$amber-palette, 200, mat.$red-palette, 300, 'dark');
+}
+
+
+//alternate theme
+.indigo-blueGrey {
+    @include themeMixer(mat.$indigo-palette, 500, mat.$blue-grey-palette, 500, mat.$red-palette, 500, 'light');
+}
+
+.indigo-blueGrey.dark {
+  @include themeMixer(mat.$indigo-palette, 200, mat.$blue-grey-palette, 200, mat.$red-palette, 300, 'dark');
+}
+
+//////base-pink//////
+.pink-pink {
+  @include themeMixer(mat.$pink-palette, 600, mat.$pink-palette, 500, mat.$red-palette, 500, 'light');
+}
+
+.pink-pink.dark {
+  @include themeMixer(mat.$pink-palette, 300, mat.$pink-palette, 200, mat.$red-palette, 300, 'dark');
+}
+
+//alternate theme
+.pink-purple {
+  @include themeMixer(mat.$pink-palette, 500, mat.$purple-palette, 500, mat.$red-palette, 500, 'light');
+}
+.pink-purple.dark {
+  @include themeMixer(mat.$pink-palette, 200, mat.$purple-palette, 200, mat.$red-palette, 300, 'dark');
+}
+
+//alternate theme
+.pink-amber{
+    @include themeMixer(mat.$pink-palette, 500, mat.$amber-palette, 500, mat.$red-palette, 500, 'light');
+}
+.pink-amber.dark {
+  @include themeMixer(mat.$pink-palette, 200, mat.$amber-palette, 200, mat.$red-palette, 300, 'dark');
+}
+
+//alternate theme
+.pink-blueGrey {
+    @include themeMixer(mat.$pink-palette, 500, mat.$blue-grey-palette, 500, mat.$red-palette, 500, 'light');
+}
+.pink-blueGrey.dark {
+  @include themeMixer(mat.$pink-palette, 200, mat.$blue-grey-palette, 200, mat.$red-palette, 300, 'dark');
+}
+
+
+mft-wc-wrapper > div {
+  width: 100%;
+  height: 100%;
+  display: block; /* Or flex/grid, depending on layout needs */
+}
+///////////////////////////////
+//definitions type from angular(guide)
+///////////////////////////////
+///////////////////////////////
+//Primary, Accent, Warn (keys)
+///////////////////////////////
+// 0: #e8eaf6,
+// 100: #c5cae9,
+// 200: #9fa8da,
+// 300: #7986cb,
+// 400: #5c6bc0,
+// 500: #3f51b5,
+// 600: #3949ab,
+// 700: #303f9f,
+// 800: #283593,
+// 900: #1a237e,
+// A100: #8c9eff,
+// A200: #536dfe,
+// A400: #3d5afe,
+// A700: #304ffe,
+// contrast: (50: rgba(0, 0, 0, 0.87), 100: rgba(0, 0, 0, 0.87), 200: rgba(0, 0, 0, 0.87), 300: white, 400: white, 500: white, 600: white, 700: white, 800: white, 900: white, A100: rgba(0, 0, 0, 0.87), A200: white, A400: white, A700: white),
+// default: #9fa8da,
+// lighter: #c5cae9,
+// darker: #303f9f,
+// text: #9fa8da,
+// default-contrast: rgba(0, 0, 0, 0.87),
+// lighter-contrast: rgba(0, 0, 0, 0.87),
+// darker-contrast: white,
+// \"50-contrast\": rgba(0, 0, 0, 0.87),
+// \"100-contrast\": rgba(0, 0, 0, 0.87),
+// \"200-contrast\": rgba(0, 0, 0, 0.87),
+// \"300-contrast\": white,
+// \"400-contrast\": white,
+// \"500-contrast\": white,
+// \"600-contrast\": white,
+// \"700-contrast\": white,
+// \"800-contrast\": white,
+// \"900-contrast\": white,
+// \"A100-contrast\": rgba(0, 0, 0, 0.87),
+// \"A200-contrast\": white,
+// \"A400-contrast\": white,
+// \"A700-contrast\": white,
+// \"contrast-contrast\": null
+
+///////////////////////////////
+//Foreground
+///////////////////////////////
+// base: black,
+// divider: rgba(0, 0, 0, 0.12),
+// dividers: rgba(0, 0, 0, 0.12),
+// disabled: rgba(0, 0, 0, 0.38),
+// disabled-button: rgba(0, 0, 0, 0.26),
+// disabled-text: rgba(0, 0, 0, 0.38),
+// elevation: black,
+// hint-text: rgba(0, 0, 0, 0.38),
+// secondary-text: rgba(0, 0, 0, 0.54),
+// icon: rgba(0, 0, 0, 0.54),
+// icons: rgba(0, 0, 0, 0.54),
+// text: rgba(0, 0, 0, 0.87),
+// slider-min: rgba(0, 0, 0, 0.87),
+// slider-off: rgba(0, 0, 0, 0.26),
+// slider-off-active: rgba(0, 0, 0, 0.38)
+
+///////////////////////////////
+//Background
+///////////////////////////////
+//status-bar: #e0e0e0,
+// app-bar: #f5f5f5,
+// background: #fafafa,
+// hover: rgba(0, 0, 0, 0.04),
+// card: white,
+// dialog: white,
+// disabled-button: rgba(0, 0, 0, 0.12),
+// raised-button: white,
+// focused-button: rgba(0, 0, 0, 0.12),
+// selected-button: #e0e0e0,
+// selected-disabled-button: #bdbdbd,
+// disabled-button-toggle: #eeeeee,
+// unselected-chip: #e0e0e0,
+// disabled-list-option: #eeeeee,
+// tooltip: #616161

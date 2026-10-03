@@ -1,0 +1,29 @@
+<div fxLayout="row" fxFill>
+  <div class="inbox-container" fxFlex.lt-md="100" fxFlex.gt-sm="30" fxFill>
+    <mat-toolbar class="inbox-toolbar" color="grey">
+      <mat-toolbar-row>
+        <div class="mat-avatar" fxLayout="row" fxLayoutAlign="space-between center">
+          <div class="toolbar-line container-ou" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-cogs">
+            </mat-icon>
+            <div class="title" fxLayout="column" fxLayoutAlign="center start">
+              <h3>Procesos Diferidos</h3>
+            </div>
+          </div>
+        </div>
+        <button mat-icon-button (click)='refresh()' title="Actualizar">
+          <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-redo"></mat-icon>
+        </button>
+      </mat-toolbar-row>
+    </mat-toolbar>
+    <mat-divider [inset]="true"></mat-divider>
+    <app-inbox (processSelected)="changeDetailClass($event)" [loadingDeferedProcess]="isLoading"></app-inbox>
+  </div>
+  <mat-divider [vertical]="true" [ngClass]="{}"></mat-divider>
+  <div class="detail" [ngClass] ="processClass" [class.close]="closeFloatMode" fxFlex.lt-md="100" fxFlex.gt-sm="70" fxFill>
+    <button mat-icon-button fxLayout="row" fxLayoutAlign="center center" class="show-md" title="Ocultar Detalle" (click)="closeFloatMode = true">
+      <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times" fxLayout="row" fxLayoutAlign="center center" ></mat-icon>
+    </button>
+    <router-outlet></router-outlet>
+  </div>
+</div>

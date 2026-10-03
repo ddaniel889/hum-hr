@@ -1,0 +1,47 @@
+<ng-container *ngIf="!loading">
+
+  <div class="separator" fxLayout="row" fxLayoutAlign="start center">
+    <div class="subtitle" fxLayoutAlign="start center" fxLayoutGap="16px">
+      <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-industry-alt">
+      </mat-icon>
+      <div class="text" fxLayout="column">
+        <h5>Nombre de la Organización</h5>
+        <h6>Personaliza el nombre</h6>
+      </div>
+    </div>
+  </div>
+
+  <div fxLayout="column" fxLayoutGap="16px">
+    <form [formGroup]="OuDescriptionConfigForm">
+      <div class="form-steped-body" fxLayout="column">
+        <div class="asisted-input icon-only" fxLayout="row-reverse" fxLayoutAlign="start center">
+          <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+            <input matInput placeholder="Ingresa el nombre" formControlName="description">
+            <span class="help-hoverable" matSuffix>
+              <mat-icon class="fa " fontSet="fal" fontIcon="fa-question-circle">
+              </mat-icon>
+              <mat-hint hidden>
+                El <b>nombre</b> ingresado en este campo reemplazará <b>el nombre de tu empresa</b> en
+                Humanage.
+              </mat-hint>
+            </span>
+            <mat-error *ngIf="OuDescriptionConfigForm.controls.description.hasError('required')">
+              *El nombre es <strong>obligratorio</strong>
+            </mat-error>
+          </mat-form-field>
+          <div class="indicator">
+            <i class="bubble fa fa-sign"></i>
+          </div>
+        </div>
+      </div>
+    </form>
+    <div class="confirm" fxLayout="row-reverse" fxFlex="grow" fxLayoutGap="12px">
+      <button mat-raised-button color="primary" (click)="save()"
+        [disabled]="loading || !OuDescriptionConfigForm.dirty || OuDescriptionConfigForm.invalid">
+        Guardar Cambios
+      </button>
+    </div>
+  </div>
+
+</ng-container>
+<mat-divider [inset]="true"></mat-divider>

@@ -1,0 +1,365 @@
+app-analytics-document-set {
+  .navigation {
+    max-width: 30% !important;
+    transition: all 0.2s ease-out;
+
+    .toolbar {
+      padding: 0 !important;
+      .module-title {
+        padding: 0 16px;
+        &.selectable {
+          cursor: pointer;
+          height: 100%;
+          width: 100%;
+
+          .info {
+            width: 100%;
+            margin-right: 0 !important;
+
+            .info-text {
+              width: 100%;
+
+              & + mat-icon {
+                margin-right: 0 !important;
+              }
+            }
+          }
+
+          .invisible-item {
+            width: 0 !important;
+            overflow: hidden !important;
+            position: absolute;
+            left: 64px;
+            top: 9px;
+          }
+        }
+      }
+    }
+
+    .sets-container {
+      height: calc(100% - 112px);
+      display: flex;
+      flex-direction: column;
+
+      .filters {
+        padding: 0 32px 16px;
+
+        mat-form-field {
+          width: 100%;
+          max-height: 64px;
+
+          .mat-form-field-prefix {
+            margin-right: 8px;
+          }
+
+          .mat-form-field-prefix,
+          .mat-form-field-suffix {
+            mat-icon {
+              font-size: 16px !important;
+              min-width: unset !important;
+            }
+          }
+        }
+      }
+
+      .mat-list-base.sets-list {
+        padding: 16px;
+        overflow-y: auto;
+        overflow-y: overlay;
+        overflow-x: hidden;
+        box-sizing: border-box;
+
+        mat-list-item {
+          border-radius: 12px;
+          cursor: pointer;
+          transition: all 0.2s ease-in !important;
+
+          .mat-list-item-content {
+            flex-wrap: wrap !important;
+
+            .mat-list-text {
+              width: 100% !important;
+
+              .mat-line {
+                h5 {
+                  text-overflow: ellipsis;
+                  overflow: hidden;
+                }
+
+                b {
+                  text-overflow: ellipsis;
+                  overflow: hidden;
+                }
+              }
+            }
+
+            .set-status {
+              margin-top: 12px;
+              width: 100% !important;
+              cursor: help;
+
+              .value-percentile {
+                height: 12px;
+                width: 100%;
+                border-radius: 6px;
+                overflow: hidden;
+
+                .undone-value {
+                  height: 100%;
+                }
+
+                .not-value {
+                  height: 100%;
+                }
+
+                .done-value {
+                  height: 100%;
+                }
+              }
+            }
+          }
+
+          & + .mat-list-item {
+            margin-top: 16px;
+          }
+        }
+      }
+    }
+
+    &.results-open {
+      overflow: hidden;
+      width: 0 !important;
+      flex: 0 !important;
+      transition: all 0.2s ease-in;
+
+      & + .work-space {
+        overflow: hidden;
+        width: 100% !important;
+        transition: all 0.2s ease-out;
+      }
+    }
+  }
+
+  .work-space {
+    width: 70%;
+    transition: all 0.2s ease-out;
+    .main {
+      .toolbar {
+        .header {
+          min-width: 30%;
+          margin-right: 0;
+
+          .content {
+            width: 100%;
+
+            .module-title {
+              width: 100%;
+
+              .info {
+                width: 100%;
+
+                .info-text {
+                  width: 100%;
+
+                  .set-status {
+                    width: 100% !important;
+                    cursor: help;
+                    margin-top: 4px;
+
+                    .value-percentile {
+                      height: 12px;
+                      width: 100%;
+                      border-radius: 6px;
+                      overflow: hidden;
+
+                      .undone-value {
+                        height: 100%;
+                      }
+
+                      .not-value {
+                        height: 100%;
+                      }
+
+                      .done-value {
+                        height: 100%;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        .search-container {
+          min-width: 50%;
+        }
+      }
+      .new-table {
+        .mat-table {
+          mat-progress-bar.status_bar-bar {
+            position: relative !important;
+            margin-right: 8px;
+            height: 8px;
+            border-radius: 4px;
+            max-width: 40%;
+            z-index: 98 !important;
+          }
+
+          .status_bar-count {
+            font-size: 10px;
+          }
+        }
+      }
+      &.side-open {
+        width: 70% !important;
+        transition: all 0.2s ease-out;
+        .toolbar {
+          .header {
+            min-width: 40%;
+          }
+          .search-container {
+            min-width: 60%;
+          }
+        }
+        & + .side {
+          width: 30%;
+          transition: all 0.2s ease-in;
+        }
+      }
+    }
+
+    .side {
+      overflow: hidden;
+      width: 0;
+      flex: 0;
+      transition: all 0.2s ease-out;
+
+      .container {
+        padding: 16px !important;
+        overflow-y: auto !important;
+
+        mat-list {
+          width: 100%;
+          border-radius: 8px;
+
+          mat-list-item {
+            &:hover {
+              .floating-action {
+                visibility: visible;
+                opacity: 1;
+              }
+            }
+
+            .floating-action {
+              visibility: hidden;
+              opacity: 0;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.mat-tooltip-panel {
+  pointer-events: none !important;
+}
+
+
+@mixin analitycs-sets($bg-card, $bg-card-side,  $divider,  $primary-text,  $signed-not-ok,  $signed-ok){
+  app-analytics-document-set {
+    .sets-container {
+      .mat-list-base.sets-list {
+        mat-list-item {
+          border: 1px solid $divider;
+          .mat-list-item-content {
+            .set-status {
+              .value-percentile {
+                .undone-value {
+                  background: $signed-not-ok;
+                }
+                .not-value {
+                  background: $bg-card-side;
+                }
+                .done-value {
+                  background: $signed-ok;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .work-space {
+      .main {
+        .toolbar {
+          .header {
+            .content {
+              .module-title {
+                .info {
+                  .info-text {
+                    .set-status {
+                      cursor: help;
+                      .value-percentile {
+                        .undone-value {
+                          background: $signed-not-ok;
+                        }
+
+                        .not-value {
+                          background: $bg-card-side;
+                        }
+
+                        .done-value {
+                          background: $signed-ok;
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        .new-table {
+          .mat-table {
+            mat-progress-bar.status_bar-bar {
+              .mat-progress-bar-buffer {
+                background-color: $bg-card-side;
+              }
+
+              &.class1 .mat-progress-bar-fill::after {
+                background-color: #f44336;
+              }
+
+              &.class2 .mat-progress-bar-fill::after {
+                background-color: #ff9800;
+              }
+
+              &.class3 .mat-progress-bar-fill::after {
+                background-color: #ffeb3b;
+              }
+
+              &.class4 .mat-progress-bar-fill::after {
+                background-color: #8bc34a;
+              }
+            }
+          }
+        }
+      }
+      .side {
+        .container {
+          mat-list {
+            background: $bg-card !important;
+            border: 1px solid $divider;
+            mat-list-item {
+              .mat-line b {
+                color: $primary-text;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

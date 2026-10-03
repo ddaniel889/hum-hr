@@ -1,0 +1,25 @@
+.related-dialog-container {
+  padding: 2rem;
+
+  .data {
+    font-size: 14px;
+    .title-box {
+      display: flex;
+      justify-content: space-between;
+      .title {
+        max-width: 28rem;
+      }
+    }
+    .user-date {
+      mat-icon {
+        font-size: 24px;
+        min-width: unset;
+      }
+    }
+
+    .history-wrapper {
+      margin-top: 1rem;
+    }
+    
+  }
+}

@@ -1,0 +1,202 @@
+<!-- audit-SEARCH -->
+<form [formGroup]="auditForm" fxFill [ngClass]="{'detail-open' : showDetail}">
+  <div class="audit-filter" [fxFlex]="30" fxFill fxLayout="column">
+    <!-- TOOLBAR -->
+    <div class="toolbar" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px" fxFlex="100">
+      <!-- info -->
+      <div class="header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+        <div class="content" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px" fxFlex="100">
+          <!-- app selector -->
+          <div class="module-title" fxLayout="row" fxLayoutAlign="start center">
+            <div class="info" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+              <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-history">
+              </mat-icon>
+              <div fxLayout="column">
+                <h3>Auditoría</h3>
+                <h5>Supervisión del Sistema</h5>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Audit Filter -->
+    <div class="filter-container" fxFlex="grow" [ngClass]="{'is-floating' : floatFilter}">
+      <div class="form-body" fxLayout="column">
+        <div class="line" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+          <div class="header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-filter">
+            </mat-icon>
+            <div class="info" fxLayout="column">
+              <h4>Filtros de Consulta</h4>
+              <h6>Completa los Datos</h6>
+            </div>
+          </div>
+          <button class="show-md" *ngIf="audits?.length > 0" mat-icon-button fxLayout="row" fxLayoutAlign="center center"
+            (click)="floatFilter=false">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-times">
+            </mat-icon>
+          </button>
+        </div>
+        <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+          <mat-icon matPrefix fxLayout="row" fxLayoutAlign="center center" class="fa-lg" fontSet="fas"
+            fontIcon="fa-industry-alt">
+          </mat-icon>
+          <mat-select formControlName="ourganizationaUnitIdFrmCtrl" placeholder="Empresa">
+            <mat-option *ngFor="let ou of organizationalUnits" [value]="ou.id">
+              {{ou.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <app-autocomplete-chip [originalList]="actionTypes" [showIcons]="true" [iconName]="'fa-directions'"
+          [placeHolderText]="'Ingresa la acción'" (OnItemSelected)="selectActionType($event)"
+          (OnRemoveItem)="itemRemoved()" [selectedItemsList]="selectedActionTypes" fxFlex="grow" fxLayout="row"
+          fxLayoutAlign="start center" *ngIf="actionTypes" [simpleSelection]="true">
+        </app-autocomplete-chip>
+        <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+          <mat-icon matPrefix fxLayout="row" fxLayoutAlign="center center" class="fa-lg" fontSet="fas"
+            fontIcon="fa-calendar-day">
+          </mat-icon>
+          <input matInput [matDatepicker]="pickerFrom" placeholder="Fecha Desde dd/mm/aaaa"
+            formControlName="dateFromFrmCtrl">
+          <mat-datepicker-toggle matSuffix [for]="pickerFrom"></mat-datepicker-toggle>
+          <mat-datepicker #pickerFrom></mat-datepicker>
+        </mat-form-field>
+        <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+          <mat-icon matPrefix fxLayout="row" fxLayoutAlign="center center" class="fa-lg" fontSet="fas"
+            fontIcon="fa-calendar-day">
+          </mat-icon>
+          <input matInput [matDatepicker]="pickerTo" [max]="today" placeholder="Fecha Hasta dd/mm/aaaa"
+            formControlName="dateToFrmCtrl">
+          <mat-datepicker-toggle matSuffix [for]="pickerTo"></mat-datepicker-toggle>
+          <mat-datepicker #pickerTo></mat-datepicker>
+        </mat-form-field>
+      </div>
+      <div class="filter-footer" fxLayout="row-reverse" fxLayoutGap="12px">
+        <button mat-raised-button (click)="search()" [disabled]="loading" color="primary" class="btn">Buscar</button>
+        <button mat-button (click)="clean()" [disabled]="loading">Limpiar Filtros</button>
+      </div>
+    </div>
+  </div>
+  <div class="audit-result" [fxFlex]="70" fxFill fxLayout="column" [ngClass]="{'float-in':showResults}">
+    <!-- LOADER -->
+    <div class="load-window new" *ngIf="loading">
+      <mat-progress-spinner style="z-index: 1" mode="indeterminate" color="primary">
+      </mat-progress-spinner>
+    </div>
+    <ng-container *ngIf="!audits && !loading">
+      <app-chapa [className]="'info-empty'" [icon]="'fa-history'" [text]="'Podés ver todo lo acontecido en Humanage'"
+        [subText]="'Completa algún dato en el Filtro para obtener resultados precisos'"></app-chapa>
+    </ng-container>
+    <!-- Audit Result -->
+    <div class="result-container" *ngIf="audits && !loading" fxLayout="column">
+      <div class="toolbar" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px" fxFlex="100">
+        <!-- info -->
+        <div class="header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+          <div class="content" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px" fxFlex="100">
+            <!-- Ou selector -->
+            <div class="ou-select show-md" (click)='floatFilter=true' matRipple fxLayout="row"
+              fxLayoutAlign="start center">
+              <div class="info" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-filter">
+                </mat-icon>
+                <div fxLayout="column">
+                  <h3>Auditorías encontradas</h3>
+                  <h5>
+                    Ver Filtros aplicados
+                  </h5>
+                </div>
+              </div>
+              <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-caret-down">
+              </mat-icon>
+            </div>
+            <!-- app selector -->
+            <div class="module-title hide-md" fxLayout="row" fxLayoutAlign="start center">
+              <div class="info" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                <div fxLayout="column">
+                  <h3>Resultado de la Búsqueda</h3>
+                  <h5>15 ítems por página</h5>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!--Action-->
+        <div class="actions" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+          <button mat-stroked-button (click)="export()" color="primary" [disabled]="loading">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-file-download">
+            </mat-icon>
+            Exportar
+          </button>
+          <app-cs-paginator [hidden]="audits?.length == 0" [pageCount]="itemsCount" [(pageIndex)]="pageIndex"
+            (pageChanged)="selectedPageChanged($event)">
+          </app-cs-paginator>
+        </div>
+      </div>
+      <!-- PROCESSES-TABLE_HEAD -->
+      <div class="new-table">
+        <div class="mat-table">
+          <div class="mat-header-row sticky" fxLayout="row" fxLayoutAlign="start center">
+            <div class="w-12" fxLayout="row" fxLayoutAlign="start center">
+              <div class="mat-header-cell w-4" fxLayout="row" fxLayoutAlign="start center">
+                <span>Acción</span>
+              </div>
+              <div class="mat-header-cell w-3" fxLayout="row" fxLayoutAlign="start center">
+                <span>Unidad Organizacional</span>
+              </div>
+              <div class="mat-header-cell w-3" fxLayout="row" fxLayoutAlign="start center">
+                <span>Usuario</span>
+              </div>
+              <div class="mat-header-cell w-2" fxLayout="row" fxLayoutAlign="center center">
+                <span class="center">Fecha</span>
+              </div>
+            </div>
+          </div>
+          <!-- PROCESS-TABLE-ROWS -->
+          <div class="mat-row" *ngFor="let audit of audits" fxLayout="row" fxLayoutAlign="start center"
+            [ngClass]="{'active': audit == selectedAudit}">
+            <div class="w-12" fxLayout="row" fxLayoutAlign="start center" (click)="selectAudit(audit)">
+              <div class="mat-cell w-4" fxLayoutAlign="start center" title="{{audit.actionType.traslatedName}}">
+                <span>
+                  {{ audit.actionType.traslatedName }}
+                </span>
+              </div>
+              <div class="mat-cell w-3" fxLayoutAlign="start center" title="{{audit.organizationalUnitName}}">
+                <span>
+                  {{ audit.organizationalUnitName }}
+                </span>
+              </div>
+              <div class="mat-cell w-3" fxLayoutAlign="start center" title="{{audit.userName}}">
+                <span>
+                  {{ audit.userName }}
+                </span>
+              </div>
+              <div class="mat-cell w-2" fxLayoutAlign="center center" title="{{audit.creationDate}}">
+                <span class="center">
+                  {{ audit.creationDate | date :'dd/MM/yyyy hh:mm:ss' }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="audit-detail-container" [fxFlex]="30" fxLayout="column" fxFill>
+    <div class="side">
+      <div class="toolbar" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+        <div class="header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+          <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-info-circle">
+          </mat-icon>
+          <h3>Detalle de la Auditoría</h3>
+        </div>
+        <!-- cerrar detalles -->
+        <button mat-icon-button fxLayout="row" fxLayoutAlign="center center" (click)="closeDetail()">
+          <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-times">
+          </mat-icon>
+        </button>
+      </div>
+      <app-audit-detail [audit]="selectedAudit" *ngIf="showDetail"></app-audit-detail>
+    </div>
+  </div>
+</form>

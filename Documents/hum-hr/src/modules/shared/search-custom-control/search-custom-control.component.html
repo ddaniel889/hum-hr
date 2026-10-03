@@ -1,0 +1,108 @@
+<div [ngSwitch]="metadata.metadataType" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">
+  <div *ngSwitchCase="'number'" fxLayout="row" fxLayoutAlign="space-between center" fxFlex="grow" fxLayoutGap="16px">
+    <mat-form-field fxLayout="row" fxFlex="grow">
+      <input [disabled]="noValue" matInput type="number"
+        [placeholder]="!noValue ? metadata.metadataLabel + ' desde' :  'Sin Valor'" [(ngModel)]="metaValueFrom"
+        (ngModelChange)="setValueFromChange()">
+    </mat-form-field>
+    <mat-form-field fxLayout="row" fxFlex="grow">
+      <input [disabled]="noValue" matInput type="number"
+        [placeholder]="!noValue ? metadata.metadataLabel + ' hasta' :  'Sin Valor'" [(ngModel)]="metaValueTo"
+        (ngModelChange)="setValueToChange()">
+    </mat-form-field>
+  </div>
+
+  <div *ngSwitchCase="'period'" fxLayout="row" fxLayoutAlign="space-between center" fxFlex="grow" fxLayoutGap="16px">
+    <mat-form-field fxLayout="row" fxFlex="grow">
+      <input [disabled]="noValue" matInput mask="0000/00" pattern="([12]\d{3}(0[1-9]|1[0-2]))"
+        [placeholder]="!noValue ? metadata.metadataLabel + ' desde' :  'Sin Valor'" [(ngModel)]="metaValueFrom"
+        (ngModelChange)="setValueFromChange()">
+    </mat-form-field>
+    <mat-form-field fxLayout="row" fxFlex="grow">
+      <input [disabled]="noValue" matInput mask="0000/00" pattern="([12]\d{3}(0[1-9]|1[0-2]))"
+        [placeholder]="!noValue ? metadata.metadataLabel + ' hasta' :  'Sin Valor'" [(ngModel)]="metaValueTo"
+        (ngModelChange)="setValueToChange()">
+    </mat-form-field>
+  </div>
+
+  <div *ngSwitchDefault fxLayout="row" fxLayoutAlign="space-between center" fxFlex="grow">
+      <mat-form-field fxLayout="row" fxFlex="grow">
+        <input [disabled]="noValue" matInput [placeholder]="!noValue ? metadata.metadataLabel :  'Sin Valor'"
+          [(ngModel)]="metaValueFrom" (ngModelChange)="setValueFromChange()">
+        <button title="Ver Opciones de Contenido" [disabled]="noValue" mat-button [matMenuTriggerFor]="menu" matSuffix
+          mat-icon-button aria-label="Clear">
+          <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-ellipsis-v"></mat-icon>
+        </button>
+      </mat-form-field>
+
+      <mat-menu #menu="matMenu" xPosition="before" class="metadata-radio-menu" class="mat-card suffix-options">
+        <mat-radio-group [(ngModel)]="searchType" (change)="searchTypeChange()" fxLayout="column" fxLayoutGap="16px">
+          <mat-radio-button value="EqualIgnoreCase">Igual a</mat-radio-button>
+          <mat-radio-button value="Contains">Contiene a</mat-radio-button>
+          <mat-radio-button value="StartWith">Comienza con</mat-radio-button>
+        </mat-radio-group>
+      </mat-menu>
+  </div>
+
+  <!-- Si tiene busqueda avanzada debe no mostrar el campo _fecDoc -->
+  <div *ngSwitchCase="'date'" fxLayout="row" fxLayoutAlign="space-between center" fxFlex="grow" fxLayoutGap="16px">
+    <div *ngIf="!enableEnhancedSearch && NoShowFecDocMetadata(metadata.metadataSystemName)">
+      <mat-form-field fxLayout="row" fxFlex="grow">
+        <input [disabled]="noValue" matInput [matDatepicker]="pickerFrom"
+          [placeholder]="!noValue ? metadata.metadataLabel + ' desde dd/mm/aaaa' :  'Sin Valor'"
+          [(ngModel)]="metaValueFrom" (ngModelChange)="setValueFromChange()">
+        <mat-datepicker-toggle matSuffix [for]="pickerFrom"></mat-datepicker-toggle>
+        <mat-datepicker #pickerFrom></mat-datepicker>
+      </mat-form-field>
+      <mat-form-field fxLayout="row" fxFlex="grow">
+        <input [disabled]="noValue" matInput [matDatepicker]="pickerTo"
+          [placeholder]="!noValue ? metadata.metadataLabel + ' hasta dd/mm/aaaa' :  'Sin Valor'"
+          [(ngModel)]="metaValueTo" (ngModelChange)="setValueToChange()">
+        <mat-datepicker-toggle matSuffix [for]="pickerTo"></mat-datepicker-toggle>
+        <mat-datepicker #pickerTo></mat-datepicker>
+      </mat-form-field>
+    </div>
+  </div>
+  <div *ngIf="metadata.metadataType === 'comboKV' || metadata.metadataType === 'combo'" fxLayout="row"
+    fxLayoutAlign="space-between center" fxFlex="grow" fxLayoutGap="16px">
+    <mat-form-field *ngSwitchCase="'comboKV'" fxLayout="row" fxFlex="grow">
+      <mat-select [disabled]="noValue" [placeholder]="!noValue ? metadata.metadataLabel :  'Sin Valor'"
+        *ngIf="!metadata.isMultivalue; else multipleKV" [(ngModel)]="metaValueFrom"
+        (ngModelChange)="setValueFromChange()">
+        <mat-option value=""></mat-option>
+        <mat-option *ngFor="let option of metadata.optionValues" value="{{option.value}}">
+          {{option.description}}
+        </mat-option>
+      </mat-select>
+      <ng-template #multipleKV>
+        <mat-select [disabled]="noValue" [placeholder]="!noValue ? metadata.metadataLabel :  'Sin Valor'"
+          [(ngModel)]="metaValueFrom" (ngModelChange)="setValueFromChange()" multiple>
+          <mat-option *ngFor="let option of metadata.optionValues" value="{{option.value}}">
+            {{option.description}}
+          </mat-option>
+        </mat-select>
+      </ng-template>
+    </mat-form-field>
+
+    <mat-form-field *ngSwitchCase="'combo'" fxLayout="row" fxFlex="grow">
+      <mat-select [disabled]="noValue" [placeholder]="!noValue ? metadata.metadataLabel :  'Sin Valor'"
+        [(ngModel)]="metaValueFrom" (ngModelChange)="setValueFromChange()"
+        *ngIf="!metadata.isMultivalue; else multipleCombo">
+        <mat-option value=""></mat-option>
+        <mat-option *ngFor="let option of metadata.optionValues" value="{{option.value}}">
+          {{option.value}}
+        </mat-option>
+      </mat-select>
+      <ng-template #multipleCombo>
+
+        <mat-select [disabled]="noValue" [placeholder]="!noValue ? metadata.metadataLabel :  'Sin Valor'"
+          [(ngModel)]="metaValueFrom" (ngModelChange)="setValueFromChange()" multiple>
+          <mat-option value=""></mat-option>
+          <mat-option *ngFor="let option of metadata.optionValues" value="{{option.value}}">
+            {{option.value}}
+          </mat-option>
+        </mat-select>
+      </ng-template>
+    </mat-form-field>
+  </div>
+</div>

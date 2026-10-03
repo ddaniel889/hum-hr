@@ -1,0 +1,45 @@
+<ng-container *ngIf="isCropping">
+  <mat-toolbar class="side-bar upload" color="grey">
+    <mat-toolbar-row>
+      <div class="mat-avatar four-icons" fxLayout="row" fxLayoutAlign="space-between center">
+        <div class="toolbar-line" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+          <mat-icon  class="fa-lg" fontSet="fa" fontIcon="fa-image">
+          </mat-icon>
+          <div class="title" fxLayout="column" fxLayoutAlign="center start">
+            <h3 matLine>Vista previa</h3>
+            <h5 matLine>Edita la imagen antes de subirla</h5>
+          </div>
+        </div>
+      </div>
+    </mat-toolbar-row>
+  </mat-toolbar>
+  <app-cs-cropper-control [mantainAspectRatio]="false" [resizeToWidth]="1000" [saveButtonName]="'Listo'"
+    [cancelButtonName]="'Cancelar'" [fileBase64]="fileImage" (uploadImage)="uploadCropper($event)"
+    (cancelCropper)="cleanFiles()">
+  </app-cs-cropper-control>
+</ng-container>
+
+<app-upload-form canViewFile="true" [canRemove]="!loading" [disabled]="loading" [hidden]="isCropping"
+  [multipleSelection]="allowMultipleFiles" [maxFile]="maxFiles"
+  acceptedExtensions=".pdf, .jpg, .jpeg, .tiff, .gif, .png" (fileSelected)="onSelectedFile($event)"
+  (filesChanged)="onFilesChanged($event)" (seeFileDefault)="onSelectedFile($event, true)" (fileNotAllowed)="onFilesNotAlloewdAdded($event)">
+</app-upload-form>
+
+<div class="metadata-list" *ngIf="isNewDocument && (filePdf || fileImage)" [hidden]="isCropping">
+  <form [formGroup]="metadataForm">
+    <h3 class="mat-subheader">Completa los datos</h3>
+    <div *ngFor="let meta of metadatas">
+      <app-custom-control [metadata]="meta" [aditionalsmetadatas]="metadatas" (valueSet)="updateMetadata($event)"
+        [isDisabled]="loading">
+      </app-custom-control>
+    </div>
+  </form>
+</div>
+
+<div *ngIf="filePdf || fileImage" class="firmador" [hidden]="isCropping">
+  <button mat-raised-button class="content-action-main" color="accent" fxLayout="row" fxLayoutAlign="center center"
+    (click)="upload()" [disabled]="loading">
+    <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-upload"></mat-icon>
+    <span>Subir</span>
+  </button>
+</div>

@@ -1,0 +1,439 @@
+<mat-drawer-container autosize>
+  <mat-drawer class="profile-menu" #sidenav [disableClose]="true">
+    <mat-toolbar class="profile-toolbar" color="grey">
+      <mat-toolbar-row>
+        <div class="mat-avatar" fxLayout="row" fxLayoutAlign="space-between center">
+          <div class="toolbar-line" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+            <!-- PROFILE TOGGLE CLOSE -->
+            <button mat-icon-button (click)="sidenav.toggle()" title="Cerrar">
+              <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+            </button>
+            <!-- PROFILE TRIGGER -->
+            <div id="employerFrame_profileBtn" class="title" fxLayout="column" fxLayoutAlign="center start">
+              <h3>Menú</h3>
+              <h5>Opciones personales</h5>
+            </div>
+          </div>
+        </div>
+        <button id="employerFrame_profileEditBtn" mat-icon-button (click)="editingMode()" title="Editar">
+          <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-pen"></mat-icon>
+        </button>
+      </mat-toolbar-row>
+    </mat-toolbar>
+    <!-- PROFILE COMPONENT -->
+    <app-profile *ngIf="sidenav.opened" [isEditable]="editMode" [isEmployeeFrame]="false" [isEmployerFrame]="true"
+      (editingMode)="editingMode($event)"></app-profile>
+  </mat-drawer>
+  <mat-drawer-content class="app-container">
+    <mat-drawer-container autosize>
+      <mat-drawer class="side-nav mat-elevation-z6" #sidenavOut mode="side" opened="true" [disableClose]="true"
+        [ngClass]="{'open': isExpanded, 'enter': menuFocus}">
+        <!-- CABECERA -->
+        <div class="side-header">
+          <img class="logo" [src]="urlIcon" *ngIf="urlIcon" />
+          <!-- PROFILE TOGGLE -->
+          <button class="menu-trigger" mat-mini-fab (click)="sidenav.toggle()"
+            matTooltip="Abrir Menú de Opciones Personales" matTooltipPosition="after">
+            <ngx-avatar [name]="initials" size="50" [round]="true">
+            </ngx-avatar>
+          </button>
+          <!-- SIDENAV TOGGLE -->
+          <button class="side-trigger" mat-mini-fab color="" (click)="isExpanded = !isExpanded"
+            [matTooltip]="!isExpanded ? 'Expandir' : 'Contraer'" matTooltipPosition="after">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-bars"></mat-icon>
+          </button>
+          <!-- SIDENAV CLOSE MOBILE -->
+          <button mat-mini-fab class="side-close-mobile" color="" (click)="menuFocus = !menuFocus"
+            [matTooltip]="!isExpanded ? 'Expandir' : 'Contraer'" matTooltipPosition="after">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+          </button>
+        </div>
+        <div class="side-nav-container">
+          <div class="actions"
+            *ngIf="isRRHH() || isAdministrator() || isCandidateAdmin() || isGestorDocumental() || isCandidateAdminBasic()">
+            <!-- ACTION ADD -->
+            <button mat-fab color="accent" (click)="openAddMenuDialog()" matTooltip="Agregar"
+              matTooltipPosition="after">
+              <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-plus"></mat-icon>
+              <span>Agregar</span>
+            </button>
+          </div>
+          <div class="content" fxLayout="column" fxLayoutAlign="space-between">
+            <div class="tools"
+              [ngClass]="appLinks && appLinks.length > 0 ? (showSettings ? 'links-5' : 'links-4') : (showSettings ? 'links-4' : 'links-3')">
+              <mat-nav-list>
+                <!-- TOOLS TITLE -->
+                <h3 mat-subheader>Herramientas</h3>
+                <!-- FILE DOCUMENT SEARCH -->
+                <mat-list-item id="mli_MenuBusquedaDocumentacion" name="mli_MenuBusquedaDocumentacion"
+                  routerLink="/employer/file-document-search" routerLinkActive="active"
+                  *ngIf="this.isRRHH() || this.isOverseer() || isGestorDocumental()"
+                  matTooltip="Búsqueda de Documentación" matTooltipPosition="after">
+                  <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+                    fontIcon="fa-file-search">
+                  </mat-icon>
+                  <span matLine>Búsqueda de Documentación</span>
+                </mat-list-item>
+                <!-- DOCUMENTATION IN PROGRESS -->
+                <mat-list-item name="mli_MenuDocumentacionEnCurso" routerLink="/employer/documentation-in-progress"
+                  routerLinkActive="active" *ngIf="this.isRRHH()" matTooltip="Documentación en Curso"
+                  matTooltipPosition="after">
+                  <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+                    fontIcon="fa-folder-open">
+                  </mat-icon>
+                  <span matLine>Documentación en Curso</span>
+                </mat-list-item>
+                <!-- DOCUMENTATION SING PENDING -->
+                <mat-list-item routerLink="/employer/documentation-signer" routerLinkActive="active"
+                  *ngIf="this.isFirmante()" matTooltip="Documentación a Firmar" matTooltipPosition="after">
+                  <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+                    fontIcon="fa-signature">
+                  </mat-icon>
+                  <span matLine>Documentación a Firmar</span>
+                </mat-list-item>
+                <!-- ANALITYCS -->
+                <mat-list-item name="mli_MenuEstadisticas" (click)="goAnalytics()"
+                  *ngIf="CanViewAnalitics() && !hasAdjetivation" matTooltip="Analíticas"
+                  matTooltipPosition="after">
+                  <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+                    fontIcon="fa-line-chart">
+                  </mat-icon>
+                  <span matLine>Analíticas</span>
+                </mat-list-item>
+                <!-- EMPLOYEE FIND -->
+                <mat-list-item id="mli_MenuBusquedaEmpleado" name="mli_MenuBusquedaEmpleado"
+                  routerLink="/employer/employee-find" routerLinkActive="active"
+                  *ngIf="this.isRRHH() || isAdministrator() || (isLeaveAprov() && !isAdministrator() && !this.isRRHH())
+                  && !(isCandidateAdmin() || isCandidateAdminBasic())" matTooltip="Personas" matTooltipPosition="after">
+                  <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fas"
+                    fontIcon="fa-user">
+                  </mat-icon>
+                  <span matLine>Personas</span>
+                </mat-list-item>
+                <!-- CANDIDATE FIND -->
+                <mat-list-item name="mli_MenuBusquedaCandidato" routerLink="/employer/candidate-find"
+                  routerLinkActive="active"
+                  *ngIf="!(this.isRRHH() || isAdministrator()) && (isCandidateAdmin() || isCandidateAdminBasic())"
+                  matTooltip="Personas" matTooltipPosition="after">
+                  <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fas"
+                    fontIcon="fa-user">
+                  </mat-icon>
+                  <span matLine>Personas</span>
+                </mat-list-item>
+                <!-- ROLE USER FIND -->
+                <!-- <mat-list-item name="mli_MenuBusquedaActores" routerLink="/employer/role-user-find"
+                  routerLinkActive="active" *ngIf="isAdministrator() && !hasFiltersMetadatos()" matTooltip="Actores"
+                  matTooltipPosition="after">
+                  <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+                    fontIcon="fa-users-crown">
+                  </mat-icon>
+                  <span matLine>Actores</span>
+                </mat-list-item> -->
+                <!-- ROLE USER FIND -->
+                <mat-list-item name="mli_MenuBusquedaActoresNew" routerLink="/employer/actor-find"
+                  routerLinkActive="active" *ngIf="isAdministrator() && !hasAdjetivation" matTooltip="Actores"
+                  matTooltipPosition="after">
+                  <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+                    fontIcon="fa-users-crown">
+                  </mat-icon>
+                  <span matLine>Actores</span>
+                </mat-list-item>
+                <!-- LEAVE FIND -->
+                <mat-list-item data-testid="main-leave-find" name="mli_BusquedaLicencias" routerLink="/employer/leave-find"
+                  routerLinkActive="active"  matTooltip="Licencias"
+                  matTooltipPosition="after">
+                  <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+                    fontIcon="fa-calendar">
+                  </mat-icon>
+                  <span matLine>Licencias</span>
+                </mat-list-item>
+                <!-- LIBRO LEY -->
+                <mat-list-item name="mli_MenuLSD" routerLink="/employer/lsd" routerLinkActive="active"
+                  *ngIf="isLDSAdministrator()" matTooltip="Libro Sueldo Digital" matTooltipPosition="after">
+                  <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fas"
+                    fontIcon="fa-book">
+                  </mat-icon>
+                  <span matLine>Libro Sueldo Digital</span>
+                </mat-list-item>
+                <!-- EMPLOYER: DEFERRED PROCESS NEW -->
+                <ng-container *ngIf="canUseProcessWithMicroservices">
+                  <mat-list-item name="mli_MenuProcesosDiferidosNew" routerLink="/employer/deferred-processes"
+                    class="fa-bg-new"
+                    routerLinkActive="active"
+                    *ngIf="((this.isRRHH() || isAdministrator() || isGestorDocumental()) || (isCandidateAdmin() || isCandidateAdminBasic()))"
+                    matTooltip="Procesos Diferidos (NEW)" matTooltipPosition="after">
+                    <mat-icon fxLayout="row" fxLayoutAlign="center center" class="fa-solid fa-flask-gear fa-shake"  style="--fa-animation-duration: 4s; --fa-animation-iteration-count: 1;--fa-animation-timing: ease-in-out;" mat-list-icon>
+                    </mat-icon>
+                    <span matLine>Procesos Diferidos (NEW)</span>
+                  </mat-list-item>
+                </ng-container>
+                <ng-container *ngIf="useDashboard">
+                  <mat-list-item name="dashboard" routerLink="/employer/dashboard"
+                    class="fa-bg-new"
+                    routerLinkActive="active"
+                    *ngIf="(this.isRRHH())"
+                    matTooltip="Dashboard (NEW)" matTooltipPosition="after">
+                    <mat-icon fxLayout="row" fxLayoutAlign="center center" class="fa-solid fa-gauge-high fa-shake"  style="--fa-animation-duration: 3s; --fa-animation-iteration-count: 1;--fa-animation-timing: ease-in-out;" mat-list-icon>
+                    </mat-icon>
+                    <span matLine>Dashboard (NEW)</span>
+                  </mat-list-item>
+                </ng-container>
+                <!-- HOME EMPLOYER (DEFERRED PROCESS) -->
+                <mat-list-item name="mli_MenuProcesosDiferidos" routerLink="/employer/home-employer"
+                  routerLinkActive="active"
+                  *ngIf="((this.isRRHH() || isAdministrator() || isGestorDocumental()) || (isCandidateAdmin() || isCandidateAdminBasic()))"
+                  matTooltip="Procesos Diferidos" matTooltipPosition="after">
+                  <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+                    fontIcon="fa-cogs">
+                  </mat-icon>
+                  <span matLine>Procesos Diferidos</span>
+                </mat-list-item>
+                <!-- AUDIT HUMANAGE -->
+                <mat-list-item name="mli_MenuAuditoria" routerLink="/employer/audits" routerLinkActive="active"
+                  *ngIf="this.isRRHH()" matTooltip="Auditoría" matTooltipPosition="after">
+                  <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+                    fontIcon="fa-history">
+                  </mat-icon>
+                  <span matLine>Auditoría</span>
+                </mat-list-item>
+
+                <!-- HUMANAGE CONNECT  -->
+                <mat-list-item name="mli_MenuHumanageConnect" routerLink="/employer/humanage-connect"
+                  class="fa-bg-beta"
+                  routerLinkActive="active"
+                  *ngIf="useConnect" matTooltip="Humanage Connect" matTooltipPosition="after">
+                  <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+                    fontIcon="fa-messages">
+                  </mat-icon>
+                  <span matLine>Humanage Connect</span>
+                </mat-list-item>
+
+              </mat-nav-list>
+            </div>
+            <div class="links">
+              <mat-nav-list>
+                <!-- NAVIGATION TITLE -->
+                <h3 mat-subheader>Navegación</h3>
+                <!-- NOTIFICATIONS -->
+                <mat-list-item [matMenuTriggerFor]="goMenuNotif" (click)="refreshNotificacion()" [matTooltip]="totalNotifications > 0 ?
+                                                (totalNotifications > 1 ?
+                                                totalNotifications + ' nuevas Notificaciones' :
+                                                '1 nueva Notificación' ) :
+                                                'Notificaciones' " matTooltipPosition="after">
+                  <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+                    fontIcon="fa-bell" matBadge="{{totalNotifications > 0  ? totalNotifications : ''}}"
+                    matBadgePosition="before" matBadgeColor="warn"></mat-icon>
+                  <span matLine>Notificaciones</span>
+                </mat-list-item>
+                <!-- LINKS -->
+                <mat-list-item *ngIf="appLinks && appLinks.length > 0" [matMenuTriggerFor]="goMenu" matTooltip="Accesos"
+                  matTooltipPosition="after">
+                  <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+                    fontIcon="fa-th"></mat-icon>
+                  <span matLine>Accesos</span>
+                </mat-list-item>
+                <!-- SETTINGS -->
+                <mat-list-item *ngIf="(showSettings || isLeaveConfig) && !hasAdjetivation" matTooltip="Configuración"
+                  routerLink="/employer/settings" routerLinkActive="active" matTooltipPosition="after">
+                  <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+                    fontIcon="fa-tools"></mat-icon>
+                  <span matLine>Configuración</span>
+                </mat-list-item>
+                <!-- HELP -->
+                <mat-list-item [matMenuTriggerFor]="goMenuAyuda" matTooltip="Ayuda y Soporte"
+                  matTooltipPosition="after">
+                  <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+                    fontIcon="fa-info"></mat-icon>
+                  <span matLine>Ayuda y Soporte</span>
+                </mat-list-item>
+
+                <!-- EXIT HUMANAGE -->
+                <mat-list-item data-testid="logout-button" (click)="logOut()" class="logout-btn"
+                  [matTooltip]="!isSamlActive ? 'Salir del sistema' : 'Salir y volver'" matTooltipPosition="after">
+                  <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+                    fontIcon="fa-sign-out"></mat-icon>
+                  <span matLine *ngIf="!isSamlActive">Salir del sistema</span>
+                  <span matLine *ngIf="isSamlActive">Salir y volver</span>
+                </mat-list-item>
+              </mat-nav-list>
+            </div>
+          </div>
+          <!-- VERSION TAG -->
+          <div class="version" matTooltip="{{releaseName}}" matTooltipPosition="after">
+            <mat-nav-list>
+              <h3 mat-subheader>{{releaseName}}</h3>
+            </mat-nav-list>
+          </div>
+        </div>
+      </mat-drawer>
+      <!-- MAIN APP -->
+      <mat-drawer-content class="app-container" [ngClass]="{'menu-is-open' : isExpanded}">
+        <!-- MAIN LOADER -->
+        <div *ngIf="loading" class="mat-loading-window">
+          <mat-progress-spinner style="z-index: 1" mode="indeterminate" color="primary">
+          </mat-progress-spinner>
+        </div>
+        <ng-container *ngIf="!loading">
+          <mat-toolbar class="mat-elevation-z1" color="primary">
+            <mat-toolbar-row></mat-toolbar-row>
+            <mat-toolbar-row></mat-toolbar-row>
+          </mat-toolbar>
+          <div class="floating-container UI-V2" fxLayout="row" fxLayoutAlign="center center" fxFill>
+            <mat-card class="card-1-1 frame-card" fxLayout="row">
+              <!-- ROUTES -->
+              <router-outlet></router-outlet>
+            </mat-card>
+          </div>
+        </ng-container>
+        <!-- SIDE TRIGGER MOBILE ONLY -->
+        <button mat-icon-button class="side-open-mobile" color="" (click)="menuFocus = !menuFocus"
+          [title]="!isExpanded ? 'Expandir' : 'Contraer'">
+          <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-bars"></mat-icon>
+        </button>
+      </mat-drawer-content>
+    </mat-drawer-container>
+  </mat-drawer-content>
+</mat-drawer-container>
+<!-- NOTIFICATIONS MENU -->
+<mat-menu #goMenuNotif="matMenu" xPosition="before" yPosition="above" overlapTrigger="true"
+  class="notifications-panel mat-card">
+  <!-- NOTIFICATIONS TOP -->
+  <div class="notification top" fxLayout="row" fxLayoutAlign="space-between center" (click)="$event.stopPropagation()">
+    <span class="header">
+      <h3>Notificaciones</h3>
+    </span>
+    <button mat-icon-button title="Actualizar" (click)="refreshNotificacion()">
+      <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-redo"></mat-icon>
+    </button>
+  </div>
+  <div class="notifications-body">
+    <div class="window-spinner" *ngIf="loadNotifications">
+      <mat-progress-spinner mode="indeterminate" color="primary">
+      </mat-progress-spinner>
+    </div>
+    <!-- notification none -->
+    <div class="notification no-notif" *ngIf="totalNotifications < 1  && !loadNotifications">
+      <div class="primary" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+        <mat-icon class="fa-lg" fxLayoutAlign="center center" fontSet="fas" fontIcon="fa-cloud-moon">
+        </mat-icon>
+        <div fxLayout="column">
+          <h3>Sin novedades por aquí...</h3>
+        </div>
+      </div>
+    </div>
+    <ng-container *ngIf="!loadNotifications">
+      <!-- NOTIFICATIONS PERSISTENT SIGNATURE STATUS -->
+      <div class="notification selectable" *ngFor="let proc of processToNotif">
+        <div fxLayout="row" fxLayoutAlign="space-between center" fxFlex="grow">
+          <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px" *ngIf="proc.results" fxFlex="grow">
+            <mat-icon class="fa-lg" fxLayoutAlign="center center" fontSet="fas" fontIcon="fa-comment-alt">
+            </mat-icon>
+            <div class="notification-on-signature" fxLayout="column">
+              <h3> Se están firmando {{ proc.results.totalItems }} {{proc.results.totalItems == 1 ? 'Documento'
+                :
+                'Documentos'}} </h3>
+              <mat-progress-bar class="signature-bar" mode="determinate" [value]="proc.results.advancePercentage">
+              </mat-progress-bar>
+              <span class="signature-count">
+                {{proc.results.pagesProcessed }} de
+                {{proc.results.totalPages}}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- NOTIFICATIONS POP MODEL -->
+      <div class="notification selectable" (click)="notifAction(notif)" *ngFor="let notif of notifications">
+        <div fxLayout="row" fxLayoutAlign="space-between center">
+          <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+            <mat-icon class="fa-lg" fxLayoutAlign="center center" fontSet="fas" [fontIcon]="notif.icon">
+            </mat-icon>
+            <div fxLayout="column">
+              <h3> {{ notif.description}} </h3>
+              <h5 *ngIf="notif.subtitle">{{ notif.subtitle }}</h5>
+            </div>
+          </div>
+          <div *ngIf="notif.actionName" class="subtitle" fxLayout="column">
+            <h5 *ngIf="notif.actionName" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+              <mat-icon class="fa-lg" fxLayoutAlign="center center" fontSet="fas" [fontIcon]="notif.actionIcon">
+              </mat-icon>
+              <span>
+                {{ notif.actionName }}
+              </span>
+            </h5>
+          </div>
+          <button mat-icon-button class="notif-hide-button" (click)="deleteNotifButton(notif.id)" title="Ocultar">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-times" fxLayout="row" fxLayoutAlign="center center">
+            </mat-icon>
+          </button>
+        </div>
+      </div>
+    </ng-container>
+
+
+  </div>
+  <!-- NOTIFICATIONS bottom -->
+  <div class="notification bottom" *ngIf="totalNotifications > 1" fxLayout="row-reverse"
+    fxLayoutAlign="space-between center" (click)="$event.stopPropagation()">
+    <button mat-button (click)="deleteAllNotif()">
+      Ocultar Todas
+    </button>
+  </div>
+</mat-menu>
+<!-- NAVIGATION MENU -->
+<mat-menu class="navigation-menu" #goMenu="matMenu" xPosition="before" yPosition="above" overlapTrigger="true">
+  <h4 class="primary">Accesos</h4>
+  <mat-nav-list class="navigation-list mat-card" *ngIf="appLinks.length <= minAccessValue">
+    <mat-list-item *ngFor="let app of appLinks" (click)="switchTo(app)">
+      <mat-icon *ngIf="app.module === 'employer' || app.module === 'candidateadmin' || app.module === 'jefe'"
+        class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+        fontIcon="fa-industry-alt">
+      </mat-icon>
+      <mat-icon *ngIf="app.module === 'employee' && !app.isSaml" class="fa-lg" fxLayout="row"
+        fxLayoutAlign="center center" mat-list-icon fontSet="fas" fontIcon="fa-id-badge">
+      </mat-icon>
+      <mat-icon *ngIf="app.module === 'signer' && !app.isSaml" class="fa-lg" fxLayout="row"
+        fxLayoutAlign="center center" mat-list-icon fontSet="fas" fontIcon="fa-signature">
+      </mat-icon>
+      <mat-icon *ngIf="app.module === 'overseer' && !app.isSaml" class="fa-lg" fxLayout="row"
+        fxLayoutAlign="center center" mat-list-icon fontSet="fas" fontIcon="fa-eye">
+      </mat-icon>
+      <mat-icon *ngIf="app.isSaml" class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon
+        fontSet="fas" fontIcon="fa-sign-in">
+      </mat-icon>
+      <mat-icon *ngIf="app.link && !app.isSaml" class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon
+        fontSet="fa" fontIcon="fa-exchange">
+      </mat-icon>
+      <span matLine>{{app.roleName }}</span>
+      <span matLine><b>{{app.ouName }}</b></span>
+    </mat-list-item>
+  </mat-nav-list>
+  <div class="navigation-search" fxLayout="column" *ngIf="appLinks.length > minAccessValue"
+    (click)="$event.stopPropagation()">
+    <app-autocomplete-chip [showIcons]="true" [iconName]="'fa-search'" [AccessList]="appLinks"
+      title="Ingrese la Empresa" [placeHolderText]="'Buscar accesos disponibles'" [AccessView]="true"
+      (OnAccessClick)="switchTo($event)" fxFlex="grow" fxLayout="row">
+    </app-autocomplete-chip>
+  </div>
+</mat-menu>
+<!-- HELP MENU -->
+<mat-menu #goMenuAyuda="matMenu" xPosition="before" yPosition="above" overlapTrigger="true" class="mat-card">
+  <mat-nav-list class="navigation-list">
+    <mat-list-item (click)="help()" matTooltip="Ayuda online" matTooltipPosition="after">
+      <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+        fontIcon="fa-question-circle"></mat-icon>
+      <span matLine>Ayuda online</span>
+    </mat-list-item>
+    <mat-list-item (click)="support()"
+      *ngIf="this.isRRHH()  || isAdministrator() || isLDSAdministrator() || isFirmante()"
+      matTooltip="Portal de Mesa de Ayuda" matTooltipPosition="after">
+      <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+        fontIcon="fa-user-headset"></mat-icon>
+      <span matLine>Portal de Mesa de Ayuda</span>
+    </mat-list-item>
+  </mat-nav-list>
+</mat-menu>
+
+<app-certificate-declaration *ngIf="isCertificateDeclarationOpen" [documentIds]="certificateAddPersonId"
+  (addFinish)="closeAddCertificate($event)" [ouId]="entity.ouId">
+</app-certificate-declaration>

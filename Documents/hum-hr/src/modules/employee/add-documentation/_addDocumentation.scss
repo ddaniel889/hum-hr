@@ -1,0 +1,223 @@
+@import '../../../../assets/styles/img-management';
+
+
+app-add-documentation {
+  .employee-add-documentation {
+
+    .inbox-toolbar {
+      padding: 0 16px;
+
+      .toolbar-line {
+        padding-left: 0 !important;
+      }
+    }
+
+    mat-divider.false-divider {
+      width: calc(100% - 32px) !important;
+      margin: -1px 16px 0 !important;
+    }
+
+    mat-tab-group {
+      height: calc(100% - 64px);
+
+      mat-tab-header {
+        margin: 0 16px;
+        border-bottom: none !important;
+        padding-top: 8px;
+
+        .mat-tab-label-active {
+          opacity: 1;
+        }
+      }
+
+      .mat-tab-body-wrapper {
+        height: 100%;
+
+        mat-tab-body {
+          height: 100%;
+
+          .mat-tab-body-content {
+            height: 100%;
+
+            .pending-container {
+              height: 100%;
+
+              .pending-items {
+                height: 100%;
+                padding: 16px 9px 16px 16px;
+                overflow: auto;
+                overflow-y: overlay;
+
+                .pending-item {
+                  height: auto;
+                  display: block;
+
+                  .content {
+                    padding: 16px;
+                    height: 100%;
+                    box-sizing: border-box;
+                    cursor: pointer;
+
+                    &.selected {
+                      cursor: default !important;
+
+                    }
+
+
+
+                    .item-data {
+                      margin-left: 16px;
+                      width: calc(100% - 40px - 16px);
+
+                      b {
+                        font-size: 18px;
+                      }
+
+                      span {
+                        font-size: 14px;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .detail {
+      app-file-document-view {
+        .mat-avatar {
+          .toolbar-line {
+            h5 {
+              display: none;
+            }
+          }
+        }
+
+        .new-container {
+          app-file-document-upload {
+            app-upload-form {
+              height: 50% !important;
+
+            }
+
+            .metadata-list {
+              padding: 0 16px 16px;
+              max-height: calc(50% - 97px);
+              overflow: auto;
+              position: relative;
+              margin-top: 16px;
+
+              .mat-subheader {
+                height: 48px;
+                line-height: 16px;
+                font-size: 14px;
+                font-weight: 500;
+                margin-bottom: 16px;
+                margin-top: 0 !important;
+                display: flex;
+                box-sizing: border-box;
+                padding: 16px;
+                align-items: center;
+                position: sticky;
+                top: 0;
+                z-index: 1;
+              }
+
+              mat-form-field {
+                width: 100%;
+                padding: 0 16px;
+                box-sizing: border-box;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@mixin addDocumentation($bg-card, $bg-background, $primary, $divider, $text-main-solid, $text-side, $primary-text) {
+  app-add-documentation {
+    .employee-add-documentation {
+      .inbox-toolbar {
+        background: $bg-background;
+
+        .toolbar-line {
+          mat-icon {
+            color: $primary-text;
+          }
+
+          h3 {
+            color: $primary-text;
+          }
+        }
+      }
+
+      mat-tab-group {
+        background: $bg-background;
+
+        mat-tab-header {
+          .mat-tab-label-active {
+            color: $primary-text;
+          }
+        }
+
+        .mat-tab-body-wrapper {
+          mat-tab-body {
+            .mat-tab-body-content {
+              .pending-container {
+                .pending-items {
+                  .pending-item {
+                    .content {
+                      &:hover {
+                        box-shadow: 0 2px 4px -1px rgba(0, 0, 0, .2), 0 4px 5px 0 rgba(0, 0, 0, .14), 0 1px 10px 0 $divider !important;
+                      }
+
+                      &.selected {
+                        border-left: 6px solid $primary !important;
+
+                        mat-icon {
+                          color: $primary-text !important;
+                        }
+
+                        .item-data {
+                          color: $text-main-solid !important;
+                        }
+                      }
+
+                      mat-icon {
+                        color: $text-side;
+                      }
+
+                      .item-data {
+                        color: $text-side;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      .detail {
+        app-file-document-view {
+          .new-container {
+            app-file-document-upload {
+              .metadata-list {
+                .mat-subheader {
+                  color: $text-side;
+                  background: $bg-card !important;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

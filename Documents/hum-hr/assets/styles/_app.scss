@@ -1,0 +1,383 @@
+@import 'img-management';
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+}
+
+*[hidden] {
+  display: none !important;
+}
+
+
+*::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  overflow: hidden;
+  border-radius: 5px;
+}
+
+*::-webkit-scrollbar-thumb {
+  overflow: hidden;
+  border-radius: 5px;
+}
+
+*:focus {
+  outline: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+a {
+  text-decoration: none;
+  cursor: pointer;
+  color: #1a0dab;
+}
+
+a:visited {
+  color: #609;
+}
+
+
+
+//estilos varios//
+button {
+  font-size: 16px !important;
+}
+
+.maximize {
+  max-height: 100% !important
+}
+
+.mat-form-field-wrapper {
+  width: 100%;
+}
+
+.mat-form-field-prefix {
+  padding: 8px 10px;
+  margin-right: 16px;
+}
+
+.mat-horizontal-stepper-header-container {
+  @include display(ni, u, u, u, u, u);
+}
+
+.toolbar-line {
+  &.container-ou {
+    width: unset !important;
+    padding: 0 24px 0 8px;
+    border-radius: 28px;
+    height: 50px;
+
+    button.notification-alert {
+      background: red;
+      max-height: 32px;
+      border-radius: 20px;
+      max-width: unset;
+      flex-shrink: 0;
+      margin-right: -15px;
+      padding: 0 8px 0 4px !important;
+
+      .mat-button-wrapper {
+        max-height: 32px;
+        display: flex;
+        align-items: center;
+        max-width: unset !important;
+      }
+    }
+
+    .invisible-container {
+      position: relative;
+
+      &.ou-selector {
+        height: 50px;
+        border-radius: 25px;
+        overflow: hidden;
+        padding: 0 8px;
+        background: #536dfe !important;
+        cursor: pointer;
+        margin-left: -8px;
+        z-index: 2;
+      }
+
+      .title {
+        width: unset !important;
+      }
+
+      .invisible-item {
+        width: 0 !important;
+        overflow: hidden !important;
+        position: absolute;
+        left: 64px;
+        top: 9px;
+      }
+    }
+  }
+
+  &.inbox-selector {
+    width: unset;
+    padding: 0 8px;
+    border-radius: 28px;
+    height: 50px;
+    cursor: pointer;
+    transition: background .2s ease;
+    position: relative;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.04);
+      transition: background .2s ease;
+    }
+
+    .invisible-container {
+      margin-right: 0 !important;
+
+      .invisible-item {
+        width: 0 !important;
+        overflow: hidden !important;
+        position: absolute;
+        left: 64px;
+        top: 9px;
+      }
+    }
+  }
+
+  &.container-persona {
+    padding-right: 0 !important;
+
+    .persona-title {
+      height: 100%;
+      border-radius: 58px;
+      overflow: hidden;
+      padding-left: 58px;
+      padding-right: 24px;
+      margin-left: -50px;
+      z-index: 1;
+    }
+
+    .invisible-container {
+
+      &.persona-selector {
+        height: 50px;
+        border-radius: 58px;
+        overflow: hidden;
+        cursor: pointer;
+        padding-left: 58px;
+        padding-right: 8px;
+        margin-left: -50px;
+
+        .invisible-item {
+          width: 0 !important;
+          overflow: hidden !important;
+          position: absolute;
+          left: 114px;
+          top: 9px;
+        }
+      }
+    }
+  }
+}
+
+button.mat-icon-button:not([disabled]):hover {
+  transition: background .2s ease;
+}
+
+
+.text-center {
+  text-align: center
+}
+
+.floating-container .mat-toolbar-row {
+  padding: 0 16px 0 8px !important;
+}
+
+.icon-stacked {
+  position: relative;
+  margin: 0 8px;
+
+  mat-icon+mat-icon {
+    position: absolute;
+    left: 0;
+    top: 0;
+    margin: 0 !important;
+  }
+}
+
+
+.divider-vert {
+  height: 40px;
+  width: 1px;
+}
+
+mat-divider {
+  z-index: 1;
+
+  &.mat-divider-inset {
+    margin-left: 0 !important;
+  }
+}
+
+.scroll-infinite {
+  height: calc(100% - 65px) !important;
+  overflow: auto !important;
+  overflow: overlay !important;
+  position: relative;
+}
+
+.scroll-infinite mat-expansion-panel.mat-expansion-panel.mat-expanded {
+  height: auto !important;
+  max-height: unset !important;
+  overflow: unset !important
+}
+
+.icon-aligned11 {
+  padding-left: 11px !important;
+  box-sizing: border-box;
+}
+
+.icon-aligned48 {
+  padding-left: 48px !important;
+  box-sizing: border-box;
+}
+
+.icon-aligned56 {
+  padding-left: 56px !important;
+  box-sizing: border-box;
+}
+
+.main-line {
+  font-size: 14px;
+}
+
+.side-line {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.mat-menu-content:not(:empty) {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.wizard-add .title {
+  width: 100% !important;
+}
+
+.mat-select-panel .mat-option .option-text {
+  display: block;
+  width: calc(100% - 56px);
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+
+.mat-form-field-suffix {
+  align-items: center;
+  display: flex;
+
+  button {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+
+    mat-icon {
+      min-width: unset;
+    }
+  }
+}
+
+
+app-edit-metadata-value-dialog .title h3 {
+  width: 100%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+ngx-avatar {
+  .avatar-content {
+    height: 100%;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    overflow: hidden;
+  }
+}
+
+
+@mixin app($bg-toolbar-dark, $btn-hover, $scroll-body, $scroll-thumb, $primary, $primary-side, $divider, $text-main, $text-main-inverse-solid) {
+
+  *::-webkit-scrollbar-track {
+    background: $scroll-body;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: $scroll-thumb;
+  }
+
+  *::-webkit-scrollbar-corner {
+    background: $scroll-body;
+  }
+
+  .toolbar-line {
+    &.container-ou {
+      background: $primary;
+      color: $text-main-inverse-solid;
+    }
+
+    &.container-persona {
+      background: $primary !important;
+
+      .persona-title {
+        background: $primary;
+      }
+
+      .invisible-container {
+        &.persona-selector {
+          background: $primary !important;
+        }
+      }
+    }
+  }
+
+  button.mat-icon-button:not([disabled]):hover {
+    background: $btn-hover;
+  }
+
+  .side-bar {
+    background: $bg-toolbar-dark;
+  }
+
+  .icon-stacked {
+    color: $text-main !important;
+
+    mat-icon+mat-icon {
+      text-shadow: -1px 1px 0px $primary, 1px -1px 0px $primary;
+    }
+  }
+
+  .divider-vert {
+    background: $divider;
+  }
+
+  .avatar {
+    background: $primary-side !important
+  }
+
+  ngx-avatar {
+    .avatar-content {
+      background: $primary-side !important
+    }
+  }
+}

@@ -1,0 +1,83 @@
+@import '../../../../assets/styles/img-management';
+
+
+  app-document-detail {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+
+    .window-spinner {
+      position: absolute;
+      top: 0;
+      height: 100%;
+      z-index: 10;
+    }
+
+    app-pdf-wrapper {
+      flex-grow: 1;
+      flex-shrink: 1;
+      flex-basis: auto;
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+
+      .pdf-view-container {
+        padding: 0;
+        height: 100%;
+        width: 100%;
+        overflow: auto !important;
+        overflow-y: overlay !important;
+        transition: max-height 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+      }
+    }
+
+    app-sign-document {
+      .firmador button.mat-raised-button.mat-accent {
+        height: 64px;
+        border-radius: 40px !important;
+        padding: 0 16px 0 32px !important;
+        min-width: unset !important;
+        pointer-events: all;
+
+
+        span.mat-button-wrapper {
+          padding: 0 20px 0 0;
+          font-size: 20px;
+        }
+      }
+
+      .sign-cycle {
+        padding: 32px 0 !important;
+        box-sizing: border-box !important;
+        position: relative;
+
+        mat-divider {
+          position: absolute !important;
+          top: 0
+        }
+
+        .sign-content {
+          width: 70%;
+          margin: 0 auto;
+
+          .indications {
+            width: calc(100% - 80px - 32px);
+            padding: 0 32px;
+            box-sizing: border-box;
+          }
+        }
+      }
+    }
+  }
+
+
+@mixin employee2016Home($text-main) {
+  app-document-detail {
+    app-sign-document {
+      .firmador button.mat-raised-button.mat-accent {
+        color: $text-main!important;
+      }
+    }
+  }
+}

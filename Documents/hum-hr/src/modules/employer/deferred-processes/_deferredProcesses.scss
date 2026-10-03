@@ -1,0 +1,208 @@
+@mixin deferredProcesses(
+  $bg-card,
+  $bg-card-side,
+  $bg-background,
+  $primary,
+  $primary-light,
+  $accent,
+  $accent-light,
+  $divider,
+  $text-main-solid,
+  $text-main,
+  $text-side,
+  $text-sub,
+  $primary-text,
+  $hover,
+  $row-odd,
+  $row-even,
+  $leave-ok,
+  $leave-not-ok,
+  $warn,
+  $success
+) {
+  .UI-V2 {
+    .deferred-process-list {
+      .header {
+        h3 {
+          color: $primary-text;
+        }
+      }
+
+      .search-container {
+        .search {
+          .content {
+            background: $bg-background;
+            border: 1px solid $divider;
+
+            &:hover,
+            &:active,
+            &:focus,
+            &:focus-within {
+              background: $hover !important;
+            }
+
+            input {
+              color: $text-main-solid;
+            }
+          }
+        }
+      }
+    }
+
+    .deferred-process-list,
+    .deferred-process-details {
+      .text-success {
+        color: $success;
+      }
+
+      .text-warn {
+        color: $warn;
+      }
+
+      .text-primary {
+        color: $primary-text;
+      }
+
+      .text-atention {
+        color: #DB7703;
+      }
+
+      .table-paginator-container {
+        display: flex;
+        flex-direction: column;
+        border-radius: 10px;
+        overflow: hidden;
+
+        .mat-table {
+          border-bottom: none;
+          border-radius: 10px 10px 0 0;
+        }
+
+        .paginator-container {
+          display: flex;
+          align-items: center;
+          justify-content: flex-end;
+          background-color: #f2f2f2;
+          padding: 0 1.5rem;
+          height: 3rem;
+        }
+      }
+
+      .mat-table {
+        border: 1px solid #f2f2f2;
+        border-radius: 10px;
+        overflow: hidden;
+
+        .mat-header-row {
+          .mat-header-cell {
+            font-size: 14px;
+            font-weight: 700;
+          }
+        }
+
+        .mat-header-row {
+          background: #f2f2f2;
+
+          .mat-header-cell {
+            color: $primary-text;
+          }
+        }
+
+        .mat-row {
+          background: $bg-card;
+        }
+      }
+    }
+
+    .progress-bar-container {
+      position: relative;
+    }
+
+    .deferred-process-details {
+      .header {
+        h3 {
+          color: $primary-text;
+        }
+
+        .back-link {
+          &:visited {
+            color: $primary-text;
+          }
+        }
+      }
+    }
+
+  }
+
+  .process-card,
+  .process-card-detail,
+  .process-card-stages {
+    mat-card-subtitle {
+      color: $text-main-solid;
+    }
+    background: $bg-background;
+    border: 1px solid $divider;
+
+    .stages-container {
+      .stage.completed {
+        mat-icon {
+          color: #499719;
+        }
+        .icon-container {
+          background-color: #4ea01c26;
+        }
+        .line {
+          background-color: #499719;
+        }
+      }
+  
+      .stage.on-going {
+        mat-icon {
+          color: $primary;
+        }
+        .icon-container {
+          background-color: #42309f33;
+        }
+        .line {
+          background-color: #949494;
+        }
+      }
+  
+      .stage.pending {
+        mat-icon {
+          color: #949494;
+        }
+        .icon-container {
+          background-color: #aeaeae33;
+        }
+        .line {
+          background-color: #949494;
+        }
+
+        color: #949494;
+      }
+  
+      .stage.has-error {
+        mat-icon {
+          color: $warn;
+        }
+        .icon-container {
+          background-color: #bc040433;
+        }
+      }
+  
+      .stage-description {
+        .button-link {
+          color: $primary;
+        }
+      }
+    }
+  }
+
+}
+
+.mat-datepicker-actions {
+  .custom-action-button {
+    margin-top: 8px;
+  }
+}

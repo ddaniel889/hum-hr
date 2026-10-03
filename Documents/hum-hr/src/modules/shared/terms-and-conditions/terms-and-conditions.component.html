@@ -1,0 +1,16 @@
+<div *ngIf="!showFile()">
+  <b class="title">{{ termsAndConditions?.title}}</b>
+  <div class="tyc-container tyc-text">{{ termsAndConditions?.body}}</div>
+</div>
+
+<div class="tyc-container" *ngIf="showFile()">
+  <div class="sticky" fxLayout="row" fxLayoutAlign="space-between center" fxFill>
+    <b class="title">{{ termsAndConditions?.title}}</b>
+    <app-pdf-wrapper-controls [pdfWrapper]="pdfWrapper" [showPrint]="showPrint" [showSave]="showSave"
+      [showZoomIn]="showZoomIn" [showZoomOut]="showZoomOut"></app-pdf-wrapper-controls>
+  </div>
+  <app-pdf-wrapper [showControls]="false" #pdfWrapper [fileName]="filename" [autoView]="false"
+    [file]="termsAndConditions?.fileBase64">
+  </app-pdf-wrapper>
+</div>
+

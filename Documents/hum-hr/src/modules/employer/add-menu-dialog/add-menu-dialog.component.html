@@ -1,0 +1,229 @@
+<mat-horizontal-stepper class="add-menu" [class]="{'hide' : showHelp}" #stepper>{{stepper.index}}
+
+    <!-- Menú Principal 0-->
+    <mat-step [stepControl]="menuFormGroup">
+        <mat-toolbar color="grey">
+            <mat-toolbar-row>
+                <div class="toolbar-line" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+                    <div class="title" fxLayout="column" fxLayoutAlign="center start">
+                        <h3>Elegí el tipo de proceso</h3>
+                    </div>
+                    <button mat-icon-button mat-dialog-close title="Cerrar">
+                        <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+                    </button>
+                </div>
+            </mat-toolbar-row>
+        </mat-toolbar>
+        <mat-divider></mat-divider>
+        <form [formGroup]="menuFormGroup">
+            <div class="add-menu-form-body" fxLayout="column" fxLayoutAlign="center start" fxLayoutGap="16px">
+                <mat-radio-group id="step0" formControlName="selectedMenu" required [(ngModel)]="selectedMenu">
+                    <mat-radio-button value="AddEmployeeFile" *ngIf="isAdministrator">
+                        Administrar Legajos
+                    </mat-radio-button>
+                    <mat-radio-button value="AddCandidate" *ngIf="isCandidateAdmin || isCandidateAdminBasic ">
+                        Administrar Candidatos
+                    </mat-radio-button>
+                    <mat-radio-button value="AddDocumentation" *ngIf="isRRHH_LD || isGestorDocumental ">
+                        Administrar Documentos
+                    </mat-radio-button>
+                </mat-radio-group>
+            </div>
+            <div class="add-menu-form-actions">
+                <button mat-button (click)="goToNextStep()" color="primary" class="btn"
+                    [disabled]="menuFormGroup.invalid">Siguiente</button>
+                <button mat-button mat-dialog-close>Cancelar</button>
+            </div>
+        </form>
+    </mat-step>
+
+    <!-- Alta de Legajos 1-->
+    <mat-step [stepControl]="addEmployeeFormGroup">
+        <mat-toolbar color="grey">
+            <mat-toolbar-row>
+                <div class="toolbar-line" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+                    <div class="title" fxLayout="column" fxLayoutAlign="center start">
+                        <h3>Administrar Legajos</h3>
+                    </div>
+
+                    <button mat-icon-button (click)="closeDialog()" title="Cerrar">
+                        <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+                    </button>
+
+                </div>
+            </mat-toolbar-row>
+        </mat-toolbar>
+        <mat-divider></mat-divider>
+        <form [formGroup]="addEmployeeFormGroup" fxFlex="grow">
+            <div class="add-menu-form-body" fxLayout="column" fxLayoutGap="16px">
+                <mat-radio-group id="step1" formControlName="adminMode" fxLayout="column" #modeGroup="matRadioGroup"
+                    [(ngModel)]="selectedEmployeeFileType">
+                    <mat-radio-button value="manual">Crear en forma Individual</mat-radio-button>
+                    <mat-radio-button value="auto">Crear en forma Masiva</mat-radio-button>
+                </mat-radio-group>
+            </div>
+            <div class="add-menu-form-actions">
+                <button mat-raised-button (click)="goToNextEmployeeStep(modeGroup.value === 'manual')" color="primary"
+                    class="btn" [disabled]="addEmployeeFormGroup.invalid">Siguiente</button>
+                <button mat-button (click)="goToPreviousStep()">Anterior</button>
+            </div>
+        </form>
+
+    </mat-step>
+
+
+
+    <!-- Alta Manual/Individual de Legajos 2-->
+    <mat-step>
+        <app-add-person *ngIf="selectedMenu == 'AddEmployeeFile'" (cancelAddPerson)="closeDialog()"
+            (backAddPerson)="goToPreviousEmployeeStep()" (actionFinished)="postPersonAdded()" [person]="employee"
+            [toolbartitle]="'Administrar Legajos'" [isCandidate]="false"></app-add-person>
+    </mat-step>
+
+
+    <!-- Alta Automática/Masiva de Legajos 3-->
+    <mat-step [stepControl]="addMassiveEmployeeFormGroup">
+        <mat-toolbar color="grey" class="is-hidden">
+            <mat-toolbar-row>
+                <div class="toolbar-line" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+                    <div class="title" fxLayout="column" fxLayoutAlign="center start">
+                        <h3>Crear en forma Masiva</h3>
+                    </div>
+                    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                        <button mat-icon-button (click)="openHelp()" title="Ayuda">
+                            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-question-circle"></mat-icon>
+                        </button>
+                        <button mat-icon-button (click)="closeDialog()" title="Cerrar">
+                            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+                        </button>
+                    </div>
+                </div>
+            </mat-toolbar-row>
+        </mat-toolbar>
+        <mat-divider></mat-divider>
+
+        <form [formGroup]="addMassiveEmployeeFormGroup" fxFlex="grow" class="is-hidden">
+            <div class="add-menu-form-body" fxLayout="column" fxLayoutGap="16px" fxLayoutAlign="center stretch">
+                <h5 class="stepper-title">Cargá tu archivo en formato Excel</h5>
+                <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow"
+                    *ngIf="certificateProviders && certificateProviders.length > 0">
+                    <mat-select placeholder="Empresa" formControlName="selectedOuMassiveFrmCtrl" placeholder="Empresa"
+                        required (selectionChange)="getMassiveRegisterExampleFile()">
+                        <mat-option *ngFor="let ou of organizationalUnits" [value]="ou.id">
+                            {{ou.name}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <div fxLayout="column" fxLayoutGap="16px" fxLayoutAlign="center stretch">
+                    <app-upload-form canRemove="true" multipleSelection="true" acceptedExtensions=".xls, .xlsx"
+                        [maxFile]="1" (filesChanged)="onFilesChanged($event)"></app-upload-form>
+                    <mat-checkbox [checked]="sendWelcome" (change)="sendWelcome = !sendWelcome">{{ useSaml ? 'Habilitar
+                        empleados' : 'Notificar al empleado'}}
+                    </mat-checkbox>
+                </div>
+            </div>
+            <div class="add-menu-form-actions">
+                <button mat-raised-button [disabled]="disableFields || clickOnce" color="primary" (click)="upload()"
+                    class="btn">Finalizar</button>
+                <button mat-button (click)="goToPreviousEmployeeStep()">Anterior</button>
+            </div>
+        </form>
+        <app-help-index [model]="helpModel" (helpFinish)="showHelp = !showHelp" *ngIf="showHelp"></app-help-index>
+    </mat-step>
+
+    <!-- Selección Alta de Candidatos 4-->
+    <mat-step [stepControl]="addCandidateFormGroup">
+        <mat-toolbar color="grey">
+            <mat-toolbar-row>
+                <div class="toolbar-line" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+                    <div class="title" fxLayout="column" fxLayoutAlign="center start">
+                        <h3>Administrar Candidatos</h3>
+                    </div>
+
+                    <button mat-icon-button (click)="closeDialog()" title="Cerrar">
+                        <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+                    </button>
+
+                </div>
+            </mat-toolbar-row>
+        </mat-toolbar>
+        <mat-divider></mat-divider>
+        <form [formGroup]="addCandidateFormGroup" fxFlex="grow">
+            <div class="add-menu-form-body" fxLayout="column" fxLayoutGap="16px">
+                <mat-radio-group id="step1" formControlName="adminMode" fxLayout="column"
+                    #modeCandidateGroup="matRadioGroup" [(ngModel)]="selectedCandidateFileType">
+                    <mat-radio-button value="manual">Crear en forma Individual</mat-radio-button>
+                    <mat-radio-button value="auto">Crear en forma Masiva</mat-radio-button>
+                </mat-radio-group>
+            </div>
+            <div class="add-menu-form-actions">
+                <button mat-raised-button (click)="goToNextCandidateStep(modeCandidateGroup.value === 'manual')"
+                    color="primary" class="btn" [disabled]="addCandidateFormGroup.invalid">Siguiente</button>
+                <button mat-button (click)="goToPreviousStep()">Anterior</button>
+            </div>
+        </form>
+
+    </mat-step>
+
+    <!-- Alta de Candidatos 5-->
+    <mat-step>
+        <app-add-person *ngIf="selectedMenu == 'AddCandidate'" (cancelAddPerson)="closeDialog()"
+            [showOuSelection]="false" (backAddPerson)="resetStepper()" (actionFinished)="postPersonAdded()"
+            [person]="candidate" [toolbartitle]="'Administrar Candidato'" [isCandidate]="true"></app-add-person>
+    </mat-step>
+
+    <!-- Alta Automática/Masiva de Candidatos 6-->
+    <mat-step [stepControl]="addMassiveCandidateFormGroup">
+        <mat-toolbar color="grey" class="is-hidden">
+            <mat-toolbar-row>
+                <div class="toolbar-line" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+                    <div class="title" fxLayout="column" fxLayoutAlign="center start">
+                        <h3>Crear en forma Masiva</h3>
+                    </div>
+                    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                        <button mat-icon-button (click)="openHelp()" title="Ayuda">
+                            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-question-circle"></mat-icon>
+                        </button>
+                        <button mat-icon-button (click)="closeDialog()" title="Cerrar">
+                            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+                        </button>
+                    </div>
+                </div>
+            </mat-toolbar-row>
+        </mat-toolbar>
+        <mat-divider></mat-divider>
+
+        <form [formGroup]="addMassiveCandidateFormGroup" fxFlex="grow" class="is-hidden">
+            <div class="add-menu-form-body" fxLayout="column" fxLayoutGap="16px" fxLayoutAlign="center stretch">
+                <h5 class="stepper-title">Cargá tu archivo en formato Excel</h5>
+                <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow"
+                    *ngIf="certificateProviders && certificateProviders.length > 0">
+                    <mat-select placeholder="Empresa" formControlName="selectedOuMassiveFrmCtrl" placeholder="Empresa"
+                        required (selectionChange)="getMassiveRegisterExampleFile()">
+                        <mat-option *ngFor="let ou of organizationalUnits" [value]="ou.id">
+                            {{ou.name}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <div fxLayout="column" fxLayoutGap="16px" fxLayoutAlign="center stretch">
+                    <app-upload-form canRemove="true" multipleSelection="true" acceptedExtensions=".xls, .xlsx"
+                        [maxFile]="1" (filesChanged)="onFilesChanged($event)"></app-upload-form>
+                </div>
+            </div>
+            <div class="add-menu-form-actions">
+                <button mat-raised-button [disabled]="disableFields || clickOnce" color="primary"
+                    (click)="uploadCandidate()" class="btn">Finalizar</button>
+                <button mat-button (click)="goToPreviousCandidateStep()">Anterior</button>
+            </div>
+        </form>
+        <app-help-index [model]="helpModel" (helpFinish)="showHelp = !showHelp" *ngIf="showHelp"></app-help-index>
+    </mat-step>
+
+    <!-- Alta de Documentación 7-->
+    <mat-step *ngIf="isRRHH_LD || isGestorDocumental ">
+        <app-add-documentation (cancelAddDocumentation)="closeDialog()" (backAddDocumentation)="resetStepper()"
+            (finishAddDocumentation)="closeDialogAddDocumentation()">
+        </app-add-documentation>
+    </mat-step>
+
+</mat-horizontal-stepper>

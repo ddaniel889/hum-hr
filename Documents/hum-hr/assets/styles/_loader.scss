@@ -1,0 +1,58 @@
+@import 'img-management';
+
+
+  .intro-spinner {
+    @include bkimg('#ededee', 'spinner.gif', nrcc, u);
+    width: 100vw;
+    height: 100vh;
+    z-index: 199;
+  }
+
+  .mat-loading-window {
+    @include display(f, u, u, c, c, u);
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 199;
+  }
+
+  .window-spinner {
+    z-index: 199;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    @include display(f, u, u, c, c, u);
+  }
+
+  .mat-progress-bar {
+    position: absolute !important;
+    z-index: 199;
+  }
+
+  .load-window {
+    position: absolute;
+    z-index: 199;
+    top: 65px;
+    width: 100%;
+    height: calc(100% - 65px);
+    @include display(f, u, u, c, c, u);
+  }
+
+  @mixin loader($bg-card) {
+
+    .mat-loading-window {
+      background: $bg-card;
+    }
+
+    .window-spinner {
+      background: $bg-card;
+    }
+
+    .load-window {
+      background: $bg-card;
+    }
+  }
+
+

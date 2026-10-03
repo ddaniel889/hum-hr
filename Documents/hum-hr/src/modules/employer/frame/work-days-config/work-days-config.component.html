@@ -1,0 +1,27 @@
+<mat-accordion>
+  <mat-progress-bar mode="indeterminate" *ngIf="loading"></mat-progress-bar>
+  <mat-expansion-panel style="height: auto;margin: 10px;" [expanded]="true">
+    <mat-expansion-panel-header>
+      <mat-panel-title  style="font-weight: bold;color: #3f51b5;">
+        <mat-icon>calendar_today</mat-icon> Configuración de días Laborales
+      </mat-panel-title>
+        </mat-expansion-panel-header>
+        <mat-card appearance="outlined" style="margin: 10px;max-width: auto;"  *ngIf="!loading">
+    <div class="work-days-config-container">
+      <div class="checkbox-container">
+        <mat-checkbox class="large-checkbox" [(ngModel)]="workDaysBoolean.monday" (change)="changeSubmit()" > Lunes </mat-checkbox>
+        <mat-checkbox class="large-checkbox" [(ngModel)]="workDaysBoolean.tuesday" (change)="changeSubmit()"> Martes </mat-checkbox>
+        <mat-checkbox class="large-checkbox" [(ngModel)]="workDaysBoolean.wednesday" (change)="changeSubmit()"> Miércoles </mat-checkbox>
+        <mat-checkbox class="large-checkbox" [(ngModel)]="workDaysBoolean.thursday" (change)="changeSubmit()"> Jueves </mat-checkbox>
+        <mat-checkbox class="large-checkbox" [(ngModel)]="workDaysBoolean.friday" (change)="changeSubmit()"> Viernes </mat-checkbox>
+        <mat-checkbox class="large-checkbox" [(ngModel)]="workDaysBoolean.saturday" (change)="changeSubmit()"> Sábado </mat-checkbox>
+        <mat-checkbox class="large-checkbox" [(ngModel)]="workDaysBoolean.sunday" (change)="changeSubmit()"> Domingo </mat-checkbox>
+     </div>
+   </div>
+    <div class="btn-container"  appearance="fill" fxFill fxLayout="row" fxLayoutAlign="end end">
+      <button mat-raised-button class="rounded-button" color="primary" (click)="saveWorkDays()" [disabled]="!enableSubmitButton">
+       <span>Guardar</span></button>
+    </div>
+  </mat-card>
+  </mat-expansion-panel>
+</mat-accordion>

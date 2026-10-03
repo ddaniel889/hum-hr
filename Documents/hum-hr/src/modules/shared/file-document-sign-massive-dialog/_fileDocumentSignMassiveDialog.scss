@@ -1,0 +1,124 @@
+@import '../../../../assets/styles/img-management';
+
+app-file-document-sign-massive-dialog,
+app-share-person-dialog {
+  .dialog-content {
+    position: relative;
+
+    mat-toolbar {
+      background: none !important;
+
+      mat-toolbar-row {
+
+        .mat-avatar {
+          width: 100% !important;
+          margin-right: 16px;
+        }
+      }
+    }
+
+    .dialog-body {
+      padding: 0;
+      position: relative;
+      width: 100%;
+      display: block !important;
+
+      p {
+        width: 100% !important;
+        margin: 0 !important;
+        text-align: center;
+        padding: 16px 32px;
+        box-sizing: border-box;
+
+        b {
+          line-height: 26px;
+          font-size: 18px;
+        }
+      }
+
+      table.mat-table * {
+        border: none !important;
+      }
+
+    }
+
+    .dialog-footer {
+      padding: 16px 32px;
+    }
+
+    .dialog-table {
+      max-height: calc(90vh - 65px - 289px);
+      overflow: auto;
+    }
+
+    app-file-document-sign {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+
+      .firmador {
+        position: unset;
+
+        button {
+          pointer-events: all;
+        }
+      }
+
+      mat-divider {
+        display: none !important;
+      }
+
+      .sign-cycle.employer {
+        width: 100%;
+        padding: 0;
+
+        mat-horizontal-stepper {
+          width: unset !important;
+
+          .sign-cycle-content {
+            display: block !important;
+            width: unset;
+            padding: 16px 32px !important;
+
+            .cycle-content-title-container {
+              max-width: unset !important;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@mixin fileDocumentSignMassiveDialog($bg-card, $bg-background, $accent, $primary-text) {
+
+  app-file-document-sign-massive-dialog,
+  app-share-person-dialog {
+    .dialog-content {
+      background: $bg-background;
+
+      mat-toolbar {
+        mat-toolbar-row {
+          .mat-avatar {
+            h3 {
+              color: $primary-text;
+            }
+          }
+        }
+      }
+
+      .dialog-body {
+
+        p {
+          b {
+            color: $accent;
+          }
+        }
+      }
+
+      app-file-document-sign {
+        background: $bg-card;
+      }
+    }
+  }
+}

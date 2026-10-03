@@ -1,0 +1,309 @@
+<mat-horizontal-stepper class="add-menu" [linear]="false" #stepper>
+    <!-- PASO 1 -->
+    <mat-step>
+        <mat-toolbar color="grey" fxLayout="row" fxLayoutAlign="start center">
+            <mat-toolbar-row fxLayout="row" fxLayoutAlign="space-between center" fxFill>
+                <div class="mat-avatar" fxLayout="row" fxLayoutAlign="space-between center">
+                    <div class="toolbar-line" fxLayout="row">
+                        <div class="title" fxLayout="column" fxLayoutAlign="center start">
+                            <h3>Carga de Documentos{{this.headerTitle() }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <button mat-icon-button (click)="cancel()" title="Cerrar">
+                    <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+                </button>
+            </mat-toolbar-row>
+        </mat-toolbar>
+        <mat-divider></mat-divider>
+        <form [formGroup]="documentationTypeForm" fxFlex="grow" (submit)="next(stepper)" (reset)="cancel()">
+            <div class="add-menu-form-body">
+                <mat-form-field>
+                    <mat-select placeholder="Empresa" formControlName="organizationalUnit">
+                        <mat-option *ngFor="let ou of organizationalUnits" [value]="ou.id"
+                            (click)="refreshDocumentationType()">
+                            {{ou.name}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <app-autocomplete-chip [originalList]="documentationTypes"
+                    [placeHolderText]="'Ingrese tipo de documentación'" (OnRemoveItem)="itemRemoved($event)"
+                    (OnItemSelected)="selectDocumentationType($event)" [selectedItemsList]="selectedDocumentationTypes"
+                    fxFlex="grow" fxLayout="row" fxLayoutAlign="start center">
+                </app-autocomplete-chip>
+            </div>
+        </form>
+        <div class="add-menu-form-actions">
+            <button mat-raised-button color="primary" (click)="next(stepper)">Siguiente</button>
+            <button mat-button *ngIf="showBack" (click)="back(stepper)">Atrás</button>
+            <button mat-button *ngIf="!showBack" (click)="cancel()">Cancelar</button>
+        </div>
+    </mat-step>
+    <!-- PASO 2 -->
+    <mat-step>
+        <mat-toolbar color="grey" fxLayout="row" fxLayoutAlign="start center">
+            <mat-toolbar-row fxLayout="row" fxLayoutAlign="space-between center" fxFill>
+                <div class="mat-avatar" fxLayout="row" fxLayoutAlign="space-between center">
+                    <div class="toolbar-line" fxLayout="row">
+                        <div class="title" fxLayout="column" fxLayoutAlign="center start">
+                            <h3>Carga de Documentos{{this.headerTitle() }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <button mat-icon-button (click)="cancel()" title="Cerrar">
+                    <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+                </button>
+            </mat-toolbar-row>
+        </mat-toolbar>
+        <mat-divider></mat-divider>
+        <div class="add-menu-form-body w-table">
+            <!-- EMPLOYEE-SEARCH-INPUT -->
+            <div class="helper" fxLayout="row" fxLayoutAlign="space-between center">
+                <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                    <button mat-icon-button (click)='filteredSearch("Enter")' title="Actualizar">
+                        <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-redo"></mat-icon>
+                    </button>
+                    <div class="search-bar" fxLayout="row" fxLayoutAlign="space-between center">
+                        <div fxLayout="row" fxLayoutAlign="start center">
+                            <mat-icon class="fa" fontSet="fal" fontIcon="fa-search">
+                            </mat-icon>
+                            <input type="search" [(ngModel)]="filterName" placeholder="Buscar Empleados"
+                                (keydown)="filteredSearch($event.key)" />
+                        </div>
+                        <button mat-button color="primary" [matMenuTriggerFor]="menu">
+                            Búsqueda Avanzada
+                        </button>
+                    </div>
+                </div>
+                <div class="actions" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                    <button mat-stroked-button color="primary" (click)="sendToAllPages()" [disabled]="disableSendToAll">
+                        Enviar a todos
+                    </button>
+                    <app-cs-paginator *ngIf="employees?.length != 0" [pageSize]="itemPerPage" [pageCount]="itemsCount"
+                        [(pageIndex)]="pageIndex" (pageChanged)="selectedPageChanged($event)">
+                    </app-cs-paginator>
+                </div>
+                <mat-progress-bar mode="indeterminate" *ngIf="loading && employees?.length"></mat-progress-bar>
+            </div>
+            <!-- Empty (app chapa) -->
+            <ng-container *ngIf="employees?.length == 0 && !loading">
+                <app-chapa [className]="'info-empty'" [icon]="'fa-meh'" [text]="'¡Ups! No hay Empleados aquí...'"
+                    [subText]="'Intenta hacer otra Búsqueda o prueba con otra Empresa'"></app-chapa>
+            </ng-container>
+            <!-- LOADER -->
+            <div class="load-window fixed" *ngIf="loading && employees?.length == 0">
+                <mat-progress-spinner style="z-index: 1" mode="indeterminate" color="primary">
+                </mat-progress-spinner>
+            </div>
+            <!-- EMPLOYEE-SEARCH-TABLE -->
+            <div class="new-table" *ngIf="employees?.length">
+                <div class="mat-table" [hidden]="loading">
+                    <!-- EMPLOYEE-SEARCH-TABLE_HEAD -->
+                    <div class="mat-header-row sticky" fxLayout="row" fxLayoutAlign="start center">
+                        <div class="mat-header-cell w-1" fxLayout="row" fxLayoutAlign="center center">
+                            <mat-checkbox [(ngModel)]="allSelected" (ngModelChange)="selectAllToogle()">
+                            </mat-checkbox>
+                        </div>
+                        <div class="w-12 multiple-selection" fxLayout="row" fxLayoutAlign="start center">
+                            <div class="mat-header-cell w-6 sorteable" (click)="sortColumn(employee.nameSystemName)"
+                                fxLayout="row" fxLayoutAlign="start center" title="Ordenar por Nombre">
+                                <div class="sort-icon" *ngIf="orderBy === employee.nameSystemName">
+                                    <mat-icon *ngIf="!orderAsc" class="fa" fontSet="fal"
+                                        fontIcon="fa-arrow-down"></mat-icon>
+                                    <mat-icon *ngIf="orderAsc" class="fa" fontSet="fal"
+                                        fontIcon="fa-arrow-up"></mat-icon>
+                                </div>
+                                <span>Apellido y Nombre</span>
+                            </div>
+                            <div class="mat-header-cell w-3 sorteable" (click)="sortColumn(employee.nroLegSystemName)"
+                                fxLayout="row" fxLayoutAlign="start center" title="Ordenar por Nro Legajo">
+                                <div class="sort-icon" *ngIf="orderBy === employee.nroLegSystemName">
+                                    <mat-icon *ngIf="!orderAsc" class="fa" fontSet="fal"
+                                        fontIcon="fa-arrow-down"></mat-icon>
+                                    <mat-icon *ngIf="orderAsc" class="fa" fontSet="fal"
+                                        fontIcon="fa-arrow-up"></mat-icon>
+                                </div>
+                                <span>Nro Legajo</span>
+                            </div>
+                            <div class="mat-header-cell w-3 sorteable" (click)="sortColumn(employee.cuilSystemName)"
+                                fxLayout="row" fxLayoutAlign="start center"
+                                title="Ordenar por {{containerType?.label}}">
+                                <div class="sort-icon" *ngIf="orderBy === employee.cuilSystemName">
+                                    <mat-icon *ngIf="!orderAsc" class="fa" fontSet="fal"
+                                        fontIcon="fa-arrow-down"></mat-icon>
+                                    <mat-icon *ngIf="orderAsc" class="fa" fontSet="fal"
+                                        fontIcon="fa-arrow-up"></mat-icon>
+                                </div>
+                                <span>{{containerType?.label}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mat-table-body">
+                        <!-- EMPLOYEE-SEARCH-TABLE-ROWS -->
+                        <div class="mat-row" matRipple *ngFor="let emp of employees" fxLayout="row"
+                            fxLayoutAlign="start center" (click)="selectEmployee(emp)"
+                            [ngClass]="{'active': emp == selectedEmployee, 'selected': emp.selected, 'disabled': emp.getEmployeeClass() }">
+                            <div [ngClass]="{'turn': emp.selected}" class="mat-cell w-1 off" fxLayout="row"
+                                fxLayoutAlign="center center">
+                                <ngx-avatar (click)="checkEmployee(emp)" [name]="emp.lastName + ' ' + emp.name"
+                                    size="30" [round]="true">
+                                </ngx-avatar>
+                                <mat-checkbox [(ngModel)]="emp.selected" (ngModelChange)="selectedChange()">
+                                </mat-checkbox>
+                            </div>
+                            <div class="w-12 multiple-selection" fxLayout="row" fxLayoutAlign="start center">
+                                <div class="mat-cell w-6" fxLayoutAlign="start center" title=" {{ emp.name }}">
+                                    <span>
+                                        {{ emp.lastName }}, {{ emp.name }}
+                                    </span>
+                                </div>
+                                <div class="mat-cell w-3" fxLayoutAlign="start center" title="{{ emp.nroLeg }}">
+                                    <span>
+                                        {{ emp.nroLeg }}
+                                    </span>
+                                </div>
+                                <div class="mat-cell w-3" fxLayoutAlign="start center" title="{{ emp.cuil }}">
+                                    <span>
+                                        {{ emp.cuil | mask: maskSplited(containerType?.mask)}}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="add-menu-form-actions">
+            <button mat-raised-button color="primary" (click)="next(stepper)">Siguiente</button>
+            <button mat-button *ngIf="showBack" (click)="back(stepper)">Atrás</button>
+            <button mat-button *ngIf="!showBack" (click)="cancel()">Cancelar</button>
+        </div>
+    </mat-step>
+    <!-- PASO 3 -->
+    <mat-step>
+        <mat-toolbar color="grey" fxLayout="row" fxLayoutAlign="start center">
+            <mat-toolbar-row fxLayout="row" fxLayoutAlign="space-between center" fxFill>
+                <div class="mat-avatar" fxLayout="row" fxLayoutAlign="space-between center">
+                    <div class="toolbar-line" fxLayout="row">
+                        <div class="title" fxLayout="column" fxLayoutAlign="center start">
+                            <h3>Carga de Documentos{{this.headerTitle() }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <button mat-icon-button (click)="cancel()" title="Cerrar">
+                    <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+                </button>
+            </mat-toolbar-row>
+        </mat-toolbar>
+        <mat-divider></mat-divider>
+        <form class="add-docs-drop" [formGroup]="sequencesForm">
+            <div class="docs-drop-preview" fxLayout="row">
+                <div class="add-menu-form-body" fxLayout="column" fxLayoutAlign="center stretch">
+                    <app-autocomplete-chip *ngIf="selectedPerson" [originalList]="documentationTypes"
+                        [placeHolderText]="'Ingrese tipo de documentación'" (OnRemoveItem)="itemRemoved($event)"
+                        (OnItemSelected)="selectDocumentationType($event, true)"
+                        [selectedItemsList]="selectedDocumentationTypes" fxFlex="grow" fxLayout="row"
+                        fxLayoutAlign="start center">
+                    </app-autocomplete-chip>
+
+                    <mat-form-field>
+                        <mat-select placeholder="Secuencia" formControlName="sequence"  [(ngModel)]="sequence">
+                            <mat-option *ngFor="let sec of sequences" [value]="sec.documentationSequence">
+                                {{sec.documentationSequence.name}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-form-field *ngIf="!hasPeriod">
+                        <input matInput [matDatepicker]="picker" [max]="maxDate" placeholder="Fecha dd/mm/aaaa"
+                            formControlName="documentationDate">
+                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-datepicker #picker></mat-datepicker>
+                    </mat-form-field>
+                    <button class="full-btn" mat-raised-button [color]="rrhhUploadFile ? 'warn' : 'primary'"
+                        (click)="toogleCompleteFormio()" *ngIf="showOptionalFormComplete">
+                        {{rrhhUploadFile ? 'No completar formulario' : 'Completar formulario'}}
+                    </button>
+                    <mat-tab-group class="wizard-tabs-options" *ngIf="rrhhUploadFile"
+                        (selectedIndexChange)="toggleScan()">
+                        <mat-tab label="Adjuntar Documentación"
+                            *ngIf="!usingFormio || (usingFormio && !isExternalFormOnly)">
+                            <app-upload-form canViewFile="false" canRemove="true" [multipleSelection]="true"
+                                acceptedExtensions="{{aceptedExtensions}}" [files]="files" [showDropZone]="!scanning"
+                                [maxFile]="maxFiles" (fileSelected)="onSelectedFile($event, null)"
+                                (filesChanged)="onFilesChanged($event)" (seeFileDefault)="onSelectedFile($event, true)"
+                                (fileNotAllowed)="onFilesNotAlloewdAdded($event)">
+                            </app-upload-form>
+                        </mat-tab>
+                        <mat-tab label="Escanear Documentación" *ngIf="hasWebScanning">
+                            <app-web-scanner (OnScanComplete)="addScan($event)" (OnScanPage)="showScan($event)"
+                                *ngIf="scanning">
+                            </app-web-scanner>
+                        </mat-tab>
+                    </mat-tab-group>
+                    <div *ngIf="adittionalsMetadatas.length > 0">
+                        <h5 class="stepper-title">Datos</h5>
+                        <div *ngFor="let meta of adittionalsMetadatas">
+                            <app-custom-control [metadata]="meta" [aditionalsmetadatas]="adittionalsMetadatas"
+                                (valueSet)="updateAditionalMetadata($event)">
+                            </app-custom-control>
+                        </div>
+                    </div>
+                </div>
+                <app-formio-cardinal [haveCloseAction]="true"
+                    *ngIf="rrhhUploadFile && usingFormio && !((files != null && files.length) || fileBlob != null)"
+                    (submitted)="onSubmitFormio($event)" [formName]="formName" [fileDocument]="documentation">
+                </app-formio-cardinal>
+                <div class="preview-container" *ngIf="fileImage || isZip">
+                    <div class="preview-container" *ngIf="fileValidPreview(); else elseBlock">
+                        <img src="{{fileImage}}" />
+                    </div>
+                    <ng-template #elseBlock>
+                        <h4>El formato del archivo seleccionado no puede ser previsualizado, pero se cargará
+                            correctamente</h4>
+                    </ng-template>
+                </div>
+                <app-file-document-detail [showFileDocumentHeader]="false" [doc]="documentation" [filePdf]="fileBase64"
+                    [showMetadatas]="false" [showWelcome]="false" [showPrint]="false" [fileBlob]="fileBlob"
+                    [showSave]="false" [showAll]="false" [showDelete]="false"
+                    *ngIf="((!fileImage && !isZip && files != null && files.length) || fileBlob != null)">
+                </app-file-document-detail>
+            </div>
+            <div class="load-window message" *ngIf="inProcess">
+                <mat-progress-spinner style="z-index: 1" mode="indeterminate" color="primary">
+                </mat-progress-spinner>
+                <h3 class="primary-text">Estamos cargando los documentos.</h3>
+                <span>No cierres esta pantalla, esto podría demorar unos instantes.</span>
+            </div>
+            <div style="height: 100px !important;" class="add-menu-form-actions" fxLayout="row-reverse" fxLayoutAlign="space-between end">
+                <mat-progress-bar mode="indeterminate" *ngIf="selectedDocumentationTypes?.length > 0 && !formReady">
+                </mat-progress-bar>
+                <mat-selection-list>
+                    <mat-list-option [selected]="employeeNotify" (click)="changeNotify($event)" *ngIf="sequence && sequence.id != 1">
+                        Envía Mail de Notificación
+                    </mat-list-option>
+                    <mat-list-option [selected]="getAddMore()" (click)="chageAddMore()">
+                        Finalizar y enviar otro
+                    </mat-list-option>
+                </mat-selection-list>
+                <div fxLayout="row-reverse" fxLayoutAlign="start center">
+                    <button mat-raised-button color="accent" (click)="submit(stepper)"
+                        [disabled]="inProcess || !formReady">Finalizar</button>
+                    <button mat-button *ngIf="showBack" (click)="back(stepper)">Atrás</button>
+                    <button mat-button *ngIf="!showBack" (click)="cancel()">Cancelar</button>
+                </div>
+            </div>
+        </form>
+    </mat-step>
+</mat-horizontal-stepper>
+<!-- APP SEARCH MENU -->
+<mat-menu #menu="matMenu" xPosition="before" yPosition="below" class="menu-options mat-card">
+    <div class="container" (click)="$event.stopPropagation()" fxLayout="column" fxLayoutAlign="start stretch">
+        <app-advanced-employee-search [filters]="employeeFilters" [containerType]="containerType"
+            (OnFilter)="filteredSearch('Enter')" [uniqueOption]="true">
+        </app-advanced-employee-search>
+    </div>
+    <div class="footer" fxLayout="row-reverse" fxLayoutAlign="start center" fxLayoutGap="16px">
+        <button mat-raised-button color="primary" (click)="filteredSearch('Enter')">Buscar</button>
+        <button mat-button>Cerrar</button>
+    </div>
+</mat-menu>

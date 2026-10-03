@@ -1,0 +1,70 @@
+<div class="catcher">
+    <div class="wizard-add mat-elevation-z3">
+        <mat-horizontal-stepper class="add-menu" #stepper>
+            <mat-step [stepControl]="certificateFormGroup">
+                <form [formGroup]="certificateFormGroup">
+                    <mat-toolbar color="grey" fxLayout="row" fxLayoutAlign="start center">
+                        <mat-toolbar-row fxLayout="row" fxLayoutAlign="space-between center" fxFill>
+                            <div class="mat-avatar" fxLayout="row" fxLayoutAlign="space-between center" >
+                                <div class="toolbar-line" fxLayout="row">
+                                    <div class="title" fxLayout="column" fxLayoutAlign="center start">
+                                        <h3>Agregar tipo de Firma para {{isEmployer() ? 'Firmante' : 'Empleado' }}</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <button mat-icon-button (click)="cancel()" title="Cerrar">
+                                        <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+                                    </button>
+                        </mat-toolbar-row>
+                    </mat-toolbar>
+                    <mat-divider></mat-divider>
+                    <div class="add-menu-form-body">
+                        <h5 class="stepper-title">Ingresá la empresa</h5>
+                        <mat-form-field>
+                            <mat-select placeholder="Empresa" formControlName="organizationalUnit">
+                                <mat-option *ngFor="let ou of organizationalUnits" [value]="ou" (onSelectionChange)="getProviders(ou)">
+                                    {{ou.name}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+
+                        <h5 class="stepper-title">Elegí un tipo de certificado a declarar</h5>
+                        <mat-form-field>
+                            <mat-select placeholder="Entidad Certificadora" id="step1" formControlName="certificateType" required>
+                                <mat-option *ngFor="let provider of certificateProviders" [value]="provider" (click)="validationProvider(provider)">
+                                    {{provider.description}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+
+                        <app-upload-form *ngIf="showFile" canRemove="true" [multipleSelection]="false" acceptedExtensions=".pfx" maxFile=1 title="Adjuntá el archivo del certificado" (filesChanged)="onFilesChanged($event)"></app-upload-form>
+
+                        <span *ngIf="showExpirationDate">
+                            <h5 class="stepper-title">Indicá el vencimiento</h5>
+                            <mat-form-field>
+                                <input matInput [min]="minDate" [matDatepicker]="picker"
+                                    placeholder="Fecha dd/mm/aaaa" formControlName="expirationDate">
+                                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                <mat-datepicker #picker></mat-datepicker>
+                            </mat-form-field>
+                        </span>
+                        <ng-container *ngIf="certificateFormGroup.value.certificateType.requiresFiscalId && isEmployer()">
+                            <h5 class="stepper-title">Ingresá el identificador fiscal asociado</h5>
+                            <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+                                <input (keyup)="validateCuil()" matInput placeholder="{{certificateFormGroup.value.organizationalUnit.country.fiscalIdMaskPlaceholder}}" mask="{{certificateFormGroup.value.organizationalUnit.country.fiscalIdMask}}" formControlName="fiscalIdentifier">
+                                <mat-error *ngIf="!certificateFormGroup.controls.fiscalIdentifier.valid">
+                                    El identificador fiscal es un campo <strong>requerido</strong>
+                                </mat-error>
+                            </mat-form-field>
+                        </ng-container>
+                    </div>
+
+                    <div class="add-menu-form-actions">
+                        <button mat-raised-button (click)="save()" color="primary" [disabled]="!certificateFormGroup.valid || inProcess" class="btn">Finalizar</button>
+                        <button mat-button (click)="cancel()">Cancelar</button>
+                    </div>
+                </form>
+            </mat-step>
+        </mat-horizontal-stepper>
+    </div>
+</div>

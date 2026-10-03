@@ -1,0 +1,254 @@
+mat-icon{
+  color: #3F51B5;
+}
+
+button{
+  border: none;
+  text-decoration: none;
+  background-color: transparent;
+}
+
+.submit-button{
+  background-color: #3f51b5;
+  color: white;
+}
+
+.btns-container{
+  button{
+    border: none;
+    padding: 0.5vh 1vw;
+    border-radius: 5px;
+    font-size: 16px !important;
+  }
+}
+
+.helper {
+  padding: 16px 0;
+  margin: 0 16px;
+  height: 40px !important;
+  position: relative;
+
+  mat-hint {
+    height: 40px;
+    padding: 16px;
+  }
+
+  .actions {
+    margin-right: 16px;
+
+    .mat-stroked-button {
+      border-radius: 20px;
+
+      .mat-button-wrapper {
+        display: flex;
+        align-items: center;
+        height: 40px;
+
+        mat-icon {
+          margin-right: 8px;
+        }
+      }
+    }
+
+    .mat-icon-button {
+      .mat-button-wrapper {
+        display: flex;
+        align-items: center;
+        height: 100%;
+      }
+    }
+  }
+
+  mat-progress-bar {
+    bottom: -4px;
+  }
+}
+
+button:hover{
+  cursor: pointer;
+}
+.mat-stroked-button {
+  border: 1px solid currentColor;
+  padding: 0 15px;
+  line-height: 34px;
+}
+.actions {
+  margin-right: 16px;
+
+  .mat-stroked-button {
+    border-radius: 20px;
+
+    .mat-button-wrapper {
+      display: flex;
+      align-items: center;
+      height: 40px;
+
+      mat-icon {
+        margin-right: 8px;
+      }
+    }
+  }
+}
+
+.mat-button-wrapper {
+  width: max-content;
+  display: flex;
+  align-items: center;
+  height: 40px;
+}
+
+ .mat-expansion-panel-header.mat-expanded {
+  height: 35px !important;
+}
+
+.search .content {
+  height: 75% !important;
+}
+.search-container .search {
+  height: 65px !important;
+}
+
+.mat-card {
+  padding-top: 0px !important;
+}
+
+.search-container{
+  margin-top: 0px !important;
+  flex-direction: row-reverse !important;
+}
+
+.toolbar-calendar{
+margin: 0px !important;
+padding: 48px !important;
+}
+
+.new-table {
+  margin-top: 0px !important;
+}
+
+
+.mat-tab-body-wrapper{
+  overflow: hidden !important;
+}
+
+.selected{
+  width: 90% !important;
+  margin-left: 20px !important;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #3f51b5;
+  margin: 0;
+}
+
+.bold-option {
+  font-weight: 600;
+}
+
+.btn-crear-anio {
+  background-color: #3f51b5 !important;
+  color: white !important;
+  font-weight: 500;
+  padding: 6px 24px;
+  border-radius: 4px;
+  text-transform: none;
+  transition: background-color 0.3s ease;
+}
+
+.btn-crear-anio:hover {
+  background-color: #3949ab !important;
+}
+
+.year-selector {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  width: 145px;
+
+  &.compact {
+    margin: 0;
+  }
+
+  .year-button {
+    background-color: #f0f0ff;
+    border-radius: 24px;
+    border: 1px solid #e0e0ff;
+    padding: 0 12px;
+    height: 40px;
+    width: 100%;
+
+    .button-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      .year-text {
+        color: #536dfe;
+        font-weight: 500;
+        font-size: 15px;
+      }
+
+      .dropdown-icon {
+        color: #536dfe;
+        font-size: 14px;
+        height: 14px;
+        width: 14px;
+        line-height: 14px;
+        margin-left: 8px;
+      }
+    }
+
+    &:hover {
+      background-color: #e6e6ff;
+    }
+  }
+}
+
+.disabled-button {
+  background-color: #D9D9D9 !important;
+  color: #000000 !important;
+  cursor: not-allowed !important;
+}
+
+.disabled-button:hover {
+  background-color: #D9D9D9 !important;
+  color: #000000 !important;
+  cursor: not-allowed !important;
+}
+
+::ng-deep .year-drop{
+  &[id^="mat-menu-panel-"] {
+    max-width: 100px !important;
+    min-width: 100px !important;
+  }
+}
+
+.hide {
+  display: none !important;
+}
+
+.year-active-indicator {
+    color: #47875c;
+    background-color: #b3ffe1;
+    width: 6em;
+    height: 2em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 1em;
+}
+
+.year-inactive-indicator {
+      color: #AB8513;
+    background-color: #ffd99c;
+    width: 6em;
+    height: 2em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 1em;
+}

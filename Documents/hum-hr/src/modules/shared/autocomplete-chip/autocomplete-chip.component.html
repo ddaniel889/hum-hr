@@ -1,0 +1,126 @@
+<ng-container *ngIf="!listView && !simpleSelection && !AccessView && !OuView">
+  <mat-form-field fxFlex="grow" fxLayout="row" fxLayoutAlign="start center">
+    <mat-icon *ngIf="showIcons" matPrefix fxLayout="row" fxLayoutAlign="center center" class="fa-lg" fontSet="fas"
+      [fontIcon]="iconName">
+    </mat-icon>
+    <mat-chip-list #chipList>
+      <mat-chip [disabled]="disabledAutocomplete" *ngFor="let item of selectedItemsList" [selectable]="true"
+        [removable]="true" (removed)="removeItem(item)" (click)="chipClick(item)" [title]="item.name">
+        <span class="chip-text">{{item.name}}</span>
+        <mat-icon matChipRemove>cancel</mat-icon>
+      </mat-chip>
+      <input #autocompleteChipInput [disabled]="disabledAutocomplete"  placeholder="{{placeHolderText}}"
+        [formControl]="formCtrl" [matAutocomplete]="auto" [matChipInputFor]="chipList" [matChipInputAddOnBlur]="true">
+    </mat-chip-list>
+    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="itemSelected($event)">
+      <mat-option *ngFor="let description of autocompleteNameList | async" [value]="description">
+        {{description}}
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+</ng-container>
+
+<div class="clean-autocomple" fxFlex="grow" fxLayout="column" fxLayoutAlign="start center" *ngIf="listView">
+  <mat-form-field fxFlex="grow" fxLayout="row" fxLayoutAlign="start center">
+    <mat-icon *ngIf="showIcons" matPrefix fxLayout="row" fxLayoutAlign="center center" class="fa-lg" fontSet="fas"
+      [fontIcon]="iconName">
+    </mat-icon>
+    <input matInput #autocompleteChipInput [disabled]="disabledAutocomplete" (input)="activeList($event)" placeholder="{{placeHolderText}}"
+      [formControl]="formCtrl" [matAutocomplete]="auto">
+    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="itemSelected($event)">
+      <mat-option *ngFor="let description of autocompleteNameList | async" [value]="description">
+        {{description}}
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+  <mat-list *ngIf="selectedItemsList?.length > 0">
+    <h3 mat-subheader>
+      <mat-icon matPrefix fxLayout="row" fxLayoutAlign="center center" class="fa-lg" fontSet="fas"
+        fontIcon="fa-layer-group">
+      </mat-icon>
+      Opciones Elegidas
+    </h3>
+    <mat-list-item *ngFor="let item of selectedItemsList">
+      <button mat-icon-button mat-list-icon fxLayout="row" fxLayoutAlign="center center" (click)="removeItem(item)">
+        <mat-icon matPrefix title="Quitar Opción" fxLayout="row" fxLayoutAlign="center center" class="fa-lg"
+          fontSet="fas" fontIcon="fa-minus">
+        </mat-icon>
+      </button>
+      <p matLine>{{item.name}}</p>
+      <button mat-icon-button fxLayout="row" [title]="itemButtonTitle" fxLayoutAlign="center center"
+        (click)="chipClick(item)" *ngIf="itemButtonIcon">
+        <mat-icon matPrefix fxLayout="row" fxLayoutAlign="center center" class="fa-lg" fontSet="fas"
+          [fontIcon]="itemButtonIcon">
+        </mat-icon>
+      </button>
+    </mat-list-item>
+  </mat-list>
+</div>
+
+<div class="clean-autocomple" fxFlex="grow" fxLayout="column" fxLayoutAlign="start center" *ngIf="simpleSelection">
+  <mat-form-field fxFlex="grow" fxLayout="row" fxLayoutAlign="start center">
+    <mat-icon *ngIf="showIcons" matPrefix fxLayout="row" fxLayoutAlign="center center" class="fa-lg" fontSet="fas"
+      [fontIcon]="iconName">
+    </mat-icon>
+    <input matInput #autocompleteChipInput [disabled]="disabledAutocomplete" placeholder="{{placeHolderText}}"
+      [formControl]="formCtrl" [matAutocomplete]="auto" [value]="selectedItemsList?.length > 0 ? selectedItemsList[0].name : ''">
+    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="itemSelected($event)">
+      <mat-option *ngFor="let description of autocompleteNameList | async" [value]="description">
+        {{description}}
+      </mat-option>
+    </mat-autocomplete>
+    <button matSuffix *ngIf="selectedItemsList?.length > 0"  mat-icon-button (click)="removeItem(selectedItemsList[0])">
+      <mat-icon  fxLayout="row" fxLayoutAlign="center center" class="fa-lg"
+        fontSet="fas" fontIcon="fa-times">
+      </mat-icon>
+    </button>
+  </mat-form-field>
+</div>
+
+<!-- AutoComplete para Filtros de Accesos-->
+<div class="clean-autocomple" fxFlex="grow" fxLayout="column" *ngIf="AccessView">
+  <mat-form-field fxFlex="grow" fxLayout="row">
+    <mat-icon *ngIf="showIcons" matPrefix fxLayout="row" class="fa-lg" fontSet="fas"
+      [fontIcon]="iconName">
+    </mat-icon>
+    <input matInput #autocompleteChipInput [disabled]="disabledAutocomplete" placeholder="{{placeHolderText}}"
+      [formControl]="formCtrl" [matAutocomplete]="auto">
+    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="itemSelected($event)" class="autocomple">
+      <mat-option *ngFor="let app of autocompleteAccessList | async" [value]="app.description"  (click)="accessClick(app)">
+                 <mat-icon matPrefix *ngIf="app.module === 'employer' || app.module === 'candidateadmin' || app.module === 'jefe'"
+        class="customAccess" fxLayout="row" fontSet="fa"
+        fontIcon="fa-industry-alt">
+      </mat-icon>
+      <mat-icon matPrefix *ngIf="app.module === 'employee' && !app.isSaml" class="customAccess" fxLayout="row" fontSet="fas" fontIcon="fa-id-badge">
+      </mat-icon>
+      <mat-icon *ngIf="app.module === 'signer' && !app.isSaml" class="customAccess" fxLayout="row" fontSet="fas" fontIcon="fa-signature">
+      </mat-icon>
+      <mat-icon matPrefix *ngIf="app.module === 'overseer' && !app.isSaml" class="customAccess" fxLayout="row" fontSet="fas" fontIcon="fa-eye">
+      </mat-icon>
+      <mat-icon matPrefix *ngIf="app.isSaml" class="customAccess" fxLayout="row" fontSet="fas" fontIcon="fa-sign-in">
+    </mat-icon>
+      <mat-icon matPrefix *ngIf="app.link && !app.isSaml" class="customAccess" fontSet="fa"
+        fontIcon="fa-exchange">
+      </mat-icon>
+             {{app.description}}
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+</div>
+
+<!-- AutoComplete para Filtros Acceso Logins-->
+<div class="clean-autocomple" fxFlex="grow" fxLayout="column" *ngIf="OuView">
+  <mat-form-field fxFlex="grow" fxLayout="row">
+    <mat-icon *ngIf="showIcons" matPrefix fxLayout="row" class="fa-lg" fontSet="fas"
+      [fontIcon]="iconName">
+    </mat-icon>
+    <input matInput #autocompleteChipInput [disabled]="disabledAutocomplete" placeholder="{{placeHolderText}}"
+      [formControl]="formCtrl" [matAutocomplete]="auto">
+    <mat-autocomplete #auto="matAutocomplete"  class="autocomplelogin" (optionSelected)="ouSelected($event)">
+      <mat-option *ngFor="let organizationalUnit of autocompleteOuList | async" [value]="organizationalUnit.name">
+        {{organizationalUnit.name}}
+      </mat-option>
+
+    </mat-autocomplete>
+  </mat-form-field>
+</div>

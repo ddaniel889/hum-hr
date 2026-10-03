@@ -1,0 +1,29 @@
+<mat-list-item [ngClass]="[active ? 'active' : '']">
+  <mat-icon matListAvatar fxLayout="row" fxLayoutAlign="center center" fontSet="fa"
+    [fontIcon]="this.item.employeeCollaborationData?.hasErrors() ? 'fa-file-exclamation' : 'fa-file'" matBadge="!"
+    matBadgePosition="before" matBadgeColor="warn"
+    [matBadgeHidden]="!(this.showBadge && (this.item.employeeCollaborationData.isActionPending() || this.item.employeeCollaborationData.hasErrors()))">
+  </mat-icon>
+  <div matLine class="item-metadata" fxLayout="column" fxLayoutgap="16px">
+    <span #listItem><b title="{{contentTitle}}">{{contentTitle}} </b> </span>
+    <span>
+      {{ temporalityTitle }}
+    </span>
+  </div>
+  <div mat-line class="chip-line">
+    <app-file-document-state [item]="this.item" [showSmallChips]="this.showSmallChips"></app-file-document-state>
+  </div>
+
+  <div class="floating-actions" fxlayout="row" fxlayoutgap="16px">
+    <button mat-icon-button (click)="saveDocument(item)" *ngIf="showSave && !item.isUploadPending()" title="Descargar">
+      <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-file-download"></mat-icon>
+    </button>
+    <button mat-icon-button (click)="openDocumentDialog(item)" *ngIf="showView && !item.isUploadPending()" title="Ver">
+      <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-eye"></mat-icon>
+    </button>
+    <button mat-icon-button (click)="gotoEmployeeDocumentViewAtDocument(item)"
+      *ngIf="showGoEmployee && this.selectedEmployee != null" title="Ir al Documento">
+      <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-arrow-right"></mat-icon>
+    </button>
+  </div>
+</mat-list-item>

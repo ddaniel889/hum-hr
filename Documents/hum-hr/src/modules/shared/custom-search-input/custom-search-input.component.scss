@@ -1,0 +1,23 @@
+:host {
+  display: flex;
+}
+
+.custom-search-container {
+  display: flex;
+  align-items: center;
+  border-radius: 500px;
+  gap: 8px;
+  padding: 0 18px;
+  box-sizing: border-box;
+
+  mat-icon.mat-icon {
+    min-width: unset;
+    font-weight: bold;
+  }
+
+  input.custom-search-input {
+    border: none;
+    height: 100%;
+    flex-grow: 1;
+  }
+}

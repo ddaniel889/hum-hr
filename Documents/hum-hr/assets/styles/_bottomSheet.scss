@@ -1,0 +1,298 @@
+@import 'img-management';
+
+
+mat-bottom-sheet-container {
+  padding: 0 !important;
+  overflow-y: hidden !important;
+  min-width: unset !important;
+
+  mat-toolbar {
+    margin: 0 !important;
+    width: 100% !important;
+
+    .toolbar-line {
+      height: 100% !important;
+
+      .mat-chip-list-wrapper {
+        flex-wrap: nowrap !important;
+      }
+    }
+  }
+
+  .add-menu-form-body {
+    max-width: unset !important;
+    height: calc(100% - 64px);
+
+    &.w-table {
+      overflow-y: auto !important;
+    }
+  }
+}
+
+.mat-horizontal-stepper-content {
+  position: relative;
+
+  .mat-search-field {
+    width: 50%;
+    min-width: unset;
+  }
+
+  .employee-search-sub-toolbar {
+    min-height: unset !important;
+    padding-top: 16px;
+  }
+}
+
+app-file-document-metadata {
+  height: 100%;
+  @include display(b, u, u, u, u, u);
+
+  .mat-list-base {
+    .mat-list-item {
+      .mat-line {
+        font-size: 14px !important;
+      }
+
+      .mat-line:nth-child(n+2) {
+        font-size: 18px !important;
+        font-weight: bold
+      }
+    }
+  }
+}
+
+app-employee-rrhh-find mat-expansion-panel.mat-expanded {
+  height: calc(100% - 148px - 64px - 50px) !important;
+  max-height: calc(100% - 148px - 64px - 50px) !important;
+}
+
+app-user-security-detail {
+  @include display(b, u, u, u, u, u);
+  max-height: unset !important;
+}
+
+.new-detail-container {
+  height: 100%;
+}
+
+.metadata-radio-menu.mat-menu-panel {
+  padding: 8px 16px !important;
+}
+
+app-dialog {
+  padding: 16px;
+  display: block;
+}
+
+app-generic-bottom-sheet {
+
+  .bottom_sheet-content {
+    padding: 0 16px 16px !important;
+
+    .bottom_sheet-title {
+      padding: 16px 0 0;
+    }
+
+    &.ok {
+      p {
+        padding: 0 32px 32px;
+      }
+    }
+
+    &.not-ok {
+      p {
+        padding: 0 32px
+      }
+    }
+
+    &.cancel {
+      p {
+        padding: 0 32px
+      }
+    }
+
+    mat-form-field {
+      padding: 0 32px
+    }
+  }
+
+  h4.accent {
+    margin: 0 !important;
+
+    &+p {
+      margin-top: 0;
+    }
+  }
+
+  p {
+    width: 30vw;
+    min-width: 200px;
+  }
+
+  .verification-code {
+    border-radius: 4px;
+
+    h2 {
+      letter-spacing: 16px;
+      padding-left: 16px;
+      line-height: 50px;
+      border-radius: 4px;
+      margin-left: 16px;
+    }
+
+    span {
+      width: 50%;
+    }
+
+    button {
+      margin-right: 16px !important;
+    }
+  }
+
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type=number] {
+    -moz-appearance: textfield;
+  }
+
+  .load-window.message {
+    position: relative;
+    top: 0;
+    padding: 16px;
+
+    .info-container {
+      margin-left: 32px;
+
+      h3.primary-text {
+        margin-top: 0;
+      }
+    }
+  }
+}
+
+@mixin bottomSheet($primary, $accent, $divider, $text-main, $primary-text, $leave-cancelled) {
+
+  mat-bottom-sheet-container {
+    mat-toolbar {
+      border-bottom: 1px solid $divider !important;
+    }
+  }
+
+  app-generic-bottom-sheet {
+    h4.accent {
+      color: $accent;
+    }
+
+    .verification-code {
+      background: $primary;
+      color: $text-main;
+
+      h2 {
+        background: $primary;
+      }
+    }
+
+    .load-window.message {
+      .info-container {
+        h3.primary-text {
+          color: $primary-text;
+        }
+      }
+    }
+
+    .bottom_sheet-content {
+      &.ok {
+        .bottom_sheet-title {
+
+          .bottom_sheet-icon,
+          h3 {
+            color: #009688;
+          }
+        }
+
+        .bottom_sheet-main_btn:not(:disabled) {
+          background: #009688;
+          color: #fff;
+        }
+      }
+
+      &.not-ok {
+        .bottom_sheet-title {
+
+          .bottom_sheet-icon,
+          h3 {
+            color: #9C27B0;
+          }
+        }
+
+        .bottom_sheet-main_btn:not(:disabled) {
+          background: #9C27B0;
+          color: #fff;
+        }
+      }
+
+      &.cancel {
+        .bottom_sheet-title {
+
+          .bottom_sheet-icon,
+          h3 {
+            color: $leave-cancelled;
+          }
+        }
+
+        .bottom_sheet-main_btn:not(:disabled) {
+          background: $leave-cancelled;
+          color: #fff;
+        }
+      }
+       .bottom_sheet_exp_btn{
+        background-color: $primary;
+        color: #fff;
+      }
+      .bottom_sheet_canc_btn{
+        background-color: lightgrey;
+        color: black;
+      }
+      .bottom_sheet-exp-h3{
+        color: $primary;
+        margin-bottom: -10px !important;
+      }
+      .mat-input-element-export{
+        display: flex !important;
+        padding-left: 15px;
+      }
+      .mat-form-field-infix-export-right{
+        width:100% !important;
+        padding: 0px !important;
+        display: flex !important;
+      }
+      .mat-form-field-infix-export-left{
+        width: 100% !important;
+        padding: 0px;
+        display: flex !important;
+
+      }
+      .mat-form-field-infix
+      {
+        display: flex;
+      }
+      .mat-checkbox-layout .mat-checkbox-label
+      {
+        color: $accent;
+      }
+      .choose-forms{
+        margin-top: 0px !important;
+        margin-bottom: 0px !important;
+        margin-left: 10px !important;
+      }
+      .card-container{
+        max-height: 150px;
+        overflow-y: auto;
+      }
+    }
+  }
+}

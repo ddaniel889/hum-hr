@@ -1,0 +1,133 @@
+<div class="employee_detail-access">
+    <div class="employee-title">
+        <div class="title-text">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-key">
+            </mat-icon>
+            <div class="title_text-main">
+                Acceso
+            </div>
+        </div>
+    </div>
+    <div class="employee_detail-side-body">
+        <div class="data">
+            <div class="data-line">
+                <div class="data_line-text">
+                    <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-user">
+                    </mat-icon>
+                    <div class="line_text-container">
+                        <div class="line_text-main">Habilitado</div>
+                    </div>
+                </div>
+                <mat-slide-toggle [(ngModel)]="user.enabled" (change)="enableUser()">
+                </mat-slide-toggle>
+            </div>
+        </div>
+        <div class="data">
+            <div class="data-line" *ngIf="!user.isSamlActive">
+                <div class="data_line-text">
+                    <mat-icon class="fa-lg" fontSet="fa" [fontIcon]="user.locked ? 'fa-lock':'fa-lock-open'">
+                    </mat-icon>
+                    <div class="line_text-container">
+                        <div class="line_text-main">Bloqueado</div>
+                    </div>
+                </div>
+                <mat-slide-toggle [disabled]="onlyEmployeeManagement" [(ngModel)]="user.locked" (change)="updateUserLock()">
+                </mat-slide-toggle>
+            </div>
+        </div>
+        <div class="data">
+            <div class="data-line show-action" *ngIf="hasSAML !! !isCandidate">
+                <div class="data_line-text">
+                    <mat-icon class="fa-lg" fontSet="fa" [fontIcon]="user.isSamlActive?'fa-hands':'fa-hand-receiving'">
+                    </mat-icon>
+                    <div class="line_text-container">
+                        <div class="line_text-main">Autenticación Delegada</div>
+                        <div class="line_text-side">
+                            Credenciales Humanage {{user.isSamlActive ? ' Desactivadas':' Activadas'}}
+                            <u class="accent" [title]="user.isSamlActive ? 'El empleado no podrá usar su mail y contraseña para ingresar a Humanage':'El empleado podrá ingresar su mail y contraseña para ingresar a Humanage, por favor asegurate que reciba su mail de bienvenida'">más-info</u>
+                        </div>
+
+                    </div>
+                </div>
+                <mat-slide-toggle [disabled]="onlyEmployeeManagement" [(ngModel)]="isSamlActive" (change)="changeSaml()" *ngIf="user.enabled">
+                </mat-slide-toggle>
+            </div>
+        </div>
+        <div class="data">
+            <div class="data-line">
+                <div class="data_line-text">
+                    <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-clock">
+                    </mat-icon>
+                    <div class="line_text-container">
+                        <div class="line_text-side">Fecha de creación</div>
+                        <div class="line_text-main">
+                            {{(user == null) ? '' : user.creationDate | date: 'dd/MM/yyyy HH:mm'}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="data">
+            <div class="data-line show-action">
+                <div class="data_line-text">
+                    <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-clock">
+                    </mat-icon>
+                    <div class="line_text-container">
+                        <div class="line_text-side">Último ingreso</div>
+                        <div class="line_text-main">
+                            {{(user?.lastLoginDate == null) ? 'Sin registro' : user.lastLoginDate | date: 'dd/MM/yyyy HH:mm'}}
+                        </div>
+                    </div>
+                </div>
+                <button *ngIf="user?.lastLoginDate == null && user?.welcomeSent && !user.locked && user.enabled && !onlyEmployeeManagement" mat-icon-button [title]="user?.welcomeSent ? 'Reenviar Mail de Bienvenida':'Enviar Mail de Bienvenida'" (click)="sendPendingWelcome()">
+          <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+            <mat-icon  class="fa-lg" fontSet="fas" fontIcon="fa-envelope">
+            </mat-icon>
+            <mat-icon  class="fa-lg complex" fontSet="fas"
+              [fontIcon]="user?.welcomeSent ? 'fa-share-all':'fa-share'">
+            </mat-icon>
+          </div>
+        </button>
+            </div>
+            <div class="data-line">
+                <div class="data_line-text">
+                    <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-clock">
+                    </mat-icon>
+                    <div class="line_text-container">
+                        <div class="line_text-side">Último ingreso fallido</div>
+                        <div class="line_text-main">
+                            {{(user?.lastFailedLoginDate == null) ? 'Sin registro' : user.lastFailedLoginDate | date: 'dd/MM/yyyy HH:mm'}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="employee_detail-access" *ngIf="!isCandidate">
+    <div class="employee-title">
+        <div class="title-text">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-theater-masks">
+            </mat-icon>
+            <div class="title_text-main">
+                Permisos y Roles
+            </div>
+        </div>
+    </div>
+    <div class="employee_detail-side-body">
+        <div class="data" *ngFor="let rol of roles">
+            <div class="data-line">
+                <div class="data_line-text">
+                    <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-user">
+                    </mat-icon>
+                    <div class="line_text-container">
+                        <div class="line_text-main">
+                            {{showRoleOrganizationalUnitName ? rol.name + ' - ' + rol.organizationalUnitName : rol.name}}
+                        </div>
+                    </div>
+                </div>
+                <mat-slide-toggle [disabled]="onlyEmployeeManagement" [(ngModel)]="rol.isSelected" class="example-margin" (change)="updateRol(rol)">
+                </mat-slide-toggle>
+            </div>
+        </div>
+    </div>
+</div>

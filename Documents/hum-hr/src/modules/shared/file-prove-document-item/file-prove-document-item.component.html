@@ -1,0 +1,18 @@
+<mat-list-item >
+  <mat-icon matListAvatar fxLayout="row" fxLayoutAlign="center center" fontSet="fa"
+  fontIcon="fa-file"  matBadgePosition="before" matBadgeColor="warn">
+  </mat-icon>
+  <div matLine   fxLayout="column" fxLayoutgap="14px" *ngIf="item.signedBy == 'Firmante'">
+    <span #listItem><b title="{{contentTitle}}">Firma Empleador </b> </span>
+    <span #listItem>Firmado por :<b title="{{contentTitle}}"> {{item.userName}}</b> </span>   
+  </div> 
+  <div matLine   fxLayout="column" fxLayoutgap="14px" *ngIf="item.signedBy == 'Empleado'">
+    <span #listItem><b title="{{contentTitle}}">Firma Empleado</b> </span>
+    <span #listItem>Firmado por :<b title="{{contentTitle}}">{{item.userName}}</b> </span>   
+  </div> 
+  <div mat-line class="chip-line">
+    <app-file-document-state [sign]="item"></app-file-document-state>
+  </div>
+
+
+</mat-list-item>

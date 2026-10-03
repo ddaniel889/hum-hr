@@ -1,0 +1,21 @@
+<span fxLayout="row" fxLayoutAlign="start center">
+  <button mat-stroked-button (click)="removeFile()" *ngIf="this.showRemove" [disabled]="disabled">
+    Cancelar subida
+  </button>
+  <button mat-icon-button (click)="showPages()" *ngIf="!pdfWrapper.showAll"
+    title="Cargar Documento Completo (esta acción puede demorar unos instantes)" [disabled]="disabled">
+    <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-file-exclamation"></mat-icon>
+  </button>
+  <button mat-icon-button (click)="zoom(0.1)" *ngIf="this.showZoomIn" title="Acercar" [disabled]="disabled">
+    <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-search-plus"></mat-icon>
+  </button>
+  <button mat-icon-button (click)="zoom(-0.1)" *ngIf="this.showZoomOut" title="Alejar" [disabled]="disabled">
+    <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-search-minus"></mat-icon>
+  </button>
+  <button id="pdfPrint" mat-icon-button (click)="printpdf()" *ngIf="this.showPrint" title="Imprimir" [disabled]="disabled">
+    <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-print"></mat-icon>
+  </button>
+  <button mat-icon-button (click)="saveFile()" *ngIf="this.showSave" title="Descargar" [disabled]="disabled">
+    <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-file-download"></mat-icon>
+  </button>
+</span>

@@ -1,0 +1,210 @@
+<ng-container *ngIf="!newPerson">
+  <mat-toolbar color="grey">
+    <mat-toolbar-row>
+      <div class="toolbar-line" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+        <div class="title" fxLayout="column" fxLayoutAlign="center start">
+          <h3>{{toolbartitle}}</h3>
+        </div>
+        <button mat-icon-button (click)="cancel()" title="Cerrar">
+          <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+        </button>
+      </div>
+    </mat-toolbar-row>
+  </mat-toolbar>
+  <mat-divider></mat-divider>
+</ng-container>
+<!-- Loading -->
+<div class="load-window fixed" *ngIf="clickOnce">
+  <mat-progress-spinner style="z-index: 1" mode="indeterminate" color="primary">
+  </mat-progress-spinner>
+</div>
+<ng-container *ngIf="isSetSelected || !isCandidate">
+  <div class="title-description accent-text" fxLayout="row" fxLayoutAlign="space-between center" *ngIf="newPerson">
+    <div class="header" fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+      <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+        <mat-icon  class="fa-lg"
+        fontSet="fa" fontIcon="fa-file-plus"></mat-icon>
+        <mat-icon class="fa-lg" fontSet="fas" [fontIcon]="isCandidate ?'fa-alien':'fa-user'">
+        </mat-icon>
+        <mat-icon class="fa-lg complex" fontSet="fas" [fontIcon]="isShared ? 'fa-share-alt':'fa-plus'">
+        </mat-icon>
+      </div>
+      <div fxLayout="column" *ngIf="!isShared">
+        <h3>{{isCandidate ? 'Nuevo Candidato' : 'Nuevo Empleado'}}</h3>
+        <h5>{{isCandidate ? 'Completa los Datos del Candidato' : 'Completa los Datos del Empleado'}} </h5>
+      </div>
+      <div fxLayout="column" *ngIf="isShared">
+        <h3>Compartir a {{ouName}}</h3>
+        <h5>Revisa los Datos del Empleado Compartido</h5>
+      </div>
+    </div>
+    <button mat-icon-button title="Cerrar" (click)="cancel()">
+      <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-times">
+      </mat-icon>
+    </button>
+  </div>
+  <ng-container *ngIf="organizationalUnits.length > 1 && showOuSelection">
+    <span [hidden]="clickOnce">
+      <div class="asisted-input aligned-icon" fxLayout="row-reverse" fxLayoutAlign="start center">
+        <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+          <mat-select [(ngModel)]="selectedOuId" placeholder="Selecciona la Empresa" (selectionChange)="setOu()"
+            required>
+            <mat-option *ngFor="let ou of organizationalUnits" [value]="ou.id">
+              {{ou.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-industry-alt">
+        </mat-icon>
+      </div>
+    </span>
+  </ng-container>
+  <form [formGroup]="addPersonForm" class="form-steped" [hidden]="clickOnce">
+    <div [ngClass]="newPerson ? 'form-steped-body':' add-menu-form-body'" fxLayout="column">
+      <ng-container *ngIf="fixedMetadatas.length > 0 ">
+        <app-custom-control [metadata]="meta" [showAdd]="true" [aditionalsmetadatas]="fixedMetadatas"
+          (valueSet)="setMetadatasValuesCustomContro($event)" [isDisabled]="isDisabled(meta)" [isAssisted]="true"
+          [assistedIndex]='1+(i)' (newValueAdded)="updateOptionValues($event, fixedMetadatas)"
+          (comboEdited)="updateOptionValues($event, fixedMetadatas, true)"
+          *ngFor="let meta of fixedMetadatas, let i=index" [isFirstField]="true" [ngClass]="{'first-field' : i == 0 }">
+        </app-custom-control>
+      </ng-container>
+      <div class="asisted-input" fxLayout="row-reverse" fxLayoutAlign="start center" *ngIf="useSaml && !isCandidate">
+        <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+          <input matInput placeholder="Identificación Delegada" formControlName="nickNameFrmCtrl">
+        </mat-form-field>
+        <div class="indicator">
+          <div class="guide top"></div>
+          <div class="bubble">{{fixedMetadatas.length + 1}}</div>
+          <div class="guide bottom"></div>
+        </div>
+      </div>
+      <ng-container *ngIf="adittionalsMetadatas.length > 0 ">
+        <app-custom-control [metadata]="meta" [showAdd]="true" (valueSet)="setMetadatasValuesCustomContro($event)"
+          [aditionalsmetadatas]="adittionalsMetadatas" [isDisabled]="isDisabled(meta)" [isAssisted]="true"
+          [assistedIndex]='useSaml && !isCandidate ? (fixedMetadatas.length + 1) + (i + 1) : fixedMetadatas.length + (i + 1) '
+          (newValueAdded)="updateOptionValues($event, adittionalsMetadatas)"
+          (comboEdited)="updateOptionValues($event, adittionalsMetadatas, true)"
+          *ngFor="let meta of adittionalsMetadatas, let i=index">
+        </app-custom-control>
+      </ng-container>
+      <div class="asisted-input" fxLayout="row-reverse" fxLayoutAlign="start center">
+        <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+          <mat-select placeholder="Forma de Firma" formControlName="certificateProviderIdFrmCtrl">
+            <mat-option *ngFor="let provider of certificateProviders" [value]="provider.id"
+              (click)="showCertificateProviderDate(provider)">
+              {{provider.description}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <div class="indicator">
+          <div class="guide top"></div>
+          <div class="bubble">{{useSaml && !isCandidate ? (fixedMetadatas.length +1)+(adittionalsMetadatas.length)+1 :
+            fixedMetadatas.length +(adittionalsMetadatas.length)+1}}</div>
+          <div class="guide bottom" [hidden]="!showDate"></div>
+        </div>
+      </div>
+      <div class="asisted-input" fxLayout="row-reverse" fxLayoutAlign="start center" *ngIf="showDate">
+        <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+          <input matInput [matDatepicker]="picker" placeholder="Fecha Vencimiento dd/mm/aaaa"
+            formControlName="expirationDateFrmCtrl" required="false">
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+        <div class="indicator">
+          <div class="guide top"></div>
+          <div class="bubble">{{useSaml && !isCandidate ? (fixedMetadatas.length +1)+(adittionalsMetadatas.length)+1 :
+            fixedMetadatas.length+(adittionalsMetadatas.length)+1}}</div>
+          <div class="guide bottom" hidden></div>
+        </div>
+      </div>
+      <mat-checkbox *ngIf="!isCandidate" [checked]="sendWelcome" (change)="sendWelcome = !sendWelcome">
+        {{useSaml ? 'Habilitar al empleado' : 'Notificar al Empleado'}}
+      </mat-checkbox>
+    </div>
+    <div [ngClass]="newPerson ? 'main-action':'add-menu-form-actions'" fxLayout="row-reverse" fxLayoutGap="8px">
+      <button mat-raised-button (click)="save()" [disabled]="clickOnce || disableFields" color="accent"
+        class="btn">Finalizar</button>
+      <button mat-button [disabled]="clickOnce" (click)="back()">{{!isCandidate && newPerson ? 'Cancelar' : 'Anterior'
+        }}</button>
+    </div>
+  </form>
+</ng-container>
+
+<ng-container *ngIf="!isSetSelected && isCandidate">
+  <div class=" title-description accent-text " fxLayout="row " fxLayoutAlign="space-between center " *ngIf="newPerson ">
+    <div class="header " fxLayout="row " fxLayoutGap="16px " fxLayoutAlign="start center ">
+      <div class="icon-complex " fxLayout="row " fxLayoutAlign="center center ">
+        <mat-icon fxLayout="row " fxLayoutAlign="center center " class="fa-lg " fontSet="fas " fontIcon="fa-alien ">
+        </mat-icon>
+        <mat-icon fxLayout="row " fxLayoutAlign="center center " class="fa-lg complex " fontSet="fas "
+          fontIcon="fa-plus ">
+        </mat-icon>
+      </div>
+      <div fxLayout="column ">
+        <h3>Nuevo Candidato</h3>
+        <h5>Selecciona un Set Documental para comenzar</h5>
+      </div>
+    </div>
+    <button mat-icon-button (click)="cancel() ">
+      <mat-icon class="fa-lg " fontSet="fas " fontIcon="fa-times ">
+      </mat-icon>
+    </button>
+  </div>
+  <div class="form-steped">
+    <ng-container *ngIf="organizationalUnits.length> 1 && showOuSelection">
+      <div class="asisted-input aligned-icon" fxLayout="row-reverse" fxLayoutAlign="start center">
+        <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+          <mat-select [(ngModel)]="selectedOuId" placeholder="Selecciona la Empresa" (selectionChange)="setOu()"
+            required>
+            <mat-option *ngFor="let ou of organizationalUnits" [value]="ou.id">
+              {{ou.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-industry-alt">
+        </mat-icon>
+      </div>
+    </ng-container>
+    <app-chapa [className]="'info-empty'" [icon]="'fa-hand-paper'" [text]="'No podés continuar'"
+      [subText]="'Aún no has configurado los Sets Documentales'" *ngIf="documentationSets.length < 1"
+      [actionIcon]="'fa-cog'" [actionText]="'Configurar Sets'" (actionClick)="createSet()">
+    </app-chapa>
+    <ng-container *ngIf="documentationSets.length > 0">
+      <div class="asisted-input aligned-icon subtitle" fxLayout="row-reverse" fxLayoutAlign="start center"
+        *ngIf="!newPerson && documentationSets.length > 0">
+        <h3>
+          Elige uno de los Sets Disponibles
+        </h3>
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-layer-group">
+        </mat-icon>
+      </div>
+      <div [ngClass]="newPerson ? 'form-steped-body':'add-menu-form-body sets-list'" fxLayout="column" fxLayoutGap="16px">
+        <mat-radio-group required [(ngModel)]="selectedSet" fxLayout="column">
+          <mat-radio-button *ngFor="let set of documentationSets" [value]="set">
+            <span fxLayout="column" fxFlex="grow">
+              <b>{{set.name}}</b>
+              <h5>{{set.description}}</h5>
+            </span>
+          </mat-radio-button>
+        </mat-radio-group>
+        <button mat-stroked-button *ngIf="newPerson" (click)="createSet()" [disabled]="clickOnce" color="primary"
+          class="btn">
+          Crear Set
+        </button>
+      </div>
+      <div [ngClass]="newPerson ? 'main-action':'add-menu-form-actions'" fxLayout="row"
+        fxLayoutAlign="space-between center">
+        <button *ngIf="!newPerson" mat-raised-button (click)="createSet()" [disabled]="clickOnce" color="accent"
+          class="btn">
+          Crear Set
+        </button>
+        <span fxLayout="row-reverse" fxLayoutGap="8px" [fxFlex]="newPerson ? 'grow':''">
+          <button mat-raised-button (click)="setDocumentationSet()" [disabled]="clickOnce || !selectedSet"
+            [color]="newPerson ? 'accent':'primary'" class="btn">Siguiente</button>
+          <button mat-button [disabled]="clickOnce" (click)="close()">{{newPerson ? 'Cancelar':'Anterior'}}</button>
+        </span>
+      </div>
+    </ng-container>
+  </div>
+</ng-container>

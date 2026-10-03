@@ -1,0 +1,116 @@
+<div class="load-window new" *ngIf="loading">
+  <mat-progress-spinner mode="indeterminate" color="primary">
+  </mat-progress-spinner>
+</div>
+<ng-container *ngIf="!loading">
+  <div class="edit-theme" fxLayout="column" fxLayoutGap="16px" *ngIf="!logoEditing">
+    <div class="separator" fxLayout="row" fxLayoutAlign="start center">
+      <div class="subtitle" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-palette">
+        </mat-icon>
+        <div class="text" fxLayout="column">
+          <h5>Tema de Color</h5>
+          <h6>Selecciona el esquema de colores</h6>
+        </div>
+      </div>
+    </div>
+    <mat-card class="example" [ngClass]="{'dark': darkMode}">
+      <div class="main-color-container">
+        <mat-toolbar [class]="'example-toolbar ' + mainColor" fxLayout="row" fxLayoutAlign="space-between center">
+          <span fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-brush">
+            </mat-icon>
+            <span class="theme-title">Vista Previa ({{mainColor != 'default' ? (mainColor ==
+              undefined ? '???': mainColor) + (primaryColor == undefined ?
+              '-???': '-' + primaryColor) : 'por defecto'}})</span>
+          </span>
+          <mat-slide-toggle [(ngModel)]="darkMode" (ngModelChange)="onDarkModeChanged()">
+            <span>Modo Oscuro</span>
+          </mat-slide-toggle>
+        </mat-toolbar>
+        <div class="main-color" fxLayout="column">
+          <h6 [ngClass]="{'required': primaryColor === 'default' || mainColor==undefined}">Color primario</h6>
+          <mat-button-toggle-group [(ngModel)]="mainColor" (ngModelChange)="onColorSelected(true)">
+            <mat-button-toggle value="indigo" title="Indigo">
+            </mat-button-toggle>
+            <mat-button-toggle value="pink" title="Pink">
+            </mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
+      </div>
+      <div class="side-color-container">
+        <button mat-fab [class]="'example-button ' + primaryColor">
+          <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-plus">
+          </mat-icon>
+        </button>
+        <div class="side-color" fxLayout="column">
+          <h6 [ngClass]="{'required': primaryColor === 'default'|| primaryColor==undefined}">Color secundario</h6>
+          <mat-button-toggle-group [(ngModel)]="primaryColor" (ngModelChange)="onColorSelected(false)">
+            <mat-button-toggle value="pink" title="Pink">
+            </mat-button-toggle>
+            <mat-button-toggle value="amber" title="Amber">
+            </mat-button-toggle>
+            <mat-button-toggle value="purple" title="Purple">
+            </mat-button-toggle>
+            <mat-button-toggle value="blueGrey" title="BlueGrey">
+            </mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
+      </div>
+    </mat-card>
+    <div class="confirm" fxLayout="row-reverse" fxLayoutGap="12px" *ngIf="isDirty">
+      <button mat-raised-button color="primary" (click)="saveTheme()"
+        [disabled]="!darkMode && (mainColor==undefined || ( primaryColor==undefined || primaryColor === 'default'))">Guardar
+        Tema</button>
+      <button mat-button (click)="cancelTheme()">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- imagen para login personalizado -->
+  <div class="edit-theme" fxLayout="column" fxLayoutGap="16px" *ngIf="ouSelected.isRoot && subdomain" style="min-height: 42vh;max-height: 65vh;">
+
+    <div fxLayout="column" class="img-editior-container">
+      <div class="img-editor">
+        <div class="separator" fxLayout="row" fxLayoutAlign="space-between center">
+          <div class="subtitle" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+            <mat-icon  class="fa-lg" fontSet="fas" fontIcon="fa-image">
+            </mat-icon>
+            <div class="text" fxLayout="column">
+              <h5>Imagen para personalización de login</h5>
+              <h6>Sube o modifica una imagen para la personalización del login</h6>
+            </div>
+          </div>
+          <div class="actions" fxLayout="row" fxLayoutGap="8px" *ngIf="imgBackgroundBase64">
+            <input id="files" style="visibility:hidden;width:0" #file type="file" (change)="updateBackgroundImage($event)"
+              accept=".jpg,.jpeg,.png">
+            <button mat-icon-button (click)="file.click()" title="Modificar Imagen">
+              <mat-icon  class="fa-lg" fontSet="fas" fontIcon="fa-pen">
+              </mat-icon>
+            </button>
+            <button mat-icon-button (click)="deleteImage()"  title="Eliminar Imagen">
+              <mat-icon  class="fa-lg" fontSet="fas" fontIcon="fa-trash-alt">
+              </mat-icon>
+            </button>
+          </div>
+        </div>
+          <ng-container *ngIf="imgBackgroundBase64">
+            <img [src]="imgBackgroundBase64" alt="/" style="max-height: 450px;"/>
+          </ng-container>
+          <ng-container *ngIf="!imgBackgroundBase64">
+            <app-chapa [className]="'info-empty'" [text]="'Aún no has configurado una imagen'"
+              [subText]="'Elige una imagen PNG, JPEG ó JPG'" [actionIcon]="'fa-plus'" [actionText]="'Agregar Imagen'"
+              (actionClick)="file.click()">
+            </app-chapa>
+            <input id="files" style="visibility:hidden;width:0" #file type="file" (change)="uploadBackgroundImage($event)"
+              accept=".jpg,.jpeg,.png">
+          </ng-container>
+      </div>
+    </div>
+  </div>
+
+  <app-cs-upload-cropper-control [newCropper]="true" [uploadedImage]="iconBase64" (uploadImage)="uploadLogo($event)"
+    (deletedImage)="deleteLogo()" defaultImageName="ou-logo-default.png" canDelete="true" [aspectRatio]="3/1"
+    (editingImage)="logoEditing=$event">
+  </app-cs-upload-cropper-control>
+
+</ng-container>

@@ -1,0 +1,90 @@
+<div class="cs-grid-test" *ngIf="items?.length > 0">
+  <ngx-datatable #table class="material" [columns]="columns" [rows]="items" [loadingIndicator]="loading"
+    [columnMode]="'force'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="50" [reorderable]="reorderable"
+    (sort)="onSort($event)" [externalPaging]="true" [count]="itemsCount" [offset]="currentPage" [limit]="pageSize"
+    [scrollbarH]="true" [sorts]="[sorts]" [selected]="selected" [selectionType]="SelectionType.single"
+    (select)="onSelect($event)" [rowClass]="getRowClass" (activate)="onActivate($event)" (page)="justPage($event)"
+    (scroll)="avoidUpdate()">
+
+    <!-- [selected]="selectedItems"
+          [selectionType]="SelectionType.checkbox"><ngx-datatable-column
+          [width]="30"
+          [sortable]="false"
+          [canAutoResize]="false"
+          [draggable]="false"
+          [resizeable]="false"
+          [headerCheckboxable]="true"
+          [checkboxable]="true">
+        </ngx-datatable-column> -->
+
+    <ngx-datatable-footer>
+      <ng-template ngx-datatable-footer-template let-rowCount="rowCount" let-pageSize="pageSize"
+        let-selectedCount="selectedCount" let-curPage="curPage" let-offset="offset">
+        <div>
+          <b style="margin-left:16px;">{{ rowCount }}</b> ítems en total.
+          <!-- <b style="margin-left:16px;">{{ pageSize }}</b> ítems por página. -->
+        </div>
+        <datatable-pager [pagerLeftArrowIcon]="'datatable-icon-left'" [pagerRightArrowIcon]="'datatable-icon-right'"
+          [pagerPreviousIcon]="'datatable-icon-prev'" [pagerNextIcon]="'datatable-icon-skip'" [page]="currentPage"
+          [size]="pageSize" [count]="rowCount" [hidden]="!((rowCount / pageSize) > 1)"
+          (change)="table.onFooterPage($event)">
+        </datatable-pager>
+      </ng-template>
+    </ngx-datatable-footer>
+
+  </ngx-datatable>
+
+</div>
+
+<ng-template #dateColumn let-row="row" let-value="value" let-i="index">
+  {{ value | date: 'dd/MM/yyyy'}}
+</ng-template>
+
+<ng-template #statusColumn let-row="row" let-value="value" let-i="index" class="material">
+  <ng-container *ngIf="row.documentStateProgress?.totalDocuments >= 1">
+    <mat-progress-bar class="status_bar-bar"
+      [ngClass]="{'class1' : row.documentStateProgress?.percentage <= 39, 'class2' : row.documentStateProgress?.percentage >= 40 && row.documentStateProgress?.percentage <= 69, 'class3' : row.documentStateProgress?.percentage >= 70 && row.documentStateProgress?.percentage <= 99, 'class4' : row.documentStateProgress?.percentage == 100}"
+      mode="determinate"
+      [value]="row.documentStateProgress?.percentage <= 10 ? 10 : row.documentStateProgress?.percentage">
+    </mat-progress-bar>
+    <span class="status_bar-count">
+      {{row.documentStateProgress?.finishedDocuments}} de
+      {{row.documentStateProgress?.totalDocuments}}
+    </span>
+  </ng-container>
+
+  <ng-container *ngIf="!row.documentStateProgress?.error && row.documentStateProgress?.totalDocuments < 1">
+    <span class="inactive">
+      <ng-container *ngIf="row.documentStateProgress?.totalDocuments == null">
+        <mat-icon class="fa-xs fa-spin" fontSet="fa" fontIcon="fa-spinner-third">
+        </mat-icon>
+      </ng-container>
+      <ng-container *ngIf="row.documentStateProgress?.totalDocuments != null">
+        Sin Documentación
+      </ng-container>
+      <!-- {{row.documentStateProgress?.totalDocuments == null ? 'Cargando...' : 'Sin Documentación'}}-->
+    </span>
+
+  </ng-container>
+  <ng-container *ngIf="row.documentStateProgress?.error">
+    <span class="inactive">
+      Error en la carga
+    </span>
+
+  </ng-container>
+</ng-template>
+
+<ng-template #setConfigurated let-row="row" let-value="value" let-i="index" class="material">
+  <ng-container>
+    <span class="inactive">
+      {{row.candidateSet?.setName}}
+    </span>
+  </ng-container>
+</ng-template>
+
+<ng-template #actionsColumn let-row="row" let-value="value" let-i="index" class="material">
+  <button mat-icon-button class="cs-floating-action" *ngFor="let action of row.actions" title="{{action.title}}"
+    (click)="execFunction(action, row)">
+    <mat-icon class="fa-lg" fontSet="fas" fontIcon="{{action.icon}}"></mat-icon>
+  </button>
+</ng-template>

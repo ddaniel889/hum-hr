@@ -1,0 +1,216 @@
+<app-chapa class="fake-intro" [className]="'info-empty'" [text]="'Procesos Diferidos'" [icon]="'fa-cogs'" [subText]="'Selecciona un proceso para ver su estado'">
+</app-chapa>
+<app-chapa *ngIf="isReprocessing" [className]="'info-empty'" [text]="'Estamos reprocesando los errores'" [icon]="'fa-sync'" [subText]="'En breve verás el cambio, podés actualizar o continuar con tus tareas'" [actionIcon]="'fa-redo'" [actionText]="'Actualizar'"
+    (actionClick)="reprocessChapaClick()">
+</app-chapa>
+<app-chapa *ngIf="deferedProcess && (deferedProcess.stateId == '001' || deferedProcess.stateId == '004' || deferedProcess.stateId == '002')" [className]="'info-empty'" [text]="'El proceso será ejecutado en breve'" [icon]="'fa-tachometer-alt-slowest'" [subText]="'Consulta nuevamente en unos instantes. Disculpa la demora'">
+</app-chapa>
+<app-chapa [ngClass]="{'fa minimize':showMore}" *ngIf="deferedProcess && deferedProcess.stateId == '005'" [className]="'info-empty'" [text]="'El proceso está pausado, será ejecutado en breve'" [subText]="'Mientras tanto podés ver su estado. Disculpa la demora'"
+    [actionIcon]="'fa-heart-rate'" [actionText]="'Ver Estado'" [icon]="'fa-pause-circle'" (actionClick)="pausedChapaClick()">
+</app-chapa>
+<app-chapa [ngClass]="{'fa minimize purged':showPurged}" *ngIf="deferedProcess && isPurged" [className]="'info-empty'" [text]="'El proceso ha Vencido'" [subText]="'Pasados 90 días el proceso vence, podés ver la información del proceso, sin embargo ya no podrás reprocesarlo ni descargar sus archivos asociados'"
+    [actionIcon]="'fa-eye'" [actionIcon]="false" [actionText]="'Ver información'" [icon]="'fa-fire-alt'" (actionClick)="purgedChapaClick()">
+</app-chapa>
+<mat-toolbar class="detail-toolbar">
+    <mat-toolbar-row>
+        <div class="mat-avatar" fxLayout="row" fxLayoutAlign="space-between center">
+            <div class="toolbar-line container-ou" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                <div class="invisible-container ou-selector" fxLayout="row" fxLayoutAlign="start center">
+                    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-industry-alt">
+                        </mat-icon>
+                        <div class="title" fxLayout="column" fxLayoutAlign="center start">
+                            <h3><b>{{deferedProcess?.OUNameDestination}}</b></h3>
+                        </div>
+                    </div>
+                </div>
+                <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                    <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-receipt">
+                    </mat-icon>
+                    <div class="title" fxLayout="column" fxLayoutAlign="center start">
+                        <h3>{{deferedProcess?.documentationType ? deferedProcess?.documentationType.name : '' }}</h3>
+                        <h5 fxLayout="row" fxLayoutGap="4px"  *ngIf="deferedProcess.processTypeId !== '014'">
+                            {{deferedProcess.files?.length}} {{deferedProcess.files?.length > 1 ? 'archivos ':'archivo '}} con secuencia {{sequenceName}}
+                        </h5>
+                        <h5 fxLayout="row" fxLayoutGap="4px"  *ngIf="deferedProcess.processTypeId === '014'">
+                            {{deferedProcess.files?.length}} {{deferedProcess.files?.length > 1 ? 'archivos ':'archivo '}} Firmados con Husigner Pro
+                        </h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button mat-icon-button title="Ver más Datos" (click)="openBottomSheet()" *ngIf="deferedProcess.processTypeId !== '014'">
+      <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-file-alt"></mat-icon>
+    </button>
+        <button mat-icon-button title="Actualizar" (click)="refresh()" *ngIf="deferedProcess.stateName == 'in progress' || deferedProcess.stateName == 'paused'">
+      <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-redo"></mat-icon>
+    </button>
+    </mat-toolbar-row>
+</mat-toolbar>
+<mat-divider [inset]="true"></mat-divider>
+
+<!-- LOADER -->
+<div class="load-window" *ngIf="loading">
+    <mat-progress-spinner style="z-index: 1" mode="indeterminate" color="primary">
+    </mat-progress-spinner>
+</div>
+
+<!-- Defered-Search -->
+<div class="documents-search-sub-toolbar" fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="space-between center">
+
+    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+        <div class="mat-search-field" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+            <mat-icon class="fa" fontSet="fal" fontIcon="fa-search">
+            </mat-icon>
+            <input type="search" [(ngModel)]="filters.searchValue" placeholder="Buscar" (keydown)="filteredSearch($event.key)" />
+        </div>
+        <mat-checkbox class="mat-search-field-check" [(ngModel)]="filters.onlyErrors" (ngModelChange)="filteredCheck()">
+            Ver sólo errores
+        </mat-checkbox>
+    </div>
+    <app-cs-paginator [pageCount]="itemsCount" [(pageIndex)]="filters.page" (pageChanged)="selectedPageChanged($event)">
+    </app-cs-paginator>
+</div>
+<!-- DEFERED-PROCESS-TABLE -->
+<div class="new-table automatic-processes" *ngIf="processResultItems?.length > 0">
+    <div class="mat-table" (click)="openProcess(item)">
+        <!-- DEFERED-PROCESS-TABLE_HEAD -->
+        <div class="mat-header-row sticky" fxLayout="row" fxLayoutAlign="start center">
+            <div class="mat-header-cell w-1" fxLayout="row" fxLayoutAlign="center center">
+            </div>
+            <div class="w-12" fxLayout="row" fxLayoutAlign="start center">
+                <div class="mat-header-cell w-2" fxLayout="row" fxLayoutAlign="start center">
+                    <span>Identificador</span>
+                </div>
+                <div class="mat-header-cell w-2" fxLayout="row" fxLayoutAlign="start center" *ngIf="deferedProcess.processTypeId !== '014'">
+                    <span>Numero de página</span>
+                </div>
+                <div class="mat-header-cell w-8" fxLayout="row" fxLayoutAlign="start center">
+                    <span>Mensaje</span>
+                </div>
+            </div>
+        </div>
+        <!-- DEFERED-PROCESS-TABLE-ROWS -->
+        <div class="mat-row" matRipple *ngFor="let log of processResultItems" fxLayout="row" fxLayoutAlign="start center">
+            <div class="mat-cell w-1" fxLayout="row" fxLayoutAlign="center center">
+                <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-check-circle" *ngIf="log.status.toLowerCase() === 'ok' && !log.fechaEliminacion" title="Procesado Correctamente">
+                </mat-icon>
+                <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-eraser" *ngIf="log.status.toLowerCase() === 'ok' && log.fechaEliminacion" title="Documento Eliminado">
+                </mat-icon>
+                <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times-circle" *ngIf="log.status.toLowerCase() === 'error'" title="Procesado con Error">
+                </mat-icon>
+            </div>
+            <div class="w-12 icon" fxLayout="row" fxLayoutAlign="start center" [ngClass]="{'w-sticky': log.documentId}">
+                <div class="mat-cell w-2" fxLayoutAlign="start center" title="{{ log.valorIdentificado }}">
+                    <span>
+            {{ log.valorIdentificado }}
+          </span>
+                </div>
+                <div class="mat-cell w-2" fxLayoutAlign="start center" *ngIf="deferedProcess.processTypeId !== '014'"> 
+                    <span>
+            {{ log.numeroPagina }}
+          </span>
+                </div>
+                <div class="mat-cell w-8" fxLayoutAlign="start center" title="{{ log.errorMessage }}">
+                    <span>
+            {{ log.errorMessage }}
+          </span>
+                </div>
+            </div>
+            <div class="mat-cell sticky-actions" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                <button mat-icon-button title="Ver" *ngIf="log.documentId && !log.fechaEliminacion" (click)="viewDocument(log.documentId)" title="Ver Documento: {{ log.documentId }}">
+          <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-eye"></mat-icon>
+        </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="new-table automatic-processes search-warning" fxLayout="column" fxLayoutAlign="center center" *ngIf="processResultItems?.length == 0">
+    <h3>Sin resultados</h3>
+</div>
+<mat-divider [inset]="true"></mat-divider>
+<div class="processes-status" *ngIf="processResultTotals" fxLayout="column" fxLayoutAlign="space-between stretch">
+    <div class="status-title" *ngIf="deferedProcess.processTypeId !== '014'"> Documentos procesados</div>
+    <div class="status-title" *ngIf="deferedProcess.processTypeId === '014'"> Documentos Firmados</div>
+    <div class="status-bar" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+        <div class="bar-header" fxLayout="column" fxLayoutAlign="center center">
+            <h1 style="text-align: center;">
+                {{ processResultTotals?.okTotalItems/processResultTotals?.totalItems | percent:'1.0-2' }}
+            </h1>
+            <h6 *ngIf="deferedProcess.processTypeId !== '014'" style="text-align: center;">Identificados</h6>
+        </div>
+        <div *ngIf="deferedProcess.processTypeId !== '014'" class="bar-graph" [title]="processResultTotals?.totalItems > 1 ? processResultTotals?.totalItems + ' Documentos Procesados en Total' : processResultTotals?.totalItems + ' Documento Procesado en Total'" fxLayout="row" fxLayoutAlign="start center"
+            fxFlex="grow">
+            <div class="graph-ok" [title]="processResultTotals?.okTotalItems > 1 ? processResultTotals?.okTotalItems + ' Documentos Procesados Correctamente' : processResultTotals?.okTotalItems + ' Documento Procesado Correctamente'" fxLayout="row" fxLayoutAlign="start center"
+                fxLayoutGap="16px" fxFlex="{{ (processResultTotals?.okTotalItems / processResultTotals?.totalItems) * 100}}">
+            </div>
+            <div class="graph-not-ok" [title]="processResultTotals?.errorTotalItems > 1 ? processResultTotals?.errorTotalItems + ' Documentos Procesados con Error' : processResultTotals?.errorTotalItems + ' Documento Procesado con Error'" fxLayout="row" fxLayoutAlign="start center"
+                fxLayoutGap="16px" fxFlex="{{ (processResultTotals?.errorTotalItems / processResultTotals?.totalItems) * 100}}">
+            </div>
+        </div>
+        <div *ngIf="deferedProcess.processTypeId === '014'" class="bar-graph" [title]="processResultTotals?.totalItems > 1 ? processResultTotals?.totalItems + ' Documentos Firmados en Total' : processResultTotals?.totalItems + ' Documento Firmados en Total'" fxLayout="row" fxLayoutAlign="start center"
+            fxFlex="grow">
+            <div class="graph-ok" [title]="processResultTotals?.okTotalItems > 1 ? processResultTotals?.okTotalItems + ' Documentos Firmados Correctamente' : processResultTotals?.okTotalItems + ' Documento Firmados Correctamente'" fxLayout="row" fxLayoutAlign="start center"
+                fxLayoutGap="16px" fxFlex="{{ (processResultTotals?.okTotalItems / processResultTotals?.totalItems) * 100}}">
+            </div>
+            <div class="graph-not-ok" [title]="processResultTotals?.errorTotalItems > 1 ? processResultTotals?.errorTotalItems + ' Documentos Firmados con Error' : processResultTotals?.errorTotalItems + ' Documento Firmados con Error'" fxLayout="row" fxLayoutAlign="start center"
+                fxLayoutGap="16px" fxFlex="{{ (processResultTotals?.errorTotalItems / processResultTotals?.totalItems) * 100}}">
+            </div>
+        </div>
+    </div>
+    <div class="status-resume" fxLayout="row" fxLayoutAlign="space-around center" fxLayoutGap="16px">
+        <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="8px" class="resume-total" *ngIf="processResultTotals?.totalItems">
+            <span>En Total</span>
+            <b>{{processResultTotals?.totalItems}}</b>
+            <button mat-icon-button [matMenuTriggerFor]="goMenuDocs" title="Ver acciones" *ngIf="processFile && !isDeleted && !isPurged && deferedProcess.processTypeId !== '014'">
+        <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-ellipsis-v"></mat-icon>
+      </button>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="8px" class="resume-ok" *ngIf="processResultTotals?.okTotalItems">
+            <span>Correctamente</span>
+            <b>{{processResultTotals?.okTotalItems}}</b>
+            <button mat-icon-button [matMenuTriggerFor]="goMenuOkDocs" title="Ver acciones" *ngIf="processResultTotals?.okTotalItems > 0 && deferedProcess?.stateName != 'queued' && !isDeleted && !isPurged && deferedProcess.processTypeId !== '014'">
+        <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-ellipsis-v"></mat-icon>
+      </button>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="8px" class="resume-not-ok" *ngIf="processResultTotals?.errorTotalItems > 0">
+            <span>Con Error</span>
+            <b>{{processResultTotals?.errorTotalItems}}</b>
+            <button mat-icon-button [matMenuTriggerFor]="goMenuError" title="Ver acciones" *ngIf="processResultTotals?.errorTotalItems > 0  && deferedProcess?.stateName != 'queued' && !isDeleted">
+        <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-ellipsis-v"></mat-icon>
+      </button>
+        </div>
+    </div>
+</div>
+<mat-menu #goMenuDocs="matMenu" yPosition="above" overlapTrigger="true" class="options-menu">
+    <mat-action-list class="navigation-list">
+        <button mat-list-item (click)="downloadFile()">
+      <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+        fontIcon="fa-file-archive"></mat-icon>
+      <span matLine>Descargar documentos</span>
+    </button>
+    </mat-action-list>
+</mat-menu>
+<mat-menu #goMenuOkDocs="matMenu" yPosition="above" overlapTrigger="true" class="options-menu">
+    <mat-action-list class="navigation-list mat-card">
+        <button mat-list-item (click)="openBottomSheetDelete()" *ngIf="canDelete && !isPurged && deferedProcess?.stateId !== '009'">
+      <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+        fontIcon="fa-trash-alt"></mat-icon>
+      <span matLine>Eliminar documentos</span>
+    </button>
+    </mat-action-list>
+</mat-menu>
+<mat-menu #goMenuError="matMenu" yPosition="above" overlapTrigger="true" class="options-menu">
+    <mat-action-list class="navigation-list mat-card">
+        <button mat-list-item (click)="reprocess()" *ngIf="!isPurged" [disabled]="disableButton">
+          <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+            fontIcon="fa-sync"></mat-icon>
+          <span matLine>Volver a procesar</span>
+        </button>
+        <button mat-list-item (click)="exportErrors()">
+              <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+                fontIcon="fa-file-spreadsheet"></mat-icon>
+              <span matLine>Exportar errores</span>
+         </button>
+    </mat-action-list>
+</mat-menu>

@@ -1,0 +1,65 @@
+<app-certificate-declaration *ngIf="isCertificateDeclarationOpen" [documentIds]="documentIds" (addFinish)="closeAdd($event)">
+</app-certificate-declaration>
+
+<div *ngIf="!loading" class="employee_detail-sign">
+    <div class="employee-title" *ngIf="hasTitle">
+        <div class="title-text">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-fingerprint">
+            </mat-icon>
+            <div class="title_text-main">
+                Formas de Firma
+            </div>
+        </div>
+        <button mat-icon-button title="agregar" *ngIf="enableAdd" (click)="openAdd()">
+            <mat-icon class="fa-xs" fontSet="fa" fontIcon="fa-plus"></mat-icon>
+        </button>
+    </div>
+    <div class="employee_detail-side-body">
+        <div class="data" *ngFor="let certificate of certificates">
+            <div class="data-line">
+                <div class="data_line-text">
+                    <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" fontSet="fa" fontIcon="fa-industry-alt" *ngIf="certificate.typeId === 1"></mat-icon>
+                    <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" fontSet="fa" fontIcon="fa-file-certificate" *ngIf="certificate.typeId === 0"></mat-icon>
+                    <div class="line_text-container">
+                        <div class="line_text-main" *ngIf="certificate.organizationalUnitId === 0">
+                            {{certificate.providerDescription}}
+                        </div>
+                        <div class="line_text-main" *ngIf="certificate.organizationalUnitId !== 0">
+                            {{certificate.providerDescription}} para {{certificate.organizationalUnitName}}
+                        </div>
+                        <div class="line_text-side" *ngIf="certificate.expirationDate">
+                            Válido hasta {{certificate.expirationDate | date:'dd/MM/yyyy'}}
+                        </div>
+                        <div class="line_text-side" *ngIf="!certificate.expirationDate">
+                            Sin caducidad indicada
+                        </div>
+                    </div>
+                </div>
+                <mat-chip-list>
+                    <mat-basic-chip disabled class="not-signed" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px" *ngIf="certificate.isPending">
+                        <mat-icon  fontSet="fa" fontIcon="fa-pause-circle">
+                        </mat-icon>
+                        <span>Pendiente</span>
+                    </mat-basic-chip>
+                    <mat-basic-chip disabled class="unseen" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px" *ngIf="!certificate.enabled">
+                        <mat-icon  fontSet="fa" fontIcon="fa-ban">
+                        </mat-icon>
+                        <span>Inhabilitado</span>
+                    </mat-basic-chip>
+                </mat-chip-list>
+            </div>
+        </div>
+        <div class="data" *ngIf="!loading  && certificates.length == 0">
+            <div class="data-line">
+                <div class="data_line-text">
+                    <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" fontSet="fa" fontIcon="fa-file-exclamation"></mat-icon>
+                    <div class="line_text-container">
+                        <div class="line_text-main" *ngIf="enableAdd">Sin forma de firma, usa "+" para habilitar una nueva
+                        </div>
+                        <div class="line_text-main" *ngIf="!enableAdd">Sin forma de firma</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

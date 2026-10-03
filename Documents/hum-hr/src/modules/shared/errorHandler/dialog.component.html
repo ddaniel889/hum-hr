@@ -1,0 +1,8 @@
+<div fxLayout="column" fxLayoutAlign="start center" fxLayoutGap="16px">
+    <h3> {{ data.message }} </h3>
+    <div fxLayout="row-reverse" fxLayoutAlign="start center" fxLayoutGap="16px" fxFill>
+        <button mat-button (click)="cancel()" cdkFocusInitial>{{ data.cancelAction }}</button>
+        <button mat-button (click)="no()" *ngIf="data.option == YesNoCancel">{{ data.noAction }}</button>
+        <button mat-button (click)="ok()">{{ data.okAction }}</button>
+    </div>
+</div>

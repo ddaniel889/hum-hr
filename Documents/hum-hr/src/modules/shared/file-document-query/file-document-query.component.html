@@ -1,0 +1,179 @@
+<div *ngIf="useDocComments && showQuery && !querying" class="firmador">
+  <button mat-raised-button class="content-action-main" color="primary" (click)="startQueryFlow()" [disabled]="loading">
+    <div class="mat-button-wrapper" fxLayout="row" fxLayoutAlign="center center">
+      <mat-icon *ngIf="loading" class="fa-xs fa-spin" fontSet="fa" fontIcon="fa-spinner-third"></mat-icon>
+      <ng-container *ngIf="!loading">
+        <mat-icon class="fa-lg" fontSet="fa" [fontIcon]="hasQuery ? 'fa-comments' : 'fa-comment-medical'"></mat-icon>
+        <span>{{ hasQuery ? 'Ver Consulta' : 'Hacer Consulta' }}</span>
+      </ng-container>
+      <span *ngIf="loading"> Cargando...</span>
+    </div>
+  </button>
+</div>
+
+<div class="sign-cycle" *ngIf="useDocComments && showQuery && querying" [class.minimized]="isMinimized" style="width: 100%;">
+
+  <button mat-icon-button class="btn-toggle-view" (click)="toggleMinimize()"
+          [title]="isMinimized ? 'Expandir consulta' : 'Minimizar consulta'">
+    <mat-icon fontSet="fa"
+              [fontIcon]="isMinimized ? 'fa-chevron-up' : 'fa-chevron-down'"
+              [style.color]="isMinimized ? 'white' : '#555'"> </mat-icon>
+  </button>
+
+  <mat-divider></mat-divider>
+  <mat-progress-bar mode="indeterminate" [style.display]="loading ? 'block' : 'none'"></mat-progress-bar>
+
+  <div *ngIf="isMinimized" class="minimized-info-bar" (click)="toggleMinimize()">
+    <mat-icon fontSet="fa" fontIcon="fa-comments" class="info-icon"></mat-icon>
+    <span>Panel de consultas activo - Haga clic para expandir</span>
+  </div>
+
+  <mat-horizontal-stepper #stepper style="background: transparent;" [style.display]="isMinimized ? 'none' : 'block'">
+    <mat-step>
+      <div class="sign-cycle-content" fxLayout="row" fxLayoutAlign="start center"
+           style="width: 100%; min-height: 150px; max-height: 2500px; display: flex !important; flex-wrap: nowrap !important;">
+
+        <div class="cycle-content-title-container" fxFlex="30%" fxLayout="row" fxLayoutAlign="start start"
+             fxLayoutGap="12px" style="padding-right: 15px;">
+
+          <button mat-icon-button color="primary" (click)="closeQuery()" title="Cerrar"
+                  style="flex: none; margin-top: -8px;">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+          </button>
+
+          <div class="cycle-content-title" fxLayout="column" fxLayoutAlign="start start" style="overflow: hidden;">
+            <h2 class="main-query-title">Consultas</h2>
+            <h4 class="text-muted" style="margin: 0; margin-top: 6px;">
+              <ng-container *ngIf="hasQuery && queryHistory[0]">
+                <span class="reason-badge">
+                  {{ getFriendlyLabel(queryHistory[0].messageType) }}
+                </span>
+              </ng-container>
+              <span *ngIf="!hasQuery" class="placeholder-text">
+                Seleccione el motivo y escriba la consulta
+              </span>
+            </h4>
+
+            <button mat-stroked-button color="warn" class="btn-finalize-query"
+                    *ngIf="hasQuery && !doc.threadClosed && !hideCloseQuery" [disabled]="loading" (click)="closeQueryThread()">
+              <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="8px">
+                <span>FINALIZAR CONSULTA</span>
+              </div>
+            </button>
+
+            <div class="status-badge-closed" *ngIf="doc?.hasMessage && doc?.threadClosed">
+              <mat-icon fontSet="fa" fontIcon="fa-check-circle"></mat-icon>
+              <span>CONSULTA CERRADA</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="cycle-content-action" fxFlex="60%" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="12px"
+             style="padding: 0 20px;">
+
+          <ng-container *ngIf="!hasQuery">
+            <div style="flex: none;">
+              <img src="assets/img/user-avatar.png" class="user-avatar-style" alt="">
+            </div>
+            <div fxFlex fxLayout="column" class="action-inputs-container">
+              <mat-form-field appearance="outline" style="width: 100%;">
+                <mat-label>Motivo de la consulta</mat-label>
+                <mat-select [(ngModel)]="queryForm.messageType" required>
+                  <mat-option *ngFor="let m of motives" [value]="m.id">{{m.description}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline" style="width: 100%;">
+                <mat-label>Descripción de su consulta</mat-label>
+                <textarea matInput rows="3" [(ngModel)]="queryForm.message" style="resize: none;"
+                          placeholder="Escriba aquí..."></textarea>
+              </mat-form-field>
+            </div>
+          </ng-container>
+
+          <ng-container *ngIf="hasQuery">
+            <div fxFlex fxLayout="column" style="width: 100%; height: 100%; justify-content: flex-end;">
+              <div #scrollContainer class="messages-list" [class.expanded]="queryHistory.length > 1"
+                   style="overflow-y: auto; padding: 15px;">
+
+                <div *ngFor="let msg of queryHistory" fxLayout="row"
+                     [fxLayoutAlign]="msg.userId === currentUser.id ? 'end start' : 'start start'"
+                     style="margin-bottom: 12px; width: 100%;">
+
+                  <div *ngIf="msg.userId !== currentUser.id" style="flex: none; margin-right: 8px;">
+                    <ngx-avatar [name]="msg.userName" [src]="'avatar-preview'" size="30"
+                                [round]="true">
+                    </ngx-avatar>
+                  </div>
+
+                  <div fxLayout="column" [fxFlex]="'70%'" [style.max-width]="'70%'"
+                       [style.align-items]="msg.userId === currentUser.id ? 'flex-end' : 'flex-start'">
+
+                    <div [style.background-color]="msg.userId === currentUser.id ? '#b9c3f8' : '#e3e0fc'"
+                         [style.color]="'#333'"
+                         [style.border-radius]="msg.userId === currentUser.id ? '10px 0px 10px 10px' : '0px 10px 10px 10px'"
+                         style="padding: 10px 14px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); width: fit-content; min-width: 100px;">
+
+                      <div style="font-size: 14px; line-height: 1.5; word-break: break-word;">
+                        <span style="font-weight: bold; color: black; margin-right: 6px;">
+                          {{ msg.userName }}
+                        </span>
+                        <span *ngIf="msg.isDeleted" style="background-color: #e8e8e8; color: #555; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-style: italic; text-transform: uppercase; letter-spacing: 0.5px;">
+                          Eliminó este mensaje
+                        </span>
+                        <span *ngIf="!msg.isDeleted">{{ msg.message }}</span>
+                      </div>
+
+                      <div style="font-size: 10.5px; color: #777; margin-top: 6px;" fxLayout="row"
+                           fxLayoutAlign="start center" fxLayoutGap="8px">
+                        <a href="javascript:void(0)"
+                           *ngIf="msg.userId === currentUser.id && !msg.isDeleted && !doc.threadClosed"
+                           style="color: #d9534f; text-decoration: none; cursor: pointer; font-weight: 600;"
+                           (click)="deleteMessage(msg.id)">
+                          Eliminar
+                        </a>
+                        <span *ngIf="msg.userId === currentUser.id" style="color: #ccc;">|</span>
+                        <span style="white-space: nowrap;">
+                          {{ msg.creationDate | date: 'dd MMM yyyy HH:mm' }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div *ngIf="msg.userId === currentUser.id" style="flex: none; margin-left: 8px;">
+                    <ngx-avatar [name]="msg.userName" [src]="'avatar-preview'" size="30"
+                                [round]="true">
+                    </ngx-avatar>
+                  </div>
+                </div>
+              </div>
+
+              <div *ngIf="!doc.threadClosed" fxLayout="row" fxLayoutAlign="start top" fxLayoutGap="8px">
+                <ngx-avatar [name]="currentUser.firstName + ' ' + currentUser.lastName" [src]="'avatar-preview'" size="30"
+                            [round]="true">
+                </ngx-avatar>
+                <mat-form-field appearance="outline" style="width: 100%;">
+                  <mat-label>Respuesta a la consulta</mat-label>
+                  <textarea matInput rows="2" [(ngModel)]="replyText" (input)="validateInput($event)"
+                            (keyup.enter)="sendReply()" style="resize: none;" placeholder="Escriba aquí..."></textarea>
+                </mat-form-field>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+
+        <div class="cycle-content-action-button action-button-container" fxFlex="10%" fxLayout="row" fxLayoutAlign="start end"
+             style="padding-left: 10px;">
+          <button mat-raised-button *ngIf="!doc.threadClosed" class="content-action-main btn-send-custom" color="accent"
+                  [disabled]="loading || (!hasQuery ? (!queryForm.messageType || !queryForm.message) : !replyText)"
+                  (click)="hasQuery ? sendReply() : submitNewQuery()">
+            <div class="btn-content-wrapper">
+              <mat-icon fontSet="fa" fontIcon="fa-long-arrow-alt-right"></mat-icon>
+              <span>Enviar</span>
+            </div>
+          </button>
+        </div>
+
+      </div>
+    </mat-step>
+  </mat-horizontal-stepper>
+</div>

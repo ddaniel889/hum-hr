@@ -1,0 +1,128 @@
+<mat-toolbar class="mat-elevation-z1 app-toolbar" color="primary" fxFlex="grow">
+  <mat-toolbar-row></mat-toolbar-row>
+  <mat-toolbar-row></mat-toolbar-row>
+</mat-toolbar>
+<div class="floating-container" fxLayout="row" fxLayoutAlign="center center" fxFill>
+  <mat-card class="card-1-1">
+    <mat-sidenav-container fxLayout="row" fxFill mode="push">
+      <mat-sidenav-content fxFill>
+        <div fxLayout="row" fxFill>
+          <div class="inbox-container employee my-documents" fxFlex.lt-md="100" fxFlex.gt-sm="30" fxFill>
+            <!-- LOADER -->
+            <div class="window-spinner" *ngIf="!loaded">
+              <mat-progress-spinner mode="indeterminate" color="primary">
+              </mat-progress-spinner>
+            </div>
+            <mat-toolbar class="inbox-toolbar" color="grey" fxLayout="row" fxLayoutAlign="start center">
+              <mat-toolbar-row fxLayout="row" fxLayoutAlign="space-between center" fxFill>
+                <div class="mat-avatar two-icons" fxLayout="row" fxLayoutAlign="space-between center">
+                  <div class="toolbar-line" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                    <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-file-exclamation"></mat-icon>
+                    <div class="title" fxLayout="column">
+                      <h3>Mis Pendientes</h3>
+                    </div>
+                  </div>
+                </div>
+                <button mat-icon-button (click)="refresh()">
+                  <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-redo"></mat-icon>
+                </button>
+              </mat-toolbar-row>
+            </mat-toolbar>
+            <mat-divider class="false-divider" [inset]="true"></mat-divider>
+            <div [class]="selectedDoc ? 'pending-container visible' : 'pending-container'">
+              <div class="pending-items" fxLayout="column" fxLayoutGap="16px" *ngIf="fileDocuments.length > 0">
+                <span class="pending-item" *ngFor="let item of fileDocuments">
+                  <div class="mat-card content mat-elevation-z2" matRipple (click)="selectDocument(item)"
+                    [ngClass]="{'selected' : item?.id === selectedDoc?.id}" fxLayout="row" fxLayoutAlign="start center">
+                    <mat-icon *ngIf="item.loading" class="fa-xs fa-spin" fontSet="fa" fontIcon="fa-spinner-third">
+                    </mat-icon>
+                    <ng-container *ngIf="!item.loading">
+                      <mat-icon *ngIf="item.pendingIcon === 'view'" class="fa-lg" fontSet="fa" fontIcon="fa-envelope"
+                        fxLayout="row" fxLayoutAlign="center center">
+                      </mat-icon>
+                      <mat-icon *ngIf="item.pendingIcon === 'signature'" class="fa-lg" fontSet="fa"
+                        fontIcon="fa-file-signature" fxLayout="row" fxLayoutAlign="center center">
+                      </mat-icon>
+                      <mat-icon *ngIf="item.pendingIcon === 'upload'" class="fa-lg" fontSet="fa"
+                        fontIcon="fa-file-upload" fxLayout="row" fxLayoutAlign="center center">
+                      </mat-icon>
+                      <mat-icon *ngIf="item.pendingIcon === 'form'" class="fa-lg" fontSet="fa" fontIcon="fa-file-alt"
+                        fxLayout="row" fxLayoutAlign="center center">
+                      </mat-icon>
+                    </ng-container>
+                    <div class="item-data" fxLayout="column">
+                      <b title="{{ item.contentTitle }}" #listItem>{{ item.contentTitle }}
+                      </b>
+                      <span *ngIf="item.pendingIcon === 'view'">
+                        Ver Documentación
+                      </span>
+                      <span *ngIf="item.pendingIcon === 'signature'">
+                        Firmar Documentación
+                      </span>
+                      <span *ngIf="item.pendingIcon === 'upload'">
+                        Adjuntar Documentación
+                      </span>
+                      <span *ngIf="item.pendingIcon === 'form'">
+                        Completar Formulario
+                      </span>
+                      <span> {{ item.temporalityTitle }} </span>
+                    </div>
+                  </div>
+                </span>
+              </div>
+              <!-- boton de firmar todo -->
+              <ng-container *ngIf="currentOu?.allowMultipleSign">
+                <div class="main-action desktop" fxLayout="row" fxLayoutAlign="center center"
+                  *ngIf="certificates.length > 0 && countSignatureFiles > 1 ">
+                  <button mat-raised-button class="main-btn" color="primary" (click)="goToMassiveSign()">
+                    <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-pen-nib">
+                    </mat-icon>
+                    Firmar Todos
+                  </button>
+                </div>
+                <div class="main-action mobile" fxLayout="row" fxLayoutAlign="center center"
+                  *ngIf="certificates.length > 0 && countSignatureFiles > 1 ">
+                  <button mat-raised-button class="main-btn" color="primary" (click)="goToMassiveSign()">
+                    <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-pen-nib">
+                    </mat-icon>
+                    Firmar Todos
+                  </button>
+                </div>
+              </ng-container>
+              <!-- Empty (app chapa) -->
+              <app-chapa [className]="'info-empty'" [icon]="'fa-smile-beam'"
+                [text]="'Genial, no tenés tareas pendientes'" *ngIf="fileDocuments.length < 1"></app-chapa>
+            </div>
+          </div>
+          <mat-divider [vertical]="true"></mat-divider>
+          <div class="detail" fxFlex.lt-md="100" fxFlex.gt-sm="70" fxFill [ngClass]="detailClass()">
+            <ng-container *ngIf="currentOu?.allowMultipleSign">
+              <app-chapa [className]="'info-empty'" [icon]="'fa-file-signature'"
+                [text]="'Firma toda tu Documentación Pendiente'"
+                [subText]="'Cumple con tus obligaciones de la manera mas fácil!'" [actionIcon]="'fa-pen-nib'"
+                [actionText]="'Firmar todos'" (actionClick)="goToMassiveSign()"
+                *ngIf="!selectedDoc && certificates.length > 0 && countSignatureFiles > 1">
+              </app-chapa>
+              <app-chapa *ngIf="!selectedDoc && (certificates.length < 1 || countSignatureFiles <= 1)"
+                [className]="'info-empty'" [icon]="'fa-hand-sparkles'" [text]="'Humanage te da la bienvenida'"
+                [subText]="'Decile adiós al papel, aquí podrás gestionar todo digitalmente y de la manera más fácil'">
+              </app-chapa>
+            </ng-container>
+            <app-chapa *ngIf="!currentOu?.allowMultipleSign && !selectedDoc" [className]="'info-empty'"
+              [icon]="'fa-hand-sparkles'" [text]="'Humanage te da la bienvenida'"
+              [subText]="'Decile adiós al papel, aquí podrás gestionar todo digitalmente y de la manera más fácil'">
+            </app-chapa>
+            <app-file-document-view [doc]="selectedDoc" [documentationType]="documentationType" [signEnabled]=true
+              [showDocumentStateBottom]=false (mobileCloseEvent)="this.setIsOpen(false)" [fileName]="fileName"
+              [filePdf]="filePdf" [autoView]="true" [showWelcome]=true [showSpinner]=true
+              (refreshDocEvent)="refreshDoc()" [uploadEnabled]=true [showPrint]="!selectedDoc?.isUploadPending()"
+              [showQueries]="showQueries"
+              [showSave]="!selectedDoc?.isUploadPending()" (submitFormioEvent)="submitFormio($event)"
+              *ngIf="selectedDoc || certificates.length < 1">
+            </app-file-document-view>
+          </div>
+        </div>
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+  </mat-card>
+</div>

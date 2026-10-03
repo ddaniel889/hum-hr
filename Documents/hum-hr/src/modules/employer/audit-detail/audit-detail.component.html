@@ -1,0 +1,24 @@
+<div class="container" style="height: 100%;">
+  <!-- chapa vacio -->
+  <ng-container *ngIf="!haveData">
+    <app-chapa [className]="'info-empty'" [icon]="'fa-meh'" [text]="'Ups! Nada por aquí...'"
+      [subText]="'No hay datos adicionales para esta auditoría'"></app-chapa>
+  </ng-container>
+  <!-- listado detalles auditoria -->
+  <mat-list fxFill *ngIf="haveData">
+    <mat-list-item *ngFor="let p of notArrays">
+      <span matLine>{{ p | auditTranslate | async }}</span>
+      <span matLine><b>{{ entity[p] }}</b></span>
+    </mat-list-item>
+  </mat-list>
+  <!-- listado detalles auditoria -->
+  <mat-list fxFill *ngFor="let array of arrays">
+    <mat-list-item *ngFor="let item of entity[array]">
+      <span matLine>{{ item.key | auditTranslate | async }}</span>
+      <span matLine><b>{{ item.value }}</b></span>
+    </mat-list-item>
+  </mat-list>
+  <div>
+    <span let ent></span>
+  </div>
+</div>

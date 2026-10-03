@@ -1,0 +1,111 @@
+@import '../../../assets/styles/img-management';
+
+
+.profile-menu {
+  width: 25vw;
+  max-width: 384px;
+  z-index: 10;
+}
+
+.profile-toolbar {
+  position: absolute;
+  z-index: 1;
+}
+
+app-profile {
+  position: relative;
+  display: block;
+  padding-top: 65px;
+
+  &.no-Holograph-signature {
+    .signature-profile {
+      display: none !important;
+    }
+  }
+
+  .profile-certificates {
+    .mat-list-item .mat-line {
+      white-space: unset !important;
+      overflow: unset !important;
+      text-overflow: unset !important;
+      margin-bottom: 4px !important;
+    }
+  }
+
+  mat-list {
+    padding: 0;
+
+    .mat-list-item {
+      background: none !important;
+    }
+  }
+
+  .scroller-user-certificates mat-list-item.mat-list-item,
+  .scroller-user-data mat-list-item.mat-list-item {
+    min-height: 64px !important;
+  }
+
+
+  .logout-btn {
+    cursor: pointer;
+    transition: background .4s cubic-bezier(.25, .8, .25, 1);
+  }
+
+  .logout-btn:hover {
+    transition: background .4s cubic-bezier(.25, .8, .25, 1);
+  }
+
+  .avatar-profile,
+  .signature-profile {
+    margin: 16px;
+    flex-wrap: wrap;
+
+    img {
+      border-radius: 50px;
+
+      &.user-avatar,
+      &.user-signature {
+        width: 100px;
+      }
+    }
+  }
+
+  .cropper {
+    position: absolute;
+    width: 100%;
+    top: 0;
+    z-index: 10;
+    height: 100vh;
+
+    .edition {
+      height: calc(100% - 65px);
+      padding-bottom: 16px;
+
+      app-cs-upload-cropper-control {
+        width: 100%;
+      }
+    }
+  }
+}
+
+
+@mixin profile($bg-card, $bg-toolbar-light, $divider) {
+
+  .profile-toolbar {
+    border-bottom: 1px solid $divider
+  }
+
+  app-profile {
+    .logout-btn:hover {
+      background: $bg-toolbar-light;
+    }
+
+    .cropper {
+      background: $bg-card;
+
+      .cropper {
+        background: unset;
+      }
+    }
+  }
+}

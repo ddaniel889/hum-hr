@@ -1,0 +1,13 @@
+.new-detail-container.cancelled{
+  position: relative;
+}
+
+.new-detail-container, .cancelled{
+  position: absolute;
+  top: 0;
+  left: 70%;
+}
+
+.no-clickable {
+  pointer-events: none;
+}

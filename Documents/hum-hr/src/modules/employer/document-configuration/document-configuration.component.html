@@ -1,0 +1,241 @@
+<!-- configuracion -->
+<div class="work-space" fxFlex="100" fxFill>
+  <!-- vista ppal -->
+  <div class="main" [fxFlex]="showDetail || isEditing ? '70' : '100'" [ngClass]="{'side-open': showDetail || isEditing}"
+    fxFill fxLayout="column">
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+      <!-- info -->
+      <div class="header">
+        <div class="content" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px" fxFlex="100">
+          <!-- app selector -->
+          <div class="module-title" fxLayout="row" fxLayoutAlign="start center">
+            <div class="info" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+              <button mat-icon-button title="Volver" (click)="goToSearch()">
+                <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-arrow-left"></mat-icon>
+              </button>
+              <div fxLayout="column">
+                <h3>Configuración de Documentos</h3>
+                <h5>{{selectedOrganizationalUnit?.name}}</h5>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Busqueda  -->
+      <div class="search-container">
+        <div class="search" fxLayout="row" fxLayoutAlign="start center" fxFlex="100" *ngIf="showSearchBar">
+          <div class="content" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px" fxFlex="100">
+            <mat-icon  class="fa" fontSet="fal" fontIcon="fa-search">
+            </mat-icon>
+            <input #documentsConfigurationSearchInput type="search" [(ngModel)]="filterName"
+              placeholder="Buscar Configuración por Nombre" (keydown.enter)="search()" />
+            <button mat-icon-button title="Ver Guía de Búsqueda" [matMenuTriggerFor]="menuHelp" [disabled]="loading">
+              <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-question-circle"></mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- loader -->
+    <!-- <div class="load-window new" *ngIf="loading">
+                    <mat-progress-spinner style="z-index: 1" mode="indeterminate" color="primary">
+                    </mat-progress-spinner>
+                </div> -->
+    <!-- Chapas -->
+    <ng-container *ngIf="noContainerType && documentationTypes?.length == 0">
+      <app-chapa [className]="'info-empty'" [icon]="'fa-tired'" [text]="'¡Ups! Tenemos un problema'"
+        [subText]="'No tenés tipos documentales configurados'"
+        [infoExtra]="'(formularios, recibos, certificados, etc.)'"></app-chapa>
+    </ng-container>
+    <!-- listado de actores -->
+    <div class="container file-configuration" fxLayout="column" *ngIf="documentationTypes?.length">
+
+      <!-- ACTUALIZAR -->
+      <button mat-icon-button (click)='filteredSearch()' title="Actualizar Listado" class="refresh">
+        <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-redo"></mat-icon>
+      </button>
+      <mat-progress-bar mode="indeterminate" *ngIf="loading" class="refresh-bar">
+      </mat-progress-bar>
+      <mat-tab-group mat-align-tabs="start" class="file-tabs" *ngIf="!noContainerType && documentationTypes?.length > 0"
+        (focusChange)="myTabFocusChange($event)">
+        <mat-tab
+          [label]="formioDocumentationTypes?.length > 1 ? 'Formularios (' + formioDocumentationTypes?.length + ')' : 'Formulario (' + formioDocumentationTypes?.length + ')'">
+          <ng-container *ngIf="!noContainerType">
+            <ng-container *ngIf="!formioDocumentationTypes?.length">
+              <app-chapa [className]="'info-empty'" [icon]="'fa-file-exclamation'"
+                [text]="'No hay formularios disponibles'" [subText]="'Contacta a tu Administrador para crear uno'">
+              </app-chapa>
+            </ng-container>
+            <div class="content-scroll" *ngIf="formioDocumentationTypes?.length">
+              <!-- foreach form -->
+              <div *ngFor="let docType of formioDocumentationTypes" class="item"
+                [ngClass]="{'selected scrollTo' : docType?.selected, 'full-page': !parentOu, 'disabled' : !docType.enabled}"
+                fxLayout="column">
+                <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                  <!-- icono del form -->
+                  <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center" *ngIf="!docType.enabled">
+                    <mat-icon  class="fa-lg" fontSet="fa"
+                      fontIcon="fa-file-alt"></mat-icon>
+                    <mat-icon  class="fa-lg complex" fontSet="fas"
+                      fontIcon="fa-lock">
+                    </mat-icon>
+                  </div>
+                  <mat-icon  class="fa-lg" fontSet="fa"
+                    fontIcon="fa-file-alt" *ngIf="docType.enabled"></mat-icon>
+                  <!-- info del form -->
+                  <div class="info" fxLayout="column">
+                    <h3>
+                      {{docType.description}}
+                    </h3>
+                    <h5 *ngIf="selectedOrganizationalUnit?.isRoot">
+                      {{docType.organizationalUnitName}}
+                    </h5>
+                  </div>
+                </div>
+                <!-- action del form -->
+                <div class="actions" fxLayout="row" fxLayoutAlign="end center" (click)="$event.stopPropagation()">
+                  <button mat-icon-button [title]="docType.enabled ? 'Deshabilitar' : 'Habilitar'"
+                    (click)="toggleDisabled(docType)">
+                    <mat-icon  class="fa-lg" fontSet="fa"
+                      [fontIcon]="docType.enabled ? 'fa-pause-circle' : 'fa-play-circle'">
+                    </mat-icon>
+                  </button>
+                  <button mat-icon-button title="Editar" (click)="createEditForm(docType)">
+                    <mat-icon  class="fa-lg" fontSet="fa" fontIcon="fa-pen">
+                    </mat-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </mat-tab>
+        <mat-tab
+          [label]="archiveDocumentationTypes?.length > 1 ? 'Documentos (' + archiveDocumentationTypes?.length + ')' : 'Documento (' + archiveDocumentationTypes?.length + ')'">
+          <ng-container *ngIf="!noContainerType">
+            <ng-container *ngIf="!archiveDocumentationTypes?.length">
+              <app-chapa [className]="'info-empty'" [icon]="'fa-file-exclamation'"
+                [text]="'No hay documentos disponibles'" [subText]="'Contacta a tu Administrador para crear uno'">
+              </app-chapa>
+            </ng-container>
+            <div class="content-scroll" *ngIf="archiveDocumentationTypes?.length">
+              <!-- foreach td -->
+              <div *ngFor="let docType of archiveDocumentationTypes" class="item"
+                [ngClass]="{'selected scrollTo' : docType?.selected, 'full-page': !parentOu, 'disabled' : !docType.enabled}"
+                fxLayout="column">
+                <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                  <!-- icono del td -->
+                  <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center" *ngIf="!docType.enabled">
+                    <mat-icon  class="fa-lg" fontSet="fa"
+                      fontIcon="fa-file"></mat-icon>
+                    <mat-icon  class="fa-lg complex" fontSet="fas"
+                      fontIcon="fa-lock">
+                    </mat-icon>
+                  </div>
+                  <mat-icon  class="fa-lg" fontSet="fa" fontIcon="fa-file"
+                    *ngIf="docType.enabled"></mat-icon>
+                  <!-- info del td -->
+                  <div class="info" fxLayout="column">
+                    <h3>
+                      {{docType.description}}
+                    </h3>
+                    <h5 *ngIf="selectedOrganizationalUnit?.isRoot">
+                      {{docType.organizationalUnitName}}
+                    </h5>
+                  </div>
+                </div>
+                <!-- action del td -->
+                <div class="actions" fxLayout="row" fxLayoutAlign="end center" (click)="$event.stopPropagation()">
+                  <button mat-icon-button [title]="docType.enabled ? 'Deshabilitar' : 'Habilitar'"
+                    (click)="toggleDisabled(docType)">
+                    <mat-icon  class="fa-lg" fontSet="fa"
+                      [fontIcon]="docType.enabled ? 'fa-pause-circle' : 'fa-play-circle'">
+                    </mat-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </mat-tab>
+
+      </mat-tab-group>
+    </div>
+  </div>
+  <!-- vista detalles -->
+  <div class="side" [fxFlex]="showDetail ? '30' : '0'" *ngIf="showDetail">
+    <div class="toolbar" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+      <div class="header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+        <mat-icon  class="fa-lg" fontSet="fas" fontIcon="fa-file-alt">
+        </mat-icon>
+        <h3>Detalle</h3>
+      </div>
+      <!-- cerrar  -->
+      <button mat-icon-button fxLayout="row" fxLayoutAlign="center center" (click)="showDetail=false">
+        <mat-icon  class="fa-lg" fontSet="fas" fontIcon="fa-times">
+        </mat-icon>
+      </button>
+    </div>
+    <!-- contenido -->
+    <div class="container">
+
+    </div>
+  </div>
+</div>
+
+<!-- APP SEARCH HELP -->
+<mat-menu #menuHelp="matMenu" yPosition="below" class="menu-options help mat-card">
+  <div class="container">
+    <div class="title" fxLayout="row" fxLayoutAlign="space-between center">
+      <span fxLayout="column">
+        <h6>Guía y Ejemplos de Uso</h6>
+        <h4 class="primary">Cómo funciona la búsqueda: Buscar Actores</h4>
+      </span>
+      <button mat-icon-button title="Ocultar Guía">
+        <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times">
+        </mat-icon>
+      </button>
+    </div>
+    <div class="slide-group">
+      <mat-accordion (click)="$event.stopPropagation()">
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <h4>Podés buscar por apellido y/o nombre.</h4>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <ul style="margin-top:16px">
+            <li>
+              <i>Si ingresas <b>José</b> encontrarás a las personas <b>con este apellido o nombre</b>.</i>
+            </li>
+            <li>
+              <i>Si ingresas <b>José Ignacio Salinas</b> encontrarás a las personas cuyo <b>apellido y/o
+                  nombre
+                  contengan alguna de las palabras</b> ingresadas.</i>
+            </li>
+          </ul>
+        </mat-expansion-panel>
+        <mat-expansion-panel hideToggle="true">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <h4>Podés buscar por correo electrónico ingresando el dominio completo (persona@organizacion.com)
+              </h4>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+        </mat-expansion-panel>
+        <mat-expansion-panel hideToggle="true">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <h4>Podés buscar por el Identificador Fiscal ingresando una cifra a partir de 7 dígitos.</h4>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+        </mat-expansion-panel>
+      </mat-accordion>
+      <div class="title" fxLayout="row" fxLayoutAlign="space-between center">
+        <span fxLayout="column">
+          <h6>Nota:</h6>
+          <h4 class="accent">¡Todos los casos de Búsqueda anteriormente mencionados son combinables!</h4>
+        </span>
+      </div>
+    </div>
+  </div>
+</mat-menu>

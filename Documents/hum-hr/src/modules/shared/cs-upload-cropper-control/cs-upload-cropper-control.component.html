@@ -1,0 +1,78 @@
+<ng-container *ngIf="!newCropper">
+  <div class="preview" *ngIf="!cropperShow" fxLayout="column" fxLayoutAlign="start center" fxFlex="grow"
+    fxLayoutGap="16px" fxFill>
+    <img *ngIf="croppedImage" [src]="croppedImage" />
+    <img *ngIf="!croppedImage" [src]="defaultImagePath" />
+    <div fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="16px">
+      <h5>Elige una imagen PNG, JPEG ó JPG</h5>
+      <div class="actions" fxLayoutAlign="center center">
+        <input id="files" style="visibility:hidden;width:0" #file type="file" (change)="fileChangeEvent($event)"
+          accept=".jpg,.jpeg,.png">
+        <button mat-button color="primary" (click)="file.click()">Elegir Imagen</button>
+        <button mat-button color="primary" (click)="deleteImage()" *ngIf="canDelete">Eliminar Imagen</button>
+      </div>
+    </div>
+  </div>
+  <div class="cropper-area" fxLayout="column" fxLayoutAlign="start center" fxFlex="grow" *ngIf="cropperShow" fxFill>
+    <image-cropper [imageChangedEvent]="imageChangedEvent" [maintainAspectRatio]="true" [roundCropper]="roundCropper"
+      [aspectRatio]="aspectRatio" [resizeToWidth]="widthSize" [resizeToHeight]="heightSize" format="png"
+      (imageCropped)="imageCropped($event)" (imageLoaded)="imageLoaded()" (cropperReady)="cropperReady()"
+      (loadImageFailed)="loadImageFailed()"></image-cropper>
+    <div class="actions" fxLayoutAlign="center center" fxLayoutGap="8px">
+      <button mat-button *ngIf="croppedImage" (click)="cancel()">Cancelar</button>
+      <button mat-raised-button color="primary" *ngIf="croppedImage" (click)="uploadFile()">Guardar</button>
+    </div>
+  </div>
+</ng-container>
+
+<ng-container *ngIf="newCropper">
+  <div fxLayout="column" class="img-editior-container">
+    <div class="img-editor">
+      <div class="separator" fxLayout="row" fxLayoutAlign="space-between center">
+        <div class="subtitle" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+          <mat-icon  class="fa-lg" fontSet="fas" fontIcon="fa-image">
+          </mat-icon>
+          <div class="text" fxLayout="column">
+            <h5>Logotipo de la Empresa</h5>
+            <h6>Sube o modifica una imagen con tu logotipo</h6>
+          </div>
+        </div>
+        <div class="actions" fxLayout="row" fxLayoutGap="8px" *ngIf="!cropperShow && croppedImage">
+          <input id="files" style="visibility:hidden;width:0" #file type="file" (change)="fileChangeEvent($event)"
+            accept=".jpg,.jpeg,.png">
+          <button mat-icon-button (click)="file.click()" title="Modificar Imagen">
+            <mat-icon  class="fa-lg" fontSet="fas" fontIcon="fa-pen">
+            </mat-icon>
+          </button>
+          <button mat-icon-button (click)="deleteImage()" *ngIf="canDelete" title="Eliminar Imagen">
+            <mat-icon  class="fa-lg" fontSet="fas" fontIcon="fa-trash-alt">
+            </mat-icon>
+          </button>
+        </div>
+      </div>
+      <ng-container *ngIf="!cropperShow">
+        <ng-container *ngIf="croppedImage">
+          <img [src]="croppedImage" />
+        </ng-container>
+        <ng-container *ngIf="!croppedImage">
+          <app-chapa [className]="'info-empty'" [text]="'Aun no has configurado un Logotipo'"
+            [subText]="'Elige una imagen PNG, JPEG ó JPG'" [actionIcon]="'fa-plus'" [actionText]="'Agregar Logo'"
+            (actionClick)="file.click()">
+          </app-chapa>
+          <input id="files" style="visibility:hidden;width:0" #file type="file" (change)="fileChangeEvent($event)"
+            accept=".jpg,.jpeg,.png">
+        </ng-container>
+      </ng-container>
+    </div>
+    <div class="cropper-area" fxLayout="column" fxFlex="grow" *ngIf="cropperShow" fxLayoutGap="16px">
+      <image-cropper [imageChangedEvent]="imageChangedEvent" [maintainAspectRatio]="true" [roundCropper]="roundCropper"
+        [aspectRatio]="aspectRatio" [resizeToWidth]="widthSize" [resizeToHeight]="heightSize" format="png"
+        (imageCropped)="imageCropped($event)" (imageLoaded)="imageLoaded()" (cropperReady)="cropperReady()"
+        (loadImageFailed)="loadImageFailed()"></image-cropper>
+      <div class="actions" fxLayout="row-reverse" fxLayoutGap="12px">
+        <button mat-raised-button color="primary" *ngIf="croppedImage" (click)="uploadFile()">Guardar Logo</button>
+        <button mat-button *ngIf="croppedImage" (click)="cancel()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</ng-container>

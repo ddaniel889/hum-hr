@@ -1,0 +1,154 @@
+<mat-toolbar class="mat-elevation-z1 app-toolbar" color="primary" fxFlex="grow">
+  <mat-toolbar-row></mat-toolbar-row>
+  <mat-toolbar-row></mat-toolbar-row>
+</mat-toolbar>
+<div class="floating-container UI-V2" fxLayout="row" fxLayoutAlign="center center" fxFill>
+  <mat-card class="card-1-1">
+    <mat-sidenav-container fxLayout="row" fxFill mode="push">
+      <mat-sidenav-content fxFill>
+
+      <!-- EMPLOYEE-SEARCH -->
+        <div class="main" fxLayout="column" fxLayoutAlign="space-between" fxFill [ngClass]="{'w-detail': showDetail}">
+          <!-- TOOLBAR -->
+          <div class="toolbar" *ngIf="showToolbar">
+            <!-- Search -->
+            <div class="search-container">
+              <div class="search" fxLayout="row" fxLayoutAlign="start center" fxFlex="100">
+                <div class="content" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px" fxFlex="100">
+                  <mat-icon class="fa" fontSet="fal" fontIcon="fa-search">
+                  </mat-icon>
+                  <input id="employeeFind_searchField" type="search" [(ngModel)]="filterName" placeholder="Buscar Empleados" (keydown.enter)="filteredSearch()"/>
+                </div>
+              </div>
+            </div>
+          </div>
+           <!-- LOADER -->
+          <div class="load-window new" *ngIf="loading && !employees?.length">
+            <mat-progress-spinner mode="indeterminate" color="primary">
+            </mat-progress-spinner>
+          </div>
+
+        <div class="helper" fxLayout="row" fxLayoutAlign="space-between center" *ngIf="employees?.length">
+              <!-- hint -->
+        <mat-hint fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="space-between center">
+          <!-- ACTUALIZAR -->
+          <button [ngClass]="loading ? 'no-clickable' : ''" mat-icon-button (click)='search(true)' title="Actualizar Listado" [disabled]="loading">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-redo"></mat-icon>
+          </button>
+          <h4 *ngIf="!loading" name="lbl_TotEmpleadosBusqueda">
+            {{itemsCount >= 2 ? itemsCount + ' Empleados encontrados': '1 Empleado encontrado'}}
+          </h4>
+          <h4 *ngIf="loading">Cargando...</h4>
+        </mat-hint>
+        <div class="actions" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+          <!-- paginator -->
+          <app-cs-paginator [ngClass]="loading ? 'no-clickable' : ''" [hidden]="employees?.length == 0" [pageCount]="itemsCount" [(pageIndex)]="pageIndex"
+          (pageChanged)="selectedPageChanged($event)">
+        </app-cs-paginator>
+        </div>
+        <mat-progress-bar mode="indeterminate" *ngIf="loading" style="visibility: visible !important;"></mat-progress-bar>
+      </div>
+
+      <!-- Empty (app chapa) -->
+      <ng-container *ngIf="!loading && employees?.length == 0">
+        <app-chapa [className]="'info-empty'" [icon]="'fa-meh'" [text]="'¡Ups! No hay Empleados aquí...'"
+        [subText]="organizationalUnits?.length > 1 ? 'No hay empleados que mostrar' : 'Intenta hacer otra Búsqueda'">
+      </app-chapa>
+      </ng-container>
+
+            <!-- EMPLOYEE-SEARCH-TABLE -->
+      <div class="new-table w-main-action" [hidden]="!employees?.length">
+        <div class="mat-table">
+          <!-- EMPLOYEE-SEARCH-TABLE_HEAD -->
+          <div class="mat-header-row sticky" fxLayout="row" fxLayoutAlign="start center">
+            <div class="mat-header-cell w-1" fxLayout="row" fxLayoutAlign="center center">
+              <mat-checkbox [(ngModel)]="allSelected"></mat-checkbox>
+            </div>
+            <div class="w-12 multiple-selection dynamic-table" fxLayout="row" fxLayoutAlign="start center">
+              <div *ngFor="let column of columns" class="mat-header-cell " [ngClass]="'w-' + columnsClass" fxLayout="row"
+                fxLayoutAlign="start center" title="Ordenar por {{column.value.metadataLabel}}">
+                <div class="sorteable" fxLayout="row" fxLayoutAlign="start center" (click)="sortColumn(column.key)" (keydown)="onKeyDown($event)" (keypress)="onKeyPress($event)" (keyup)="onKeyUp($event)">
+                  <span>{{column.value.metadataLabel}}</span>
+                  <mat-icon [hidden]="orderBy === 'm.' + column.key" class="fal indication" fxLayout="row"
+                    fxLayoutAlign="center center" fontSet="fal" fontIcon="fa-sort-alt"></mat-icon>
+                  <div class="sort-icon" *ngIf="orderBy === 'm.' + column.key">
+                    <mat-icon *ngIf="!orderAsc" class="fa" fontSet="fal" fontIcon="fa-arrow-down"></mat-icon>
+                    <mat-icon *ngIf="orderAsc" class="fa" fontSet="fal" fontIcon="fa-arrow-up"></mat-icon>
+                  </div>
+                </div>
+              </div>
+              <!-- col-select -->
+              <!-- <button class="col-selector" mat-icon-button [matMenuTriggerFor]="menuColSelect" title="Seleccionar Columnas"
+                *ngIf="(availableColumns?.length > 0)" [disabled]="loading">
+                <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+                  <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-columns">
+                  </mat-icon>
+                  <mat-icon class="fa-lg complex" fontSet="fas" fontIcon="fa-eye">
+                  </mat-icon>
+                </div>
+              </button> -->
+            </div>
+          </div>
+          <!-- EMPLOYEE-SEARCH-TABLE-ROWS -->
+          <div [id]="'employeeListRow'+i" class="mat-row" matRipple *ngFor="let emp of employees; let i= index"
+            fxLayout="row" fxLayoutAlign="start center"
+            [ngClass]="{'active': emp == selectedEmployee, 'selected': emp.selected, 'disabled': emp.getEmployeeClass() }">
+            <div [ngClass]="{'turn': emp.selected}" class="mat-cell w-1 off" fxLayout="row" fxLayoutAlign="center center">
+              <ngx-avatar *ngIf="emp.preview" [name]="emp.lastName + ' ' + emp.name" [src]=" emp.preview" size="30"
+                [round]="true" (click)="sortColumn(column.key)" (keydown)="onKeyDown($event)" (keypress)="onKeyPress($event)" (keyup)="onKeyUp($event)">
+              </ngx-avatar>
+              <!-- <mat-checkbox [(ngModel)]="emp.selected" (ngModelChange)="selectedChange()"></mat-checkbox> -->
+            </div>
+
+            <div class="w-12 multiple-selection dynamic-table w-sticky" fxLayout="row" fxLayoutAlign="start center" [ngClass]="loading ? 'no-clickable' : ''"
+              (click)="selectEmployee(emp)" (keydown)="onKeyDown($event)" (keypress)="onKeyPress($event)" (keyup)="onKeyUp($event)">
+              <div *ngFor="let column of columns" [ngClass]="'mat-cell w-' + columnsClass" fxLayoutAlign="start center"
+                [title]="emp.getMetadataValue(column.key)">
+                <ng-container [ngSwitch]="column.value.metadataType">
+                  <span *ngSwitchCase="'date'">
+                    {{ emp.getMetadataValue(column.key)}}
+                  </span>
+                  <span *ngSwitchCase="'period'">
+                    {{ emp.getMetadataValue(column.key) | mask :'9999/99' }}
+                  </span>
+                  <span *ngSwitchCase="'comboKV'">
+                    {{ emp.getMetadataValue(column.key) | ComboKv : column.value.optionValues }}
+                  </span>
+                  <span *ngSwitchDefault>
+                    <ng-container *ngIf="!column.value.metadataMask">
+                      {{ emp.getMetadataValue(column.key)}}
+                    </ng-container>
+                    <!-- La siguiente mascara, se pone para que funcione cuando viene id Fiscal, con mascaras dinamicas de dos valores -->
+                    <ng-container *ngIf="column.value.metadataMask">
+                      {{ emp.getMetadataValue(column.key) | mask:
+                      column.value.metadataMask.split("||")[column.value.metadataMask.split("||").length-1] }}
+                    </ng-container>
+                  </span>
+                </ng-container>
+              </div>
+            </div>
+            <div class="mat-cell sticky-actions" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+              <button name="btn_LeaveDraft" mat-icon-button
+              title="Ver Solicitudes" (click)="goLeaves(emp)">
+                <mat-icon class="fa-regular" fontSet="fa" fontIcon="fa-calendar-clock"></mat-icon>
+              </button>
+              <button name="btn_LeaveDraft" mat-icon-button
+              title="Nueva Solicitud" (click)="createRequestLeaveDraft(emp)">
+                <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-calendar"></mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- DETAILS -->
+    <div class="new-detail-container" fxLayout="column" fxFill [ngClass]="{'cancelled':!selectedEmployee?.isActive || !showDetail}">
+      <!-- APP EMPLOYEE-DETAILS-->
+      <app-employee-detail [selectedEmployee]="selectedEmployee" (refreshGrid)="search($event)"
+         (detailClose)="toggleEmployeeDetail()"></app-employee-detail>
+    </div>
+
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+  </mat-card>
+</div>

@@ -1,0 +1,188 @@
+.dialog-content {
+    max-height: 90vh;
+    position: relative;
+
+    mat-toolbar {
+        padding: 0;
+    }
+
+    .dialog-container {
+        .document-template-container {
+            max-width: 420px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            max-height: calc(90vh - 64px - 64px);
+
+            .document-selection {
+                width: 100%;
+                box-sizing: border-box;
+                height: 100%;
+
+                &.new {
+                    padding: 16px;
+                    overflow-y: auto;
+
+                    .asisted-input.big {
+                        margin-bottom: 16px;
+
+                        mat-tab-group {
+                            width: 100%;
+                            max-width: calc(100% - 56px);
+
+                            .dropzone {
+                                margin: 0 !important;
+
+                                & + mat-list {
+                                    padding: 0;
+                                    min-width: unset;
+                                    max-height: unset;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                mat-form-field {
+                    width: 100%;
+
+                    &.mat-form-field-disabled {
+                        * {
+                            cursor: not-allowed;
+                        }
+
+                        .mat-form-field-underline {
+                            height: 2px !important;
+                        }
+                    }
+
+                    .mat-form-field-flex {
+                        border-radius: 4px 4px 0 0 !important;
+                        padding: 8px 8px 0 !important;
+                        min-height: 56px !important;
+                        align-items: unset !important;
+
+                        .mat-form-field-prefix {
+                            padding: 0 !important;
+                            display: flex;
+                            align-items: center;
+                        }
+                    }
+                }
+
+                app-upload-form {
+                    height: 100%;
+
+                    .dropzone {
+                        margin: 16px !important;
+
+                        & + mat-list {
+                            margin: 0;
+                            max-height: calc(100% - 160px - 32px);
+                            overflow-y: auto;
+                            padding: 16px;
+                            width: 100%;
+                        }
+                    }
+
+                    .file-upload-list {
+                        max-width: unset;
+
+                        .mat-subheader {
+                            margin-bottom: 16px !important;
+                            position: relative;
+
+                            &::before {
+                                content: "(click para vista previa)";
+                                position: absolute;
+                                bottom: 0;
+                                font-size: 12px;
+                                font-weight: 300;
+                            }
+                        }
+
+                        mat-list-item {
+                            cursor: pointer;
+                        }
+                    }
+                }
+            }
+        }
+
+        .view-container {
+            height: calc(90vh - 64px - 64px);
+            overflow-y: auto;
+            max-width: 70vw;
+            box-sizing: border-box;
+
+            app-pdf-wrapper-controls {
+                position: absolute;
+                top: 12px;
+                right: 72px;
+            }
+
+            .load-window.new {
+                width: 25vw;
+                top: 0;
+                height: 25vw;
+                position: relative;
+            }
+        }
+    }
+
+    .form-actions {
+        padding: 16px;
+        max-height: 64px;
+    }
+}
+
+@mixin uploadFileModal($bg-card, $bg-background, $primary, $divider, $text-sub, $row-odd) {
+    .dialog-content {
+        max-height: 90vh;
+
+        mat-toolbar {
+            background: $bg-card;
+            border-bottom: 1px solid $divider;
+        }
+
+        .dialog-container {
+            .document-template-container {
+                .document-selection {
+                    mat-form-field {
+                        &.mat-form-field-disabled {
+                            .mat-form-field-flex {
+                                background: $bg-background !important;
+
+                                .mat-form-field-prefix {
+                                    color: $text-sub;
+                                }
+                            }
+                        }
+
+                        .mat-form-field-flex {
+                            background: $row-odd;
+                        }
+                    }
+
+                    app-upload-form {
+                        .file-upload-list {
+                            .mat-subheader {
+                                &::before {
+                                    color: $primary;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            .view-container {
+                border-left: 1px solid $divider;
+            }
+        }
+
+        .form-actions {
+            border-top: 1px solid $divider;
+        }
+    }
+}

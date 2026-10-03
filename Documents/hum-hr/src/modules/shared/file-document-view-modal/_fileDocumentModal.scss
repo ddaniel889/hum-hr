@@ -1,0 +1,1237 @@
+@import "../../../../assets/styles/img-management";
+
+.cdk-overlay-pane {
+  max-width: 95vw !important;
+}
+
+.employee-deetail-dialog {
+  position: relative;
+
+  .mat-loading-window {
+    position: relative;
+    visibility: hidden;
+    height: 0;
+    width: 0;
+
+    &.visible {
+      visibility: visible;
+      width: 150px;
+      height: 150px;
+    }
+
+    .dialog-content {
+      visibility: hidden;
+      height: 0;
+      width: 0;
+
+      &.visible {
+        visibility: visible;
+        width: 100%;
+        height: 100%;
+      }
+    }
+  }
+
+  &.mat-dialog-content {
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    height: 80vh !important;
+    max-height: unset !important;
+    max-width: 95vw;
+    min-width: 70vw;
+    position: relative !important;
+  }
+
+  app-file-document-state {
+    mat-chip-list {
+      .mat-chip-list-wrapper {
+        flex-wrap: nowrap !important;
+      }
+    }
+  }
+
+  app-pdf-wrapper {
+    height: 100%;
+
+    .pdf-view-container {
+      height: 100%;
+      overflow: auto;
+    }
+  }
+
+  .resume-status {
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+  }
+}
+
+.list-check {
+  padding: 0 56px;
+
+  .mat-checkbox-layout {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .mat-checkbox-inner-container {
+    width: 16px;
+    height: 16px;
+    margin: 12px 4px;
+    box-sizing: border-box;
+  }
+}
+
+.list-align {
+  padding: 0 56px;
+}
+
+mat-dialog-container {
+  padding: 0 !important;
+  transition: all 0.2s ease;
+  overflow: hidden !important;
+
+  mat-toolbar-row {
+    justify-content: space-between !important;
+
+    .mat-avatar {
+      width: unset !important;
+    }
+
+    app-file-document-state-chips {
+      width: 100%;
+      @include display(f, u, u, u, u, u);
+    }
+  }
+
+  app-file-document-state-chips {
+    height: 96px;
+    @include display(f, u, u, c, c, u);
+  }
+
+  app-pdf-wrapper {
+    &.w-chips {
+      height: calc(100% - 65px - 96px) !important;
+      @include display(b, u, u, u, u, u);
+    }
+
+    &.no-chips {
+      height: calc(100% - 65px) !important;
+      @include display(b, u, u, u, u, u);
+    }
+  }
+
+  .firmador {
+    position: relative !important;
+
+    button {
+      pointer-events: all;
+    }
+  }
+
+  .sign-cycle {
+    position: relative;
+
+    .mat-divider {
+      position: absolute;
+      top: 0;
+      width: 100%;
+    }
+  }
+}
+
+app-metadata-filter-dialog {
+  .dialog-footer {
+    min-height: 56px;
+    padding: 16px;
+  }
+}
+
+app-candidate-promotion {
+  display: block;
+
+  .load-window.message {
+    top: 0;
+    position: relative;
+    height: 100%;
+    flex-direction: column;
+    padding: 32px;
+    box-sizing: border-box;
+    text-align: center;
+
+    h3.primary-text {
+      margin-top: 40px;
+    }
+  }
+
+  .promote-container {
+    display: flex;
+    flex-direction: column;
+    min-width: 60vw !important;
+    max-width: 600px !important;
+  }
+}
+
+app-multiple-documentation-add-dialog,
+app-documentation-type-set-configuration-dialog,
+app-add-candidate-dialog,
+app-share-person-dialog,
+app-share-person-response-dialog {
+  .icon-complex {
+    position: relative;
+
+    mat-icon {
+      &.complex {
+        position: absolute;
+        bottom: -8px;
+        right: -2px;
+        font-size: 16px !important;
+        height: 20px;
+        width: 20px !important;
+        min-width: unset !important;
+      }
+    }
+  }
+
+  .dialog-content {
+    max-height: 95vh !important;
+    position: relative;
+
+    .load-window {
+      &.fixed {
+        top: 0;
+        height: 100%;
+        min-height: 25vw;
+      }
+
+      &.message {
+        height: 100%;
+      }
+    }
+
+    .toolbar-line {
+      padding: 0 !important;
+      margin-right: 16px;
+    }
+
+    .document-template-container {
+      min-height: 25vw;
+      min-width: 40vw;
+
+      &.auto-height {
+        min-height: auto !important;
+
+        .form-steped {
+          min-height: unset !important;
+        }
+
+        .form-steped-body {
+          min-height: unset !important;
+        }
+      }
+
+      .set-create-add {
+        margin: calc(((25vw - 80px - 64px) / 2) - 18px) auto !important;
+        left: 0;
+        right: 0;
+        display: block;
+
+        & + div > .mat-list {
+          height: 0 !important;
+          min-height: 0 !important;
+        }
+      }
+
+      &.expanded {
+        max-width: 95vw;
+        height: 95vh;
+
+        mat-list {
+          height: calc(95vh - 80px - 64px);
+        }
+
+        .form-steped {
+          height: calc(95vh - 80px);
+
+          .form-steped-body {
+            height: 100%;
+          }
+        }
+
+        .set-create-add {
+          margin: calc(((95vh - 80px - 64px) / 2) - 18px) auto !important;
+          left: 0;
+          right: 0;
+          display: block;
+        }
+
+        .upload-content {
+          height: 100% !important;
+          max-height: unset;
+
+          &.pdf-visible {
+            app-file-document-detail {
+              position: absolute;
+              right: 0;
+              z-index: 201;
+            }
+          }
+        }
+      }
+
+      .document-selection {
+        width: 100%;
+        min-width: 25vw;
+        height: 100%;
+
+        .title-description {
+          height: 80px;
+          padding: 0 16px;
+
+          .header {
+            margin-right: 16px;
+
+            button {
+              height: 32px;
+              padding: 0 0 0 10px;
+              margin: 0 -8px;
+              border-radius: 20px;
+
+              .mat-button-wrapper {
+                height: 32px;
+                line-height: 32px;
+              }
+            }
+
+            h3,
+            h5 {
+              margin: 0;
+            }
+          }
+        }
+
+        mat-list {
+          max-height: calc(95vh - 80px - 64px);
+          overflow: auto;
+          overflow-y: overlay;
+          min-height: calc(25vw - 80px - 64px);
+
+          &.reactive {
+            .mat-list-item-content {
+              cursor: pointer;
+            }
+          }
+
+          .mat-list-item-content {
+            opacity: 0.8;
+            transition: opacity 0.2s ease;
+
+            &:hover {
+              transition: opacity 0.1s ease;
+              opacity: 1;
+
+              .mat-line {
+                b {
+                  width: 100% !important;
+                  white-space: nowrap !important;
+                }
+              }
+
+              .floating-action {
+                opacity: 1;
+                transition: all 0.1s ease;
+                pointer-events: all;
+              }
+            }
+
+            .mat-list-icon.icon-complex {
+              min-width: 40px;
+            }
+
+            .mat-line {
+              margin-right: 16px;
+              white-space: normal;
+              max-width: calc(100% - 160px - 32px);
+
+              h5 {
+                margin: 0;
+                font-weight: normal;
+              }
+
+              b {
+                max-width: calc(25vw * 0.6);
+              }
+
+              .mat-chip {
+                padding: 0 12px;
+                font-size: 12px;
+                margin-top: 8px;
+                box-sizing: border-box;
+                max-width: calc(100% * 0.6);
+
+                &.mat-chip-disabled {
+                  pointer-events: none;
+                }
+
+                .mat-icon {
+                  width: unset !important;
+                  min-width: unset !important;
+                  font-size: 14px !important;
+                  line-height: 14px !important;
+                  height: 14px !important;
+                }
+
+                span {
+                  white-space: nowrap;
+                  text-overflow: ellipsis;
+                  overflow: hidden;
+                  display: block;
+                  width: 100%;
+                }
+              }
+            }
+          }
+
+          .floating-action {
+            position: absolute;
+            height: 100%;
+            padding: 0 16px;
+            right: 0;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.2s ease;
+
+            .icon-complex {
+              width: 40px;
+            }
+          }
+
+          button mat-icon {
+            min-width: 40px !important;
+          }
+        }
+
+        .form-steped {
+          min-height: calc(25vw - 80px);
+          max-height: calc(95vh - 80px);
+
+          .form-steped-body {
+            padding: 0 16px;
+            min-height: calc(25vw - 80px - 72px);
+            max-height: calc(95vh - 80px - 72px);
+            overflow-y: auto;
+            margin-bottom: 8px;
+
+            .mat-radio-group {
+              height: calc(100% - 56px);
+              overflow-y: auto;
+              min-height: calc(25vw - 80px - 72px - 56px);
+
+              .mat-radio-button {
+                padding: 16px 0;
+                display: flex;
+                align-items: center;
+
+                .mat-radio-label {
+                  height: 100%;
+                  display: flex;
+                  align-items: center;
+
+                  .mat-radio-container {
+                    margin: 10px;
+                  }
+
+                  .mat-radio-label-content {
+                    padding-left: 16px;
+                    width: 100%;
+
+                    b {
+                      max-width: calc(25vw * 0.6);
+                      line-break: normal;
+                      white-space: break-spaces;
+                    }
+
+                    h5 {
+                      margin: 0;
+                      font-weight: normal;
+                      max-width: calc(25vw * 0.6);
+                      line-break: normal;
+                      white-space: break-spaces;
+                    }
+                  }
+                }
+              }
+            }
+
+            mat-checkbox {
+              .mat-checkbox-layout {
+                width: 100%;
+                height: 48px;
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+
+                .mat-checkbox-inner-container {
+                  margin: 15px 12px !important;
+                }
+
+                .mat-checkbox-label {
+                  margin-left: 16px;
+                }
+              }
+            }
+
+            .asisted-input {
+              position: relative;
+              padding: 16px 0;
+
+              .mat-focused:not(.mat-form-field-invalid) + .indicator > .bubble {
+                transform: scale(1.05) !important;
+              }
+
+              &:hover {
+                .bubble {
+                  transform: scale(1.05) !important;
+                }
+              }
+
+              &.big {
+                height: auto !important;
+                padding: 0;
+              }
+
+              .indicator {
+                min-width: 40px;
+                margin-right: 16px;
+                justify-content: center;
+                display: flex;
+                align-items: center;
+
+                .bubble {
+                  height: 30px;
+                  width: 30px;
+                  align-items: center;
+                  justify-content: center;
+                  display: flex;
+                  transform: scale(1);
+                  border-radius: 15px;
+                }
+
+                .guide {
+                  position: absolute;
+                  border-left: 1px solid;
+                  height: calc(50% - 20px);
+
+                  &.top {
+                    bottom: calc(50% + 20px);
+                  }
+
+                  &.bottom {
+                    top: calc(50% + 20px);
+                  }
+                }
+              }
+
+              textarea {
+                overflow: hidden !important;
+              }
+
+              &.icon-only {
+                .bubble {
+                  background: none !important;
+                  font-size: 20px;
+                }
+              }
+            }
+          }
+        }
+
+        .main-action {
+          height: 64px;
+          padding: 8px 16px 16px;
+
+          button {
+            width: 100%;
+          }
+        }
+
+        .list-action {
+          padding: 0 16px;
+          height: 64px;
+
+          button {
+            width: 100%;
+
+            .mat-button-wrapper {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+            }
+          }
+        }
+
+        app-documentation-type-set-edit {
+          height: 100%;
+          display: block;
+          width: 100%;
+
+          .add-open {
+            & > .title-description {
+              display: none !important;
+            }
+
+            .sets-content {
+              display: none !important;
+            }
+          }
+
+          .upload-content {
+            width: 100% !important;
+            max-height: 95vh;
+
+            &.pdf-visible {
+              height: 95vh !important;
+
+              .upload-container {
+                min-width: 25vw;
+              }
+
+              app-file-document-detail {
+                display: block;
+                width: calc(100% - 25vw);
+              }
+            }
+
+            .upload-container {
+              height: 100%;
+              min-height: 25vw;
+              justify-content: space-between;
+              width: 100%;
+
+              .title-description {
+                min-height: 80px;
+              }
+
+              app-upload-form {
+                width: 100%;
+                padding: 8px 16px;
+                box-sizing: border-box;
+                height: calc(100% - 80px - 64px);
+                display: flex;
+                flex-direction: column;
+
+                .dropzone {
+                  height: calc(100% - 32px) !important;
+                  box-sizing: border-box;
+                  margin: 16px 0;
+                }
+
+                .file-upload-list {
+                  width: 100% !important;
+                  max-width: 25vw;
+
+                  .mat-line {
+                    white-space: nowrap !important;
+                  }
+                }
+              }
+            }
+
+            app-file-document-detail {
+              .view-container {
+                .mat-toolbar {
+                  min-height: 80px;
+                  border-bottom: none;
+                  justify-content: center;
+                  padding: 0;
+
+                  mat-toolbar-row {
+                    width: 100%;
+                    justify-content: flex-end !important;
+                  }
+                }
+
+                .view-content {
+                  height: calc(100% - 80px);
+
+                  app-pdf-wrapper {
+                    display: block;
+                    height: 100%;
+
+                    .pdf-view-container {
+                      overflow-y: auto !important;
+                      padding: 0 32px 24px !important;
+                      box-sizing: border-box;
+
+                      pdf-viewer {
+                        .cardinal-pdf-viewer-container {
+                          overflow-x: unset !important;
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+
+          mat-list,
+          mat-selection-list {
+            max-height: calc(95vh - 80px - 64px) !important;
+            overflow: auto;
+            overflow-y: overlay;
+            min-height: calc(25vw - 80px - 64px);
+
+            mat-list-option {
+              height: unset !important;
+
+              .mat-list-text {
+                .mat-line {
+                  white-space: normal !important;
+                }
+              }
+            }
+
+            mat-pseudo-checkbox {
+              margin: 0 12px;
+            }
+          }
+
+          .main-action {
+            height: 64px;
+            padding: 0 16px;
+          }
+        }
+      }
+
+      .add-docs-drop {
+        min-width: 70vw !important;
+        position: relative;
+        max-height: unset !important;
+
+        app-file-document-detail {
+          border-left: none !important;
+        }
+
+        .modal-close {
+          position: absolute;
+          right: 16px;
+          top: 16px;
+        }
+
+        .set-create {
+          position: absolute;
+          bottom: 32px;
+          left: 0;
+          right: 0;
+          margin: 0 auto;
+        }
+
+        .catcher {
+          position: absolute !important;
+        }
+
+        .docs-drop-preview {
+          width: 100% !important;
+          height: 100% !important;
+          flex-grow: 2;
+
+          .add-menu-form-body {
+            width: calc(100% / 3) !important;
+            min-width: calc(100% / 3) !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+
+            .title-description {
+              height: 64px;
+              padding: 0 16px;
+
+              .header {
+                margin-right: 16px;
+                width: 100%;
+
+                h3,
+                h5 {
+                  margin: 0;
+                  white-space: nowrap;
+                  text-overflow: ellipsis;
+                  overflow: hidden;
+                  width: 100%;
+                }
+              }
+            }
+          }
+
+          .scroller {
+            height: calc(100% - 64px) !important;
+            max-height: unset;
+            padding: 0 16px 16px !important;
+
+            .dropzone {
+              text-align: center;
+              margin-bottom: 16px;
+            }
+
+            h5 {
+              margin: 0;
+              line-height: 40px;
+            }
+          }
+
+          .dropzone {
+            text-align: center;
+          }
+
+          app-file-document-detail,
+          .preview-container,
+          app-formio-cardinal {
+            min-width: calc((100% / 3) * 2) !important;
+            height: calc(95vh - 64px - 80px) !important;
+          }
+
+          .view-container .view-toolbar + .view-content {
+            display: block;
+            height: calc(100% - 64px);
+
+            .cardinal-pdf-viewer-container {
+              overflow-x: unset;
+            }
+          }
+        }
+
+        .template-selection-indicator {
+          min-height: 80px;
+          overflow-x: scroll;
+          overflow-y: hidden;
+          padding: 12px 16px 4px;
+
+          mat-chip-list {
+            flex: 0 0 auto;
+
+            .mat-chip-list-wrapper {
+              flex-wrap: nowrap !important;
+              margin: 0 !important;
+
+              mat-chip {
+                padding: 0 8px !important;
+                margin: 0 !important;
+                font-size: 16px !important;
+                height: auto !important;
+                border-radius: 10px !important;
+                flex: 0 0 auto;
+                box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2),
+                  0px 2px 2px 0px rgba(0, 0, 0, 0.14),
+                  0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+
+                &.mat-primary {
+                  .header {
+                    margin-right: 16px !important;
+                  }
+                }
+
+                &.mat-disabled {
+                  pointer-events: none;
+
+                  mat-icon.mat-chip-remove {
+                    pointer-events: all;
+                  }
+
+                  &:hover::after {
+                    display: none !important;
+                  }
+                }
+
+                &:last-child {
+                  margin-right: 16px !important;
+                }
+
+                & + mat-chip {
+                  margin-left: 16px !important;
+                }
+
+                .header {
+                  height: 56px;
+
+                  mat-icon {
+                    min-width: 40px;
+                  }
+
+                  h5,
+                  h3 {
+                    margin: 0 !important;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    max-width: 170px !important;
+                  }
+                }
+
+                mat-icon.mat-chip-remove {
+                  min-width: 40px;
+                  margin-left: 8px !important;
+                }
+              }
+            }
+          }
+        }
+
+        .preview-action {
+          min-height: 64px;
+          padding: 0 16px;
+          position: relative;
+
+          mat-progress-bar {
+            top: 0;
+            left: 0;
+            margin: 0 !important;
+          }
+        }
+      }
+    }
+  }
+}
+app-multiple-documentation-add-dialog {
+  .dialog-content {
+    width: 95vw !important;
+    .document-template-container {
+      .document-selection {
+        max-width: 30vw;
+        mat-list {
+          .mat-list-item-content {
+            .mat-line {
+              max-width: unset !important;
+              b {
+                width: 100%;
+                max-width: unset;
+                white-space: nowrap;
+              }
+            }
+          }
+        }
+      }
+      .add-docs-drop {
+        min-width: unset !important;
+        width: 200% !important;
+        max-width: 70vw;
+        .docs-drop-preview {
+          .add-menu-form-body {
+            width: 100% !important;
+            min-width: 25vw !important;
+          }
+          .preview-container,
+          app-chapa,
+          app-file-document-detail {
+            width: 200% !important;
+            min-width: unset !important;
+            max-width: unset !important;
+          }
+        }
+      }
+    }
+  }
+}
+
+@mixin fileDocumentModal(
+  $bg-card,
+  $bg-card-side,
+  $bg-background,
+  $bg-dark-blue,
+  $primary,
+  $accent,
+  $warn,
+  $disabled,
+  $divider,
+  $text-main-solid,
+  $text-main,
+  $text-side,
+  $text-sub,
+  $text-disabled,
+  $primary-text,
+  $hover
+) {
+  mat-dialog-container {
+    app-file-document-state-chips {
+      border-top: 1px solid $divider;
+    }
+  }
+
+  app-candidate-promotion {
+    .load-window.message {
+      h3.primary-text {
+        color: $primary-text;
+      }
+    }
+  }
+
+  app-multiple-documentation-add-dialog,
+  app-documentation-type-set-configuration-dialog,
+  app-add-candidate-dialog,
+  app-share-person-dialog,
+  app-share-person-response-dialog {
+    .icon-complex {
+      mat-icon {
+        color: $text-main-solid !important;
+
+        &.complex {
+          color: $primary-text !important;
+
+          &.mat-accent {
+            color: $accent;
+          }
+
+          &.side {
+            color: $text-side;
+          }
+        }
+      }
+    }
+
+    .dialog-content {
+      .document-template-container {
+        .document-selection {
+          background: $bg-background;
+
+          .title-description {
+            &.accent-text {
+              mat-icon,
+              mat-icon.complex,
+              h3 {
+                color: $accent !important;
+              }
+            }
+
+            &.primary-text {
+              .header {
+                mat-icon {
+                  color: $primary-text;
+                }
+
+                h3 {
+                  color: $primary-text;
+                }
+              }
+            }
+          }
+
+          mat-list {
+            .mat-list-item-content {
+              &:hover {
+                .floating-action {
+                  mat-icon.complex {
+                    color: $accent !important;
+                    text-shadow: -2px 0 0px $bg-card-side,
+                      0 -2px 0px $bg-card-side, 2px 0 0px $bg-card-side,
+                      0 2px 0px $bg-card-side, -2px -2px 0px $bg-card-side,
+                      2px 2px 0px $bg-card-side, 2px -2px 0px $bg-card-side,
+                      -2px 2px 0px $bg-card;
+                  }
+                }
+              }
+
+              .mat-list-icon.icon-complex {
+                mat-icon.complex {
+                  color: $text-sub !important;
+                }
+              }
+
+              .mat-line {
+                b {
+                  color: $text-main-solid;
+                }
+              }
+            }
+
+            .floating-action {
+              .icon-complex {
+                color: $text-sub !important;
+
+                mat-icon.complex {
+                  color: $text-sub !important;
+                }
+              }
+            }
+          }
+
+          .form-steped {
+            .form-steped-body {
+              .mat-radio-group {
+                .mat-radio-button {
+                  &:hover {
+                    background: $hover;
+                  }
+
+                  .mat-radio-label {
+                    .mat-radio-label-content {
+                      b {
+                        color: $text-main-solid;
+                      }
+                    }
+                  }
+                }
+              }
+
+              .asisted-input {
+                .mat-focused:not(.mat-form-field-invalid)
+                  + .indicator
+                  > .bubble {
+                  background: $primary;
+                }
+
+                .mat-form-field-invalid + .indicator > .bubble {
+                  background: $warn;
+                }
+
+                .mat-form-field-disabled + .indicator > .bubble {
+                  color: $text-disabled;
+                  background: $divider;
+                }
+
+                .indicator {
+                  .bubble {
+                    background: $disabled;
+                    color: $text-main;
+                  }
+
+                  .guide {
+                    border-color: $divider;
+                  }
+                }
+
+                &.icon-only {
+                  .bubble {
+                    color: $text-side;
+                  }
+
+                  .mat-focused:not(.mat-form-field-invalid)
+                    + .indicator
+                    > .bubble {
+                    color: $primary;
+                  }
+
+                  .mat-form-field-invalid + .indicator > .bubble {
+                    color: $warn;
+                  }
+                }
+              }
+            }
+          }
+
+          app-documentation-type-set-edit {
+            .upload-content {
+              app-file-document-detail {
+                .view-container {
+                  .mat-toolbar {
+                    background: $bg-dark-blue;
+
+                    mat-toolbar-row {
+                      color: $text-main;
+                    }
+                  }
+
+                  .view-content {
+                    app-pdf-wrapper {
+                      background: $bg-dark-blue;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        .add-docs-drop {
+          border-left: 1px solid $divider;
+
+          .docs-drop-preview {
+            .add-menu-form-body {
+              border-right: 1px solid $divider;
+
+              .title-description {
+                .header {
+                  h3 {
+                    color: $accent;
+                  }
+
+                  h5 {
+                    color: $text-side;
+                  }
+                }
+              }
+            }
+
+            .scroller {
+              h5 {
+                color: $text-side;
+              }
+            }
+          }
+
+          .template-selection-indicator {
+            border-bottom: 1px solid $divider;
+            background: $bg-background;
+
+            mat-chip-list {
+              .mat-chip-list-wrapper {
+                mat-chip {
+                  background: $bg-card !important;
+
+                  &.mat-accent {
+                    .header {
+                      mat-icon {
+                        color: $accent !important;
+                      }
+
+                      h3 {
+                        color: $accent !important;
+                      }
+
+                      h5 {
+                        color: $text-side !important;
+                      }
+                    }
+                  }
+
+                  &.mat-primary {
+                    .header {
+                      mat-icon {
+                        color: $primary-text !important;
+                      }
+
+                      h3 {
+                        color: $primary-text !important;
+                      }
+
+                      h5 {
+                        color: $primary-text !important;
+                      }
+                    }
+                  }
+
+                  &.mat-disabled {
+                    background: $bg-background !important;
+                    color: $disabled;
+
+                    mat-icon.mat-chip-remove {
+                      color: $text-side;
+                    }
+                  }
+
+                  mat-icon.mat-chip-remove {
+                    color: $text-side !important;
+                  }
+                }
+              }
+            }
+          }
+
+          .preview-action {
+            border-top: 1px solid $divider;
+          }
+        }
+      }
+    }
+  }
+}

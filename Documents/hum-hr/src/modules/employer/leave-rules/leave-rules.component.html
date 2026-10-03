@@ -1,0 +1,55 @@
+<mat-accordion>
+  <mat-progress-bar mode="indeterminate" *ngIf="loading"></mat-progress-bar>
+ <mat-expansion-panel [expanded]="true" style="height: auto;margin: 10px;">
+
+     <mat-expansion-panel-header>
+       <mat-panel-title style="font-weight: bold;color: #3f51b5;">
+         <mat-icon>rule</mat-icon>
+         Reglas para licencias de vacaciones
+       </mat-panel-title>
+     </mat-expansion-panel-header>
+     <mat-card appearance="outlined" style="margin: 10px;max-width: auto; overflow-x: hidden;" *ngIf="!loading">
+
+      <form [formGroup]="ruleForm" class="leaveRule-form" (ngSubmit)="Save()">
+       <div class="toggle-checkbox-container">
+        <mat-label>Seleccione el esquema de cómputo de días *</mat-label>
+         <mat-button-toggle-group formControlName="computingScheme" appearance="standard" (change)="enableSubmit()">
+           <mat-button-toggle value="corridos">Corridos</mat-button-toggle>
+           <mat-button-toggle value="habiles">Hábiles</mat-button-toggle>
+         </mat-button-toggle-group>
+         <mat-tooltip *ngIf="ruleForm.get('computingScheme')?.value == 'corridos'"  matTooltip="Se cuentan todos los días de manera consecutiva, incluyendo fines de semana y feriados" matTooltipPosition="right">
+          <mat-icon>help_outline</mat-icon>
+         </mat-tooltip>
+         <mat-tooltip *ngIf="ruleForm.get('computingScheme')?.value == 'habiles'"matTooltip="Se cuentan solo los días laborables de la empresa, excluyendo los feriados definidos en el calendario laboral">
+          <mat-icon>help_outline</mat-icon>
+         </mat-tooltip>
+        <div class="day-selector-container">
+          <mat-form-field appearance="fill" class="day-selector">
+            <mat-label>Día en que inician las vacaciones</mat-label>
+            <mat-select [readonly]="workDays == null" formControlName="leaveStartDayForm" (selectionChange)="enableSubmit()">
+              <mat-option *ngFor="let day of daysOfWeek" [value]="day['value']">
+                {{ day['value'] }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+       </div>
+
+       <div class="form-fields-container">
+        <mat-form-field appearance="fill">
+          <mat-label>Mínimo de días a solicitar por solicitud</mat-label>
+          <input [readonly]="workDays == null"  matInput formControlName="leaveMinDayForm" type="number" step="1" (input)="enableSubmit()"
+          >
+        </mat-form-field>
+        <mat-checkbox value="" id="rule-check" formControlName="nextAbleDayForm" (input)="changeSubmit()" [checked]="isNextAbleDayChecked"  [disabled]="disableNextAbleDay" color="accent" appearance="fill">Inicia el primer día hábil de la semana.</mat-checkbox>
+      </div>
+
+       <div class="btn-container"  appearance="fill" fxFill fxLayout="row" fxLayoutAlign="end end">
+         <button mat-raised-button class="rounded-button" color="primary" [disabled]="!enableSubmitButton" type="submit">
+          <span>Guardar</span></button>
+       </div>
+      </form>
+</mat-card>
+</mat-expansion-panel>
+</mat-accordion>

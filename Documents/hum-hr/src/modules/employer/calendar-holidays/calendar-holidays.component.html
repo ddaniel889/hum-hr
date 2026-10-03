@@ -1,0 +1,256 @@
+    <mat-card appearance="outlined">
+      <ng-container>
+        <div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="32px"
+        style="margin: 25px 0; padding: 0 48px;">
+        <div fxLayout="column" fxLayoutGap="20px">
+          <h3 class="section-title">Configuración de Año</h3>
+          <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
+            <!--Select Año -->
+            <div class="year-selector compact">
+              <button mat-button [matMenuTriggerFor]="yearsMenu" class="year-button">
+                <div class="button-content">
+                  <span class="year-text">{{ selectedYear }}</span>
+                  <mat-icon class="dropdown-icon" fontSet="fa" fontIcon="fa-caret-down"></mat-icon>
+                </div>
+              </button>
+              <mat-menu #yearsMenu="matMenu" class ="year-drop">
+                <button mat-menu-item *ngFor="let year of years"
+                        [disabled]="year === selectedYear"
+                        (click)="onYearMenuChange(year, yearsMenu)">
+                  {{ year }}
+                </button>
+              </mat-menu>
+            </div>
+            <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="8px">
+              <div fxLayout="column" fxLayoutAlign="start center" fxLayoutGap="4px" style="padding-bottom: 2em;">
+                <p style="font-size: small">Estado</p>
+                <span style="font-weight: 500;"
+                  [ngClass]="{'year-active-indicator': selectedYearActive, 'year-inactive-indicator': !selectedYearActive }">
+                  {{ selectedYearActive ? 'Activo' : 'Inactivo' }}
+                </span>
+              </div>
+              <button mat-raised-button class="btn-crear-anio" [ngClass]="{'hide': selectedYearActive}" style="margin-left: 2em;" [disabled]="selectedYearActive" (click)="activeConfig()">Activar</button>
+            </div>
+          </div>
+        </div>
+          <!--Crear Año -->
+        <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="8px">
+          <button mat-raised-button class="btn-crear-anio" (click)="openCreateYearDialog()" [disabled]="!enableCreateYear"
+            [ngClass]="{'disabled-button': !enableCreateYear}">
+            Crear Año
+          </button>
+          <mat-icon style="cursor: pointer;" [matTooltip]="'Inicia el asistente para configurar desde cero un nuevo año vacacional en tu empresa.'" matTooltipPosition="above">
+            help_outline
+          </mat-icon>
+        </div>
+      </div>
+
+      <div class="toolbar toolbar-calendar" fxLayout="column" fxLayoutGap="8px">
+
+          <h3 class="section-title">Configuración de Feriados</h3>
+
+        <div class="search-container">
+          <div class="search" fxLayout="row" fxLayoutAlign="start center" fxFlex="100">
+            <div class="content" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px" fxFlex="100">
+              <mat-icon class="fa" fontSet="fal" fontIcon="fa-search">
+              </mat-icon>
+              <input id="holidayFind_searchField" type="search"  (keydown.enter)="filteredSearch()" [(ngModel)]="filterName" placeholder="Buscar Feriados"/>
+              <button *ngIf="true" mat-button color="primary" [matMenuTriggerFor]="menu"
+                [disabled]="false" #menuTrigger="matMenuTrigger">
+                <span class="mat-button-wrapper">
+                <mat-icon style="margin-right: 10px;" class="fa-lg" fontSet="fa" fontIcon="fa-caret-down">
+                </mat-icon>
+                Búsqueda Avanzada
+              </span>
+              </button>
+              <button id="employeeFind_advancedSearchBtn" *ngIf="false" mat-icon-button color="primary"
+                [matMenuTriggerFor]="menu" #menuTrigger="matMenuTrigger" title="Búsqueda Avanzada"
+                [disabled]="false">
+                <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-caret-down">
+                </mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+        </div>
+
+        <!-- helper -->
+        <div class="helper" fxLayout="row" fxLayoutAlign="space-between center">
+          <!-- hint -->
+          <mat-hint fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="space-between center">
+            <button mat-icon-button color="primary" title="Refresh" class="refresh" (click)="refresh()">
+              <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-redo"></mat-icon>
+            </button>
+
+
+            <!-- ACTUALIZAR -->
+            <h4 *ngIf="!loading" name="lbl_TotvigenciasBusqueda">
+              {{
+              itemsCount >= 2
+              ? itemsCount + " Feriados encontrados"
+              : itemsCount == 0
+              ? "Sin Feriados"
+              : "1 Feriado
+              encontrado"
+              }}
+            </h4>
+            <h4 *ngIf="loading">Cargando...</h4>
+            <button mat-icon-button color="primary" title="Nuevo Feriado" class="addHolidayBtn"
+              (click)="openAddHoliday()">
+              <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-plus"></mat-icon>
+            </button>
+          </mat-hint>
+          <!-- actions -->
+
+          <div class="actions" fxLayout="row" fxLayoutAlign="start center">
+            <app-cs-paginator [hidden]="calendarHolidays?.length == 0" [pageCount]="itemsCount"
+              [(pageIndex)]="pageIndex"  (pageChanged)="selectedPageChanged($event)">
+            </app-cs-paginator>
+          </div>
+          <mat-progress-bar mode="indeterminate" *ngIf="loading"></mat-progress-bar>
+        </div>
+        <div *ngIf="!loading && calendarHolidays?.length == 0" fxLayout="row" fxLayoutAlign="center center">
+          <app-chapa [className]="'info-empty'" [icon]="'fa-meh'" [text]="'¡Ups! No hay feriados aquí...'">
+          </app-chapa>
+        </div>
+        <div class="new-table" *ngIf="!editLoading && !loading && calendarHolidays?.length > 0">
+          <div class="mat-table">
+            <!-- CONFIG-TIMELINES-SEARCH-TABLE_HEAD -->
+            <div class="mat-header-row sticky" fxLayout="row" fxLayoutAlign="start center">
+              <div class="mat-header-cell w-1" fxLayout="row" fxLayoutAlign="center center">
+                <mat-checkbox *ngIf="true" [(ngModel)]="allSelected" (ngModelChange)="selectAllToogle()">
+                </mat-checkbox>
+              </div>
+              <div class="w-12 multiple-selection dynamic-table" fxLayout="row" fxLayoutAlign="start center">
+                <div class="mat-header-cell w-2" fxLayout="row" fxLayoutAlign="start center" title="Ordenar">
+                  <div class="sorteable" fxLayout="row" fxLayoutAlign="start center">
+                    <span>Tipo Feriado</span>
+                  </div>
+                </div>
+                <div class="mat-header-cell w-3" fxLayout="row" fxLayoutAlign="start center" title="Ordenar">
+                  <div class="sorteable" fxLayout="row" fxLayoutAlign="start center">
+                    <span>Descripción</span>
+                  </div>
+                </div>
+                <div class="mat-header-cell w-2" fxLayout="row" fxLayoutAlign="start center" title="Ordenar">
+                  <div class="sorteable" fxLayout="row" fxLayoutAlign="start center">
+                    <span>Fecha Feriado</span>
+                  </div>
+                </div>
+                <div class="mat-header-cell w-2" fxLayout="row" fxLayoutAlign="start center" title="Ordenar">
+                  <div class="sorteable" fxLayout="row" fxLayoutAlign="start center">
+                    <span>Fecha Efectiva</span>
+                  </div>
+                </div>
+                <div class="mat-header-cell w-2" fxLayout="row" fxLayoutAlign="start center" title="Ordenar">
+                  <div class="sorteable" fxLayout="row" fxLayoutAlign="start center">
+                    <span>Estado</span>
+                  </div>
+                </div>
+                <!-- Columna: Año -->
+                <div class="mat-header-cell w-1" fxLayout="row" fxLayoutAlign="start center" title="Ordenar">
+                  <div class="sorteable" fxLayout="row" fxLayoutAlign="start center">
+                    <span>Año</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="mat-row" fxLayout="row" *ngFor="let holiday of calendarHolidays" fxLayoutAlign="start center">
+              <div class="mat-cell w-1" fxLayout="row" fxLayoutAlign="center center">
+                <mat-checkbox *ngIf="holiday.enabled" [(ngModel)]="holiday.selected" (ngModelChange)="selectedChange()">
+                </mat-checkbox>
+              </div>
+              <div class="w-12 multiple-selection w-sticky" fxLayout="row" fxLayoutAlign="start center">
+                <div class="mat-cell w-2" fxLayoutAlign="start center">
+                  {{ holiday?.holidayType }}
+                </div>
+                <div class="mat-cell w-3" fxLayoutAlign="start center">
+                  {{ holiday?.description }}
+                </div>
+                <div class="mat-cell w-2" fxLayoutAlign="start center">
+                  {{ holiday?.holidayDate | date:'dd/MM/yyyy' }}
+                </div>
+                <div class="mat-cell w-2" fxLayoutAlign="start center">
+                  {{ holiday?.effectiveHolidayDate | date:'dd/MM/yyyy' }}
+                </div>
+                <div class="mat-cell w-2" fxLayoutAlign="n  center">
+                  {{ holiday?.state ? "Activo" : "Inactivo" }}
+                </div>
+                <div class="mat-cell w-1" fxLayoutAlign="start center">
+                  {{ holiday?.year }}
+                </div>
+              </div>
+              <div class="mat-cell sticky-actions" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                <button class="ok" name="btn_edit_holidays" mat-icon-button title="Editar"
+                  (click)="editAddHoliday(holiday)">
+                  <mat-icon class="fa-solid" fontSet="fas" fontIcon="fa-pen"></mat-icon>
+                </button>
+              </div>
+            </div>
+
+            <!-- fin para borrar -->
+          </div>
+        </div>
+      </ng-container>
+    </mat-card>
+
+    <!-- APP SEARCH MENU -->
+<mat-menu #menu="matMenu" xPosition="before" yPosition="below" class="menu-options mat-card">
+  <div class="container" fxLayout="column" fxLayoutAlign="start stretch" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()" (keypress)="$event.stopPropagation()" (keyup)="$event.stopPropagation()">
+    <div class="title" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+      <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-cog">
+        </mat-icon>
+        <mat-icon class="fa-lg complex" fontSet="fas" fontIcon="fa-search">
+        </mat-icon>
+      </div>
+      <h4>Búqueda Avanzada</h4>
+    </div>
+    <div class="slide-group" fxLayout="column" fxLayoutAlign="start stretch">
+      <div class="title" [ngClass]="{'mat-error': errorStatus()}" fxLayout="row" fxLayoutAlign="start center"
+        fxLayoutGap="16px">
+        <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+          <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-gear">
+          </mat-icon>
+        </div>
+        <div fxLayout="column">
+          <h4>Estado del Feriado</h4>
+          <h6 *ngIf="!errorStatus()">
+            {{activeHoliday && inactiveHoliday ? 'Buscar Todos' : (activeHoliday ? 'Buscar sólo los Activos' :
+            'Buscar sólo los Inactivos' )}}
+          </h6>
+          <h6 *ngIf="errorStatus()">{{errorStatus() ?'Selecciona una opción': ''}}</h6>
+        </div>
+      </div>
+      <mat-slide-toggle [(ngModel)]="activeHoliday" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()" (keypress)="$event.stopPropagation()" (keyup)="$event.stopPropagation()">
+        Activo
+      </mat-slide-toggle>
+      <mat-slide-toggle [(ngModel)]="inactiveHoliday" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()" (keypress)="$event.stopPropagation()" (keyup)="$event.stopPropagation()">
+        Inactivo
+      </mat-slide-toggle>
+    </div>
+    <div class="slide-group" fxLayout="column" fxLayoutAlign="start stretch">
+      <div class="title" fxLayout="row" fxLayoutAlign="start center"
+      fxLayoutGap="16px">
+      <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-globe">
+        </mat-icon>
+      </div>
+      <div fxLayout="column">
+        <h4>Tipos de Feriados</h4>
+      </div>
+    </div>
+    <mat-select [(ngModel)]="selectedTipo" class="selected" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()" (keypress)="$event.stopPropagation()" (keyup)="$event.stopPropagation()">
+      <mat-option *ngFor="let feriado of filterTiposDeFeriados" [value]="feriado">{{feriado}}</mat-option>
+     </mat-select>
+    </div>
+  </div>
+  <div class="footer btns-container" fxLayout="row-reverse" fxLayoutAlign="start center" fxLayoutGap="16px" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()" (keypress)="$event.stopPropagation()" (keyup)="$event.stopPropagation()" style="margin-top: 10px;">
+    <button class="submit-button" [disabled]="errorStatus()" mat-raised-button color="primary"
+      (click)="filteredSearch()">Buscar</button>
+    <button mat-button (click)="closeFindAdvanced()">Cerrar</button>
+  </div>
+  <div class="footer btns-container" fxLayout="row" fxLayoutAlign="start center" fxFill (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()" (keypress)="$event.stopPropagation()" (keyup)="$event.stopPropagation()">
+    <button class="submit-button" (click)="resetSearchForm()">Limpiar filtros</button>
+  </div>
+</mat-menu>

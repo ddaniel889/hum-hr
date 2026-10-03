@@ -1,0 +1,12 @@
+<div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="32px">
+    <mat-form-field fxLayout="row" fxLayoutAlign="start center" *ngIf="!hidePageSizeSelection">
+      <mat-select [(ngModel)]="pageSize" (selectionChange)="setSizePage()">
+        <mat-option *ngFor="let pageSize of optionsPageSize" [value]="pageSize">
+          {{pageSize}}
+        </mat-option>
+      </mat-select>
+      <mat-hint>Resultados por página</mat-hint>
+    </mat-form-field>
+    <mat-paginator [showFirstLastButtons]="this.pageCount / this.pageSize < 1900" [length]="pageCount" [pageSize]="this.pageSize" [hidePageSize]="hidePageSize" [(pageIndex)]="zeroBasedPageIndex" (page)="selectedPageChanged($event)">
+    </mat-paginator>
+  </div>

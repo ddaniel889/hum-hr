@@ -1,0 +1,33 @@
+<!-- LOADER -->
+<div class="window-spinner" *ngIf="loading">
+  <mat-progress-spinner mode="indeterminate" color="primary">
+  </mat-progress-spinner>
+</div>
+
+<mat-toolbar color="grey">
+  <mat-toolbar-row>
+    <div class="mat-avatar four-icons" fxLayout="row" fxLayoutAlign="space-between center">
+      <div class="toolbar-line" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+        <mat-icon  class="fa-lg" fontSet="fa" fontIcon="fa-file">
+        </mat-icon>
+        <div class="title" fxLayout="column">
+          <h3 matLine> {{process?.period | date :'MMMM yyyy' | titlecase }} - {{process?.type}}</h3>
+        </div>
+      </div>
+    </div>
+    <button id="closeDetail" mat-icon-button (click)="documentClose()">
+      <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+    </button>
+    <div class="toolbar-actions" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="16px">
+      <app-pdf-wrapper-controls [pdfWrapper]="pdfWrapper"></app-pdf-wrapper-controls>
+      
+    </div>
+  </mat-toolbar-row>
+</mat-toolbar>
+<mat-divider [inset]="true"></mat-divider>
+
+<app-pdf-wrapper [file]="filePdf" [fileName]="fileName" [process]="process" [autoView]="true" [showControls]="false"
+  #pdfWrapper [ngClass]="(!signing && signable) ? 'not-signed' : 'signed'" [hidden]="loading"></app-pdf-wrapper>
+
+<app-sign-document [employeeProcess]="process" (signingFinish)="reloadDocument()"
+  (signingChanged)="signingChanged($event)" [hidden]="loading"></app-sign-document>

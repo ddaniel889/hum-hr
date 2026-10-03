@@ -1,0 +1,11 @@
+@mixin snackbar($bg-ripple-light, $alert) {
+
+  .mat-simple-snackbar-action button.mat-button {
+    color: $alert;
+  }
+
+  .mat-simple-snackbar-action .mat-ripple-element {
+    background-color: $bg-ripple-light;
+  }
+}
+

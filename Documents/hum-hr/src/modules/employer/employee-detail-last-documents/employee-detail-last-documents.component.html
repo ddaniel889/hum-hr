@@ -1,0 +1,9 @@
+<mat-progress-bar mode="indeterminate" [style.display]="loading ? 'block' : 'none'"></mat-progress-bar>
+<mat-action-list *ngIf="!loading">
+    <mat-list-item *ngIf="items.length == 0">
+        <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa" fontIcon="fa-info-circle"></mat-icon>
+        <span matLine>No disponible.</span>
+    </mat-list-item>
+    <app-file-document-inbox-item *ngFor="let item of items" [item]="item" [selectedEmployee]="this.selectedEmployee" [orgUnits]="this.organizationalUnits" [showGoEmployee]="true" [showSave]="true" [documentationTypes]="documentationTypes" [showView]="true"
+        [autoview]="false" [showSmallChips]=true></app-file-document-inbox-item>
+</mat-action-list>

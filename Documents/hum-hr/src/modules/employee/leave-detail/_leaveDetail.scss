@@ -1,0 +1,220 @@
+app-leave-detail {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .leave_detail {
+    height: 100%;
+
+    .leave_detail-title {
+      height: 64px;
+      padding: 0 16px;
+
+      .info {
+
+        h3,
+        h5 {
+          margin: 0;
+        }
+
+        h3 {
+          font-weight: 500;
+        }
+
+        h5 {
+          font-weight: 300;
+        }
+
+        b {
+          font-weight: 700;
+        }
+      }
+    }
+
+    .leave_detail-container {
+      height: calc(100% - 64px);
+
+      app-chapa {
+        .upload-warning {
+          .large-icon {
+            height: 120px !important;
+            width: 120px !important;
+            border-radius: 70px;
+            font-size: 70px !important;
+            margin-bottom: 16px;
+            margin-top: 65px;
+          }
+          h2 {
+            margin: 0;
+            text-align: center;
+          }
+          h4 {
+            margin: 8px 0 0;
+            text-align: center;
+            max-width: 40vw;
+            font-weight: 400;
+
+            &:before {
+              content: '"';
+              margin-right: 4px;
+            }
+
+            &:after {
+              content: '"';
+              margin-left: 4px;
+            }
+          }        
+        } 
+      }
+    }
+
+   
+   
+
+    .leave_detail-loading {
+      height: 100%;
+    }
+  }
+  .main-action {
+    padding: 0 16px 16px;
+
+    .main-btn {
+      height: 64px;
+      width: 100%;
+      border-radius: 32px;
+
+      .mat-button-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 20px;
+        padding-right: 8px;
+
+        mat-icon.mat-icon {
+          min-width: 40px;
+          margin-right: 8px;
+        }
+      }
+    }
+  }
+}
+
+@mixin leaveDetail($primary-text, $text-side, $leave-pending, $leave-bk-pending, $leave-ok, $leave-bk-ok, $leave-not-ok, $leave-bk-not-ok, $leave-cancelled, $leave-bk-cancelled,$leave-draft,$leave-bk-draft,$text-main,$bg-toolbar-light,$divider) {
+  app-leave-detail {
+    .leave_detail {
+      .leave_detail-title {
+        .info {
+
+          h3,
+          mat-icon {
+            color: $primary-text;
+          }
+        }
+      }
+
+      .leave_detail-container {
+        app-chapa {
+          .upload-warning {
+            .ok {
+              .large-icon {
+                background: $leave-bk-ok;
+                color: $leave-ok;
+              }
+
+              h2 {
+                color: $leave-ok;
+              }
+            }
+
+            .not-ok {
+              .large-icon {
+                background: $leave-bk-not-ok;
+                color: $leave-not-ok;
+              }
+
+              h2 {
+                color: $leave-not-ok;
+              }
+              
+            }
+
+            .pending {
+              .large-icon {
+
+                background: $leave-bk-pending;
+                color: $leave-pending;
+              }
+
+              h2 {
+                color: $leave-pending;
+              }
+            }
+
+            .draft {
+              .large-icon {
+
+                background: $leave-bk-draft;
+                color: $leave-draft;
+              }
+
+              h2 {
+                color: $leave-draft;
+              }
+            }
+            
+            .cancelled {
+              .large-icon {
+
+                background: $leave-bk-cancelled;
+                color: $leave-cancelled;
+              }
+
+              h2 {
+                color: $leave-cancelled;
+              }
+            }
+                   
+            .actions {
+              padding: 16px;
+              height: 96px;
+              column-gap: 16px;
+          
+              button {
+                
+                      &.ok {
+                        background: $leave-ok !important;
+                        color: $text-main;
+                      }
+          
+                      &.not-ok {
+                        color: $leave-not-ok !important;
+                      }
+                height: 100%;
+                border-radius: 40px;      
+              }
+            }
+            
+             mat-basic-chip {
+              background: $bg-toolbar-light !important;
+              border: 1px solid $divider !important;
+              border-radius: 40px !important;      
+              height: 35px !important;       
+              &.signed-ok {
+                border-color: $leave-ok !important;
+                color: $leave-ok!important;
+              } 
+              &.signed-not-ok {
+                border-color: $leave-not-ok!important;
+                color: $leave-not-ok !important;
+              }    
+              &.draft {
+                border-color: $leave-draft!important;
+                color: $leave-draft !important;
+              }      
+            }
+          }
+        }
+      }
+    }
+  }
+}

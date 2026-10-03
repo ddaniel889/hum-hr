@@ -1,0 +1,55 @@
+@import 'img-management';
+
+
+thead.mat-calendar-table-header tr+tr {
+  @include display(ni, u, u, u, u, u);
+}
+
+thead.mat-calendar-table-header {
+  line-height: 30px !important;
+}
+
+.mat-calendar-header {
+  padding: 0 8px !important;
+}
+
+.mat-calendar-content {
+  padding: 0 8px 8px !important;
+  height: 277px;
+}
+
+.mat-datepicker-content .mat-calendar {
+  height: auto !important;
+}
+
+@mixin datepicker($bg-card, $primary-side, $text-main-inverse) {
+  table.mat-calendar-table {
+    background: $bg-card !important;
+  }
+
+  .mat-calendar-body-label {
+    color: $text-main-inverse !important;
+  }
+
+  .mat-calendar-arrow {
+    border-top-color: $bg-card !important;
+  }
+
+  .mat-datepicker-content .mat-calendar-next-button,
+  .mat-datepicker-content .mat-calendar-previous-button {
+    color: $text-main-inverse !important;
+  }
+
+  .mat-calendar-header {
+    background: $primary-side !important;
+  }
+
+  mat-datepicker-content {
+    background-color: $primary-side !important;
+    color: $text-main-inverse !important;
+  }
+
+  .mat-calendar-content {
+    background: $bg-card !important;
+  }
+}

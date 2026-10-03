@@ -1,0 +1,68 @@
+<mat-progress-spinner mode="indeterminate" color="primary" *ngIf="loading">
+</mat-progress-spinner>
+<ng-container *ngIf="!loading">
+  <div class="separator" fxLayout="row" fxLayoutAlign="start center">
+    <div class="subtitle" fxLayoutAlign="start center" fxLayoutGap="16px">
+      <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-envelope-open-text">
+      </mat-icon>
+      <div class="text" fxLayout="column">
+        <h5>Correo Electrónico</h5>
+        <h6>Personaliza tus comunicaciones</h6>
+      </div>
+    </div>
+  </div>
+  <div fxLayout="column" fxLayoutGap="16px">
+    <form [formGroup]="ouEmailConfigForm">
+      <div class="form-steped-body" fxLayout="column">
+        <div class="asisted-input" fxLayout="row-reverse" fxLayoutAlign="start center">
+          <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+            <input matInput placeholder="Nombre" formControlName="productName" required />
+            <span class="help-hoverable" matSuffix>
+              <mat-icon class="fa " fontSet="fal" fontIcon="fa-question-circle">
+              </mat-icon>
+              <mat-hint hidden>
+                El <b>Nombre</b> ingresado en este campo se verá reflejado <b>en el asunto</b> de algunos mails
+                enviados por el sistema
+              </mat-hint>
+            </span>
+            <mat-error *ngIf="ouEmailConfigForm.controls.productName.hasError('required')">
+              *El Nombre es <strong>obligratorio</strong>
+            </mat-error>
+          </mat-form-field>
+          <div class="indicator">
+            <div class="bubble">1</div>
+            <div class="guide bottom"></div>
+          </div>
+        </div>
+        <div class="asisted-input" fxLayout="row-reverse" fxLayoutAlign="start center">
+          <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+            <input matInput placeholder="Saludo Final" formControlName="signature" required />
+            <span class="help-hoverable" matSuffix>
+              <mat-icon class="fa " fontSet="fal" fontIcon="fa-question-circle">
+              </mat-icon>
+              <mat-hint hidden>
+                El <b>Saludo</b> ingresado en este campo se verá reflejado <b>al final del cuerpo</b> de algunos mails
+                enviados por el sistema
+              </mat-hint>
+            </span>
+            <mat-error *ngIf="ouEmailConfigForm.controls.signature.hasError('required')">
+              *El Saludo Final es <strong>obligratorio</strong>
+            </mat-error>
+          </mat-form-field>
+          <div class="indicator">
+            <div class="guide top"></div>
+            <div class="bubble">2</div>
+            <div class="guide bottom"></div>
+          </div>
+        </div>
+      </div>
+    </form>
+    <div class="confirm" fxLayout="row-reverse" fxFlex="grow" fxLayoutGap="12px">
+      <button mat-raised-button color="primary" (click)="save()"
+        [disabled]="loading || ouEmailConfigForm.invalid || !ouEmailConfigForm.dirty">
+        Guardar Cambios
+      </button>
+    </div>
+  </div>
+</ng-container>
+<mat-divider [inset]="true"></mat-divider>

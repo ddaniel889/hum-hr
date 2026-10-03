@@ -1,0 +1,32 @@
+@mixin customSearchInput(
+  $bg-background,
+  $divider,
+  $text-main-solid,
+  $text-sub,
+  $hover
+) {
+  app-custom-search-input {
+    .custom-search-container {
+      background: $bg-background;
+      border: 1px solid $divider;
+      transition: color 0.1s ease, background 0.15s ease;
+
+      mat-icon.mat-icon {
+        color: $text-sub;
+      }
+
+      input.custom-search-input {
+        color: $text-main-solid;
+        background: unset;
+      }
+
+      &:hover,
+      &:active,
+      &:focus,
+      &:focus-within {
+        background: $hover !important;
+        transition: background 0.15s ease;
+      }
+    }
+  }
+}

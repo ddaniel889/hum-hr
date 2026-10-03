@@ -1,0 +1,117 @@
+<div class="upload-warning">
+  <div [class]="className" fxLayout="column" fxLayoutAlign="center center" fxFill fxLayoutGap="16px">
+      <!--Detalle de la solicitud-->
+      <span fxLayout="column" fxLayoutAlign="center center" *ngIf="isApprover">
+        <h3 style="color: black;margin-bottom: 35px;">{{leaveDetail.userName}}</h3>
+      </span>
+    <span fxLayout="column" fxLayoutAlign="center center">
+      <h4 *ngIf="headerDraft && leaveRequestDraft"  style="text-align:left;font-weight: bold;color: #0f0101; font-size: 30px;">{{headerDraft}}</h4>
+      <ng-container *ngIf="icon && icon.length > 0">
+        <mat-icon class="fa-lg large-icon" fontSet="fas" [fontIcon]="icon">
+        </mat-icon>
+      </ng-container>
+      <h2 *ngIf="text && !leaveRequestDraft">{{text}}</h2>
+      <h2 *ngIf="text && leaveRequestDraft" style="font-size: 20px;text-align:left;color:#8f8f8f;font-weight: bold;">{{text}}</h2>
+      <h4 *ngIf="subText && leaveRequestDraft && !isApprover" style="font-size: 30px;text-align:left;color: #0f0101;font-weight: bold;margin-top: 20px;">{{subText}}</h4>
+      <h4 *ngIf="textDraft && leaveRequestDraft && !isApprover"  style="text-align:left;font-weight: bold;color:#798c92; font-size: 20px;">{{textDraft}}</h4>
+      <h4 *ngIf="subText && !leaveRequestDraft && isApprover && this.leaveDetail.state?.key != '2'" >{{subText}}</h4>
+      <h4 *ngIf="subText && !leaveRequestDraft && !isApprover" >{{subText}}</h4>
+      <h5 *ngIf="infoExtra">{{infoExtra}}</h5>
+    </span>
+    <!--Botón para Cancelar la solicitud-->
+    <button mat-raised-button (click)="click()" *ngIf="(actionText || actionIcon) && !isApprover && !leaveRequestDraft" [color]="buttonColor">
+      <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="8px">
+        <mat-icon class="fa-lg" fontSet="fa" [fontIcon]="actionIcon" *ngIf="actionIcon" fxLayout="row"
+          fxLayoutAlign="center center"></mat-icon>
+        <span *ngIf="actionText"> {{ actionText }} </span>
+      </div>
+    </button>
+    <div fxLayout="row" fxLayoutAlign="start center" *ngIf="leaveRequestDraft && !isApprover" fxLayoutGap="16px">
+      <!-- Agree Button -->
+      <button mat-raised-button color="accent" style="font-size: 24px; padding: 15px 20px; border: none; border-radius: 5px; cursor: pointer; margin-top: 20px;"  (click)="approveReject(true)" >
+        <span fxLayout="row" fxLayoutGap="12px" fxLayoutAlign="center center">
+        <mat-icon fontSet="fas" fontIcon="fa-smile" style="font-size: 20px;"></mat-icon>
+        <span>Sí, estoy de acuerdo</span>
+        </span>
+      </button>
+      <button style="font-size: 16px; color: gray; text-decoration: underline; background: none; border: none; padding: 0; cursor: pointer;" (click)="approveReject(false)">
+        no lo estoy
+      </button>
+    </div>
+    <!--Botón para Aprobar o rechazar la solicitud por el validador-->
+    <div class="actions" fxLayout="row" fxLayoutAlign="space-between center" *ngIf="isApprover && !leaveRequestDraft && !isValidated && leaveDetail.state.key == '1'">
+      <button name="btn_RechazarSolicitud" mat-stroked-button class="not-ok" fxFlex="50"
+      (click)="approveReject(false)">
+        <span fxLayout="row" fxLayoutGap="12px" fxLayoutAlign="center center">
+          <mat-icon fontSet="fas" fontIcon="fa-thumbs-down">
+          </mat-icon>
+          <span>
+            Rechazar Solicitud
+          </span>
+        </span>
+      </button>
+
+      <button name="btn_AprobarSolicitud" mat-raised-button class="ok" fxFlex="50">
+        <span fxLayout="row" fxLayoutGap="12px" fxLayoutAlign="center center"
+        (click)="approveReject(true)">
+          <mat-icon fontSet="fas" fontIcon="fa-thumbs-up">
+          </mat-icon>
+          <span>
+            Aprobar Solicitud
+          </span>
+        </span>
+      </button>
+    </div>
+    <div class="actions" fxLayout="row" fxLayoutAlign="space-between center" *ngIf="isApprover && !leaveRequestDraft && workflowApproveShow()">
+      <button name="btn_RechazarSolicitud" mat-stroked-button class="not-ok"
+      (click)="approveReject(false)">
+        <span fxLayout="row" fxLayoutGap="12px" fxLayoutAlign="center center">
+          <mat-icon fontSet="fas" fontIcon="fa-thumbs-down">
+          </mat-icon>
+          <span>
+            Rechazar Solicitud
+          </span>
+        </span>
+      </button>
+    </div>
+    <div class="main-action actions" fxLayout="row" *ngIf="!isApprover">
+      <button name="btn_ViewDocument" mat-raised-button class="main-btn" color="accent" fxFlex="800" (click)="viewDocumentLeave()" *ngIf="hasDocument">
+        <span fxLayout="row" fxLayoutGap="12px" fxLayoutAlig="center center">
+          <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-file">
+          </mat-icon>
+          <span>
+            Ver Documento
+          </span>
+        </span>
+      </button>
+    </div>
+      <!--Detalle de las validaciones Realizadas-->
+      <mat-basic-chip *ngIf="!showActionRol() && isNotsameApprover() && !noteCancelation" matLine [ngClass]="getClass()" fxLayout="row wrap" fxLayoutAlign="center center" fxLayoutGap="8px">
+        <mat-icon  fontSet="fa"  [fontIcon]="getIcon()">
+        </mat-icon>
+        <span style="padding-right: 10px;">{{getDescriptionRol()}}</span>
+      </mat-basic-chip>
+      <mat-basic-chip
+        *ngIf="!showActionRol() && isNotsameApprover() && noteCancelation"
+        matLine
+        [ngClass]="getClass()"
+        fxLayout="row"
+        fxLayoutAlign="center center"
+        fxLayoutGap="8px"
+        style="align-items: center; justify-content: center;">
+      <span style="padding: 10px; text-align: center;">{{getDescriptionRol()}}</span>
+      </mat-basic-chip>
+      <mat-list-item class="mat-list-actionApprovers" *ngFor="let action of leaveDetail.actionApprovers" fxLayout="row"  fxLayoutGap="8px" >
+          <mat-basic-chip *ngIf="action.action == '2'" matLine class="signed-ok" fxLayout="row wrap" fxLayoutAlign="center center" fxLayoutGap="8px">
+          <mat-icon  fontSet="fa" fontIcon="fa-smile">
+          </mat-icon>
+          <span style="padding-right: 10px;">Aprobado por {{action.firstName}} {{action.lastName}} el {{getDateTime(action.fecha)}}</span>
+          </mat-basic-chip>
+          <mat-basic-chip *ngIf="action.action == '3'" matLine class="signed-not-ok" fxLayout="row wrap" fxLayoutAlign="center center" fxLayoutGap="8px">
+            <mat-icon  fontSet="fa" fontIcon="fa-frown">
+            </mat-icon>
+            <span style="padding-right: 10px;">Rechazado por {{action.firstName}} {{action.lastName}} el {{getDateTime(action.fecha)}}</span>
+          </mat-basic-chip>
+      </mat-list-item>
+  </div>
+</div>

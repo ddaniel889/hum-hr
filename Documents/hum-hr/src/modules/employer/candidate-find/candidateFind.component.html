@@ -1,0 +1,280 @@
+<!-- CANDIDATE-SEARCH -->
+<div class="main" fxLayout="column" fxFill [ngClass]="{ 'w-detail': showDetail }">
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <!-- info -->
+    <div class="header">
+      <div class="content" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px" fxFlex="100">
+        <!-- Ou selector -->
+        <div class="ou-select" (click)="selectOU.open()" matRipple fxLayout="row" fxLayoutAlign="start center"
+          title="Cambiar de Empresa" *ngIf="organizationalUnits?.length > 1">
+          <div class="info" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-industry-alt">
+            </mat-icon>
+            <div fxLayout="column">
+              <h5>Empresa</h5>
+              <h3>
+                {{
+                loading && !selectedOrganizationalUnit
+                ? "Cargando..."
+                : selectedOrganizationalUnit?.name
+                }}
+              </h3>
+            </div>
+          </div>
+          <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-caret-down">
+          </mat-icon>
+          <mat-select class="invisible-item" #selectOU (click)="$event.stopPropagation()"
+            [(ngModel)]="selectedOrganizationalUnit">
+            <mat-option *ngFor="let organizationalUnit of organizationalUnits" [value]="organizationalUnit"
+              (click)="search()">
+              {{ organizationalUnit?.name }}
+            </mat-option>
+          </mat-select>
+        </div>
+
+        <!-- app selector -->
+        <div class="module-title selectable" (click)="selectView.open()" matRipple fxLayout="row"
+          fxLayoutAlign="start center" title="Cambiar Persona">
+          <div class="info" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-alien">
+            </mat-icon>
+            <div fxLayout="column">
+              <h3>{{ selectedView.key }}</h3>
+              <h5 *ngIf="organizationalUnits?.length == 1">
+                {{ selectedOrganizationalUnit?.name }}
+              </h5>
+              <h5 *ngIf="organizationalUnits?.length > 1">Personas</h5>
+            </div>
+          </div>
+          <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-caret-down">
+          </mat-icon>
+          <mat-select class="invisible-item" #selectView (click)="$event.stopPropagation()" [(ngModel)]="selectedView">
+            <mat-option *ngFor="let view of views" [value]="view" (click)="changeView(view)"
+              [disabled]="view.key === selectedView.key">
+              {{ view.key }}
+            </mat-option>
+          </mat-select>
+        </div>
+      </div>
+    </div>
+    <!-- Search -->
+    <div class="search-container">
+      <div class="search" fxLayout="row" fxLayoutAlign="start center" fxFlex="100">
+        <div class="content" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px" fxFlex="100">
+          <mat-icon class="fa" fontSet="fal" fontIcon="fa-search">
+          </mat-icon>
+          <input #candidateSearchInput type="search" [(ngModel)]="filterName" placeholder="Buscar Candidatos"
+            (keydown.enter)="filteredSearch()" />
+          <button *ngIf="!showDetail" mat-button color="primary" [matMenuTriggerFor]="menu"
+            [disabled]="!selectedOrganizationalUnit">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-caret-down">
+            </mat-icon>
+            Búsqueda Avanzada
+          </button>
+          <button *ngIf="showDetail" mat-icon-button color="primary" [matMenuTriggerFor]="menu"
+            title="Búsqueda Avanzada" [disabled]="!selectedOrganizationalUnit">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-caret-down">
+            </mat-icon>
+          </button>
+          <button [disabled]="loading" mat-icon-button title="Ver Guía de Búsqueda" [matMenuTriggerFor]="menuHelp"
+            *ngIf="false">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-question-circle"></mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- LOADER -->
+  <div class="load-window new" *ngIf="loading && !candidates?.length">
+    <mat-progress-spinner mode="indeterminate" color="primary">
+    </mat-progress-spinner>
+  </div>
+  <!-- helper -->
+  <div class="helper" fxLayout="row" fxLayoutAlign="space-between center" *ngIf="candidates?.length">
+    <!-- hint -->
+    <mat-hint fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="space-between center">
+      <!-- ACTUALIZAR -->
+      <button mat-icon-button (click)="refresh(true)" title="Actualizar Listado" [disabled]="loading">
+        <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-redo"></mat-icon>
+      </button>
+      <h4 *ngIf="!loading">
+        {{ candidates?.length >= 2 ? itemsCount + " Candidatos encontrados" : "1 Candidato encontrado" }}
+      </h4>
+      <h4 *ngIf="loading">{{ actionText }} ... </h4>
+    </mat-hint>
+    <!-- actions -->
+    <div class="actions" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+      <!-- SET-CONFIGURATION -->
+      <button (click)="openConfigurationSet()" mat-stroked-button color="primary" [disabled]="loading"
+        *ngIf="!showDetail">
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-cog">
+        </mat-icon>
+        Configurar Sets
+      </button>
+      <button (click)="openConfigurationSet()" mat-icon-button title="Configurar Sets" *ngIf="showDetail"
+        [disabled]="loading">
+        <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+          <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-layer-group">
+          </mat-icon>
+          <mat-icon class="fa-lg complex" fontSet="fas" fontIcon="fa-cog">
+          </mat-icon>
+        </div>
+      </button>
+      <!-- BULK-EXPORT-LIST -->
+      <button (click)="exportAll()" mat-stroked-button color="primary" *ngIf="!showDetail" [disabled]="loading">
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-file-spreadsheet">
+        </mat-icon>
+        Exportar Listado
+      </button>
+      <button (click)="exportAll()" mat-icon-button title="Exportar Listado a Excel" *ngIf="showDetail"
+        [disabled]="loading">
+        <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+          <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-file-spreadsheet">
+          </mat-icon>
+          <mat-icon class="fa-lg complex" fontSet="fas" fontIcon="fa-download">
+          </mat-icon>
+        </div>
+      </button>
+      <button (click)="exportAllWithDocuments()" mat-stroked-button color="primary" *ngIf="!showDetail" [disabled]="loading">
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-file-excel">
+        </mat-icon>
+        Exportar Listado con Documentación
+      </button>
+      <button (click)="exportAllWithDocuments()" mat-icon-button title="Exportar Listado a Excel" *ngIf="showDetail"
+        [disabled]="loading">
+        <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+          <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-file-excel">
+          </mat-icon>
+          <mat-icon class="fa-lg complex" fontSet="fas" fontIcon="fa-download">
+          </mat-icon>
+        </div>
+      </button>
+    </div>
+    <mat-progress-bar mode="indeterminate" *ngIf="loading"></mat-progress-bar>
+  </div>
+  <!-- Empty (app chapa) -->
+  <ng-container *ngIf="!loading && !candidates?.length ">
+    <app-chapa [className]="'info-empty'" [icon]="'fa-meh'" [text]="'¡Ups! No hay Candidatos aquí...'"
+      [subText]="organizationalUnits?.length > 1 ? 'Intenta hacer otra Búsqueda o prueba con otra Empresa':'Intenta hacer otra Búsqueda'">
+    </app-chapa>
+  </ng-container>
+  <!-- CANDIDATE-SEARCH-TABLE -->
+  <div class="new-table w-main-action" [hidden]="!candidates.length">
+    <app-cs-grid-control [items]="candidates" [columns]="columns" [currentPage]="pageIndex" [pageSize]="pageSize"
+      [itemsCount]="itemsCount" (sortColumn)="sortColumn($event)" (changePage)="changePage($event)" [loading]="false"
+      (executeFunction)="executeFunction($event)" (selectFunction)="selectCandidate($event)" [currentPage]="pageIndex">
+    </app-cs-grid-control>
+  </div>
+  <!-- ADD-CANDIDATE -->
+  <div class="main-action" fxLayout="row" fxLayoutAlign="center center">
+    <button mat-raised-button class="main-btn" color="accent" (click)="showAddCandidate()" [disabled]="loading">
+      <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-plus">
+      </mat-icon>
+      Nuevo Candidato
+    </button>
+  </div>
+</div>
+<!-- CANDIDATE-DETAILS -->
+<div class="new-detail-container" [ngClass]="{ cancelled: !selectedCandidate?.isActive }" fxLayout="column" fxFill>
+  <!-- APP CANDIDATE-DETAILS-->
+  <app-employee-detail [selectedEmployee]="selectedCandidate" (refreshGrid)="search($event)"
+    (detailClose)="toggleCandidateDetail()" [isCandidate]="true"></app-employee-detail>
+</div>
+<!-- APP SEARCH MENU -->
+<mat-menu #menu="matMenu" xPosition="before" yPosition="below" class="mat-card menu-options">
+  <app-advanced-employee-search [filters]="searchFilters" [containerType]="containerType" (OnFilter)="filteredSearch()"
+    [isEmployee]="false">
+  </app-advanced-employee-search>
+</mat-menu>
+<!-- APP SEARCH HELP -->
+<mat-menu #menuHelp="matMenu" yPosition="below" class="mat-card menu-options help ">
+  <div class="container">
+    <div class="title" fxLayout="row" fxLayoutAlign="space-between center">
+      <span fxLayout="column">
+        <h6>Guía y Ejemplos de Uso</h6>
+        <h4 class="primary">Cómo funciona la búsqueda: Buscar Personas</h4>
+      </span>
+      <button mat-icon-button title="Ocultar Guía">
+        <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"> </mat-icon>
+      </button>
+    </div>
+    <div class="slide-group">
+      <mat-accordion (click)="$event.stopPropagation()">
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <h4>Podés buscar por apellido y/o nombre.</h4>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <ul style="margin-top: 16px">
+            <li>
+              <i>Si ingresas <b>José</b> encontrarás a las personas
+                <b>con este apellido o nombre</b>.</i>
+            </li>
+            <li>
+              <i>Si ingresas <b>José Ignacio Salinas</b> encontrarás a las
+                personas cuyo
+                <b>apellido y/o nombre contengan alguna de las palabras</b>
+                ingresadas.</i>
+            </li>
+          </ul>
+        </mat-expansion-panel>
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <h4>
+                Podés buscar por número de legajo ingresando cifras de hasta 6
+                dígitos.
+              </h4>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <ul style="margin-top: 16px">
+            <li>
+              <i>Si ingresas <b>000001</b> encontrarás a la persona
+                <b> con este legajo</b>.</i>
+            </li>
+            <li>
+              <i>Si ingresas <b>000001 000012</b> encontrarás a las personas
+                cuyos <b>legajos</b> se encuentren dentro
+                <b>del rango ingresado</b>.</i>
+            </li>
+            <li>
+              <i>Si ingresas <b>000001 000006 000012</b> encontrarás a las
+                personas con <b>cada uno de estos legajos</b>.</i>
+            </li>
+          </ul>
+        </mat-expansion-panel>
+        <mat-expansion-panel hideToggle="true">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <h4>
+                Podés buscar por correo electrónico ingresando el dominio
+                completo (persona@organizacion.com)
+              </h4>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+        </mat-expansion-panel>
+        <mat-expansion-panel hideToggle="true">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <h4>
+                Podés buscar por el Identificador Fiscal ingresando una cifra
+                de hasta 7 dígitos.
+              </h4>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+        </mat-expansion-panel>
+      </mat-accordion>
+      <div class="title" fxLayout="row" fxLayoutAlign="space-between center">
+        <span fxLayout="column">
+          <h6>Nota:</h6>
+          <h4 class="accent">
+            ¡Todos los casos de Búsqueda anteriormente mencionados son
+            combinables!
+          </h4>
+        </span>
+      </div>
+    </div>
+  </div>
+</mat-menu>

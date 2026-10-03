@@ -1,0 +1,155 @@
+<div class="navigation" fxFlex="30" fxFill *ngIf="parentOu" [ngClass]="{'float-in' : showOus}">
+  <!-- estado OU -->
+  <div class="toolbar" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px"
+    *ngIf="parentOu?.selected">
+    <div class="header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+      <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-layer-group">
+      </mat-icon>
+      <div class="info" fxLayout="column">
+        <h3>{{parentOu?.name}}</h3>
+        <h5>Empresas del Grupo</h5>
+      </div>
+    </div>
+    <!-- accion cerrar ous tablet -->
+    <button class="show-md" mat-icon-button fxLayout="row" fxLayoutAlign="center center" (click)="closeOus()">
+      <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-times">
+      </mat-icon>
+    </button>
+  </div>
+  <!-- volver -->
+  <div class="toolbar reverse" fxLayout="row" fxLayoutAlign="space-between center"
+    *ngIf="parentOu && !parentOu?.selected">
+    <div class="header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+      <mat-icon class="fa-lg hide-md" fontSet="fas" fontIcon="fa-layer-group">
+      </mat-icon>
+      <!-- accion volver ous tablet -->
+      <button class="show-md" mat-icon-button fxLayout="row" fxLayoutAlign="center center"
+        (click)="selectRootOu(); isEditing = false ; showDetail = false">
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-arrow-left">
+        </mat-icon>
+      </button>
+      <div class="info" fxLayout="column">
+        <h5>Regresar</h5>
+        <h3>{{ parentOu?.name }}</h3>
+      </div>
+    </div>
+    <!-- accion cerrar ous tablet -->
+    <button class="show-md" mat-icon-button fxLayout="row" fxLayoutAlign="center center" (click)="closeOus()">
+      <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-times">
+      </mat-icon>
+    </button>
+    <!-- accion volver -->
+    <button class="hide-md" mat-icon-button fxLayout="row" fxLayoutAlign="center center"
+      (click)="selectRootOu(); isEditing = false ; showDetail = false">
+      <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-arrow-left">
+      </mat-icon>
+    </button>
+  </div>
+  <!-- listado de empresas -->
+  <div class="container">
+    <!-- ayuda -->
+    <div class="helper" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px" *ngIf="parentOu?.selected">
+      <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-exclamation-circle">
+      </mat-icon>
+      <h5>Elije una empresa</h5>
+    </div>
+    <!-- foreach empresas del grupo -->
+    <ng-container *ngIf="!selectedOrganizationalUnit || selectedOrganizationalUnit?.isRoot">
+      <div *ngFor="let ou of organizationalUnits" class="item" [ngClass]="{'active' : ou?.selected}" matRipple
+        fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px" (click)="selectChildOu(ou) ; showDetail = false">
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-industry-alt">
+        </mat-icon>
+        <h3>{{ou?.name}}</h3>
+      </div>
+    </ng-container>
+    <div class="item active" matRipple *ngIf="selectedOrganizationalUnit && !selectedOrganizationalUnit?.isRoot"
+      fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px"
+      (click)="selectChildOu(selectedOrganizationalUnit)">
+      <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-industry-alt">
+      </mat-icon>
+      <h3>{{selectedOrganizationalUnit?.name}}</h3>
+    </div>
+  </div>
+</div>
+<!-- configuraciones -->
+<div class="work-space" [fxFlex]="parentOu ? '70': '100'" fxFill>
+  <!-- vista ppal -->
+  <div class="main" fxFlex="100" fxFill fxLayout="column" fxLayoutAlign="space-between">
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+      <!-- info -->
+      <div class="header">
+        <div class="content" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px" fxFlex="100">
+          <!-- Ou selector -->
+          <div class="ou-select" (click)='toggleOus()' matRipple fxLayout="row" fxLayoutAlign="start center"
+            title="Cambiar de Empresa" *ngIf="parentOu" [hidden]="!showDetail && !isEditing">
+            <div class="info" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+              <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-industry-alt">
+              </mat-icon>
+              <div fxLayout="column">
+                <h5>Ver Sección</h5>
+                <h3>
+                  Empresas
+                </h3>
+              </div>
+            </div>
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-caret-down">
+            </mat-icon>
+          </div>
+          <!-- app selector -->
+          <div class="module-title" fxLayout="row" fxLayoutAlign="start center">
+            <div class="info" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+              <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-users-crown">
+              </mat-icon>
+              <div fxLayout="column">
+                <h3>Configuraciones</h3>
+                <h5>{{selectedOrganizationalUnit?.name}}</h5>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Tabs -->
+    <mat-tab-group #tab *ngIf="ouLoaded" mat-align-tabs="start" class="tabs-settings"
+      (focusChange)="myTabFocusChange($event)">
+      <!-- apariencia -->
+      <mat-tab *ngIf="showSettings" label="Apariencia">
+        <div class="content-scroll">
+          <app-appearance *ngIf="configTabs.APPEARANCE == childTab" [ouSelected]="selectedOrganizationalUnit"
+            (openDetailChanged)="openDetailChanged($event)"></app-appearance>
+        </div>
+      </mat-tab>
+      <!-- permisos -->
+      <mat-tab *ngIf="showSettings" [disabled]="selectedOrganizationalUnit?.isRoot" label="Accesos">
+        <div class="content-scroll">
+          <app-permissions *ngIf="configTabs.PERMISSIONS == childTab && !selectedOrganizationalUnit?.isRoot"
+            [ouSelected]="selectedOrganizationalUnit" (openDetailChanged)="openDetailChanged($event)"></app-permissions>
+        </div>
+      </mat-tab>
+      <!-- personalizacion -->
+      <mat-tab *ngIf="showSettings" [disabled]="selectedOrganizationalUnit?.isRoot" label="Personalización">
+        <div class="content-scroll">
+          <app-ou-description-config [ouSelected]="selectedOrganizationalUnit"
+            (openDetailChanged)="openDetailChanged($event)"></app-ou-description-config>
+          <app-email-config *ngIf="selectedOrganizationalUnit?.canViewHumanageCustomSettings"
+            [ouSelected]="selectedOrganizationalUnit" (openDetailChanged)="openDetailChanged($event)">
+          </app-email-config>
+          <app-help-link-config *ngIf="selectedOrganizationalUnit?.canViewHumanageCustomSettings"
+            [ouSelected]="selectedOrganizationalUnit" (openDetailChanged)="openDetailChanged($event)">
+          </app-help-link-config>
+        </div>
+      </mat-tab>
+      <!-- Configuración de Tiempos Efectivos Para Licencias -->
+      <mat-tab *ngIf="isLeaveConfig && configOu && configOu.length > 0" [disabled]="selectedOrganizationalUnit?.isRoot || !configOu || configOu.id == 0" label="Calendario"><app-calendar-holidays (loadRules)="reloadRules()"></app-calendar-holidays></mat-tab>
+
+      <mat-tab *ngIf="isLeaveConfig && configOu && configOu.length > 0" [disabled]="selectedOrganizationalUnit?.isRoot || !configOu || configOu.id == 0" label="Vigencias"><div class="content-scroll"><app-leave-times-lines [ouSelected]="selectedOrganizationalUnit"></app-leave-times-lines></div></mat-tab>
+      <mat-tab *ngIf="isLeaveConfig && configOu && configOu.length > 0" [disabled]="selectedOrganizationalUnit?.isRoot || !configOu || configOu.id == 0" label="Reglas">
+        <app-work-days-config (loadRules)="reloadRules()" [configOu]="configOu"></app-work-days-config>
+        <app-leave-rules [configOu]="configOu"></app-leave-rules>
+        <app-workflow-approve [configOu]="configOu"></app-workflow-approve>
+        </mat-tab>
+
+      </mat-tab-group>
+  </div>
+</div>

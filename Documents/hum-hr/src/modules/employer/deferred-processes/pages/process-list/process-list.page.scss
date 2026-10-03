@@ -1,0 +1,53 @@
+.deferred-process-list {
+  padding: 24px 24px 12px 24px;
+  overflow-y: scroll;
+
+  .header {
+    margin-bottom: 16px;
+
+    h5 {
+      font-weight: 400;
+    }
+  }
+
+  section.on-going {
+    margin-bottom: 32px;
+  }
+
+  section.history {
+    flex-grow: 1;
+
+    h4 {
+      padding-top: 32px;
+      padding-bottom: 16px;
+    }
+  }
+
+  section {
+    h4 {
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 25px;
+      margin-bottom: 8px;
+    }
+
+    &.history {
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
+  .cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 16px;
+  }
+
+  .form-item.dates {
+    width: 315px;
+  }
+
+  .clear-date-btn {
+    margin-right: .5rem;
+  }
+}

@@ -1,0 +1,607 @@
+<app-certificate-declaration *ngIf="isCertificateDeclarationOpen" [documentIds]="documentIds"
+  (addFinish)="closeAdd($event)">
+</app-certificate-declaration>
+
+<!-- EMPLOYEE-SEARCH -->
+<div class="main" fxLayout="column" fxLayoutAlign="space-between" fxFill [ngClass]="{'w-detail': showDetail}">
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <!-- info -->
+    <div class="header">
+      <div class="content" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px" fxFlex="100">
+        <!-- Ou selector -->
+        <div class="ou-select" (click)='selectOU.open()' matRipple fxLayout="row" fxLayoutAlign="start center"
+          title="Cambiar de Empresa" *ngIf="organizationalUnits?.length > 1">
+          <div class="info" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-industry-alt">
+            </mat-icon>
+            <div fxLayout="column">
+              <h5>Empresa</h5>
+              <h3>{{loading && !selectedOrganizationalUnit ? 'Cargando...': selectedOrganizationalUnit?.name}}
+              </h3>
+            </div>
+          </div>
+          <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-caret-down">
+          </mat-icon>
+          <mat-select class="invisible-item" #selectOU (click)="$event.stopPropagation()"
+            [(ngModel)]="selectedOrganizationalUnit">
+            <mat-option *ngFor="let organizationalUnit of organizationalUnits" [value]="organizationalUnit"
+              (click)="filteredSearchChangeOu()">
+              {{organizationalUnit?.name}}
+            </mat-option>
+          </mat-select>
+        </div>
+        <!-- app selector -->
+        <div class="module-title" *ngIf="views?.length < 2 " fxLayout="row" fxLayoutAlign="start center"
+          title="Cambiar Persona">
+          <div class="info" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-user">
+            </mat-icon>
+            <div fxLayout="column">
+              <h3>{{selectedView.key}}</h3>
+              <h5 *ngIf="organizationalUnits?.length == 1">
+                {{selectedOrganizationalUnit?.name}}
+              </h5>
+              <h5 *ngIf="organizationalUnits?.length > 1">
+                Personas
+              </h5>
+            </div>
+          </div>
+        </div>
+        <div class="module-title selectable" [hidden]="views?.length < 2" (click)='selectView.open()' matRipple
+          fxLayout="row" fxLayoutAlign="start center" title="Cambiar Persona">
+          <div class="info" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-user">
+            </mat-icon>
+            <div fxLayout="column">
+              <h3>{{selectedView.key}}</h3>
+              <h5 *ngIf="organizationalUnits?.length == 1">
+                {{selectedOrganizationalUnit?.name}}
+              </h5>
+              <h5 *ngIf="organizationalUnits?.length > 1">
+                Personas
+              </h5>
+            </div>
+          </div>
+          <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-caret-down">
+          </mat-icon>
+          <mat-select class="invisible-item" #selectView (click)="$event.stopPropagation()" [(ngModel)]="selectedView">
+            <mat-option *ngFor="let view of views" [value]="view" (click)="changeView(view)"
+              [disabled]="view.key === selectedView.key">
+              {{view.key}}
+            </mat-option>
+          </mat-select>
+        </div>
+      </div>
+    </div>
+    <!-- Search -->
+    <div class="search-container">
+      <div class="search" fxLayout="row" fxLayoutAlign="start center" fxFlex="100">
+        <div class="content" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px" fxFlex="100">
+          <mat-icon class="fa" fontSet="fal" fontIcon="fa-search">
+          </mat-icon>
+          <input id="employeeFind_searchField" type="search" [(ngModel)]="filterName" placeholder="Buscar Empleados"
+            (keydown.enter)="filteredSearch()" />
+          <button *ngIf="!showDetail" mat-button color="primary" [matMenuTriggerFor]="menu"
+            [disabled]="!selectedOrganizationalUnit">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-caret-down">
+            </mat-icon>
+            Búsqueda Avanzada
+          </button>
+          <button id="employeeFind_advancedSearchBtn" *ngIf="showDetail" mat-icon-button color="primary"
+            [matMenuTriggerFor]="menu" title="Búsqueda Avanzada" [disabled]="!selectedOrganizationalUnit">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-caret-down">
+            </mat-icon>
+          </button>
+          <button [disabled]="loading" mat-icon-button title="Ver Guía de Búsqueda" [matMenuTriggerFor]="menuHelp"
+            *ngIf="!showDetail">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-question-circle"></mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- LOADER -->
+  <div class="load-window new" *ngIf="loading && !employees?.length">
+    <mat-progress-spinner mode="indeterminate" color="primary">
+    </mat-progress-spinner>
+  </div>
+  <!-- helper -->
+  <div class="helper" fxLayout="row" fxLayoutAlign="space-between center" *ngIf="employees?.length">
+    <!-- hint -->
+    <mat-hint fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="space-between center">
+      <!-- ACTUALIZAR -->
+      <button mat-icon-button [ngClass]="loading ? 'no-clickable' : ''" (click)='search(true)' title="Actualizar Listado" [disabled]="loading">
+        <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-redo"></mat-icon>
+      </button>
+      <h4 *ngIf="!loading" name="lbl_TotEmpleadosBusqueda">
+        {{itemsCount >= 2 ? itemsCount + ' Empleados encontrados': '1 Empleado encontrado'}}
+      </h4>
+      <h4 *ngIf="loading">Cargando...</h4>
+    </mat-hint>
+    <!-- actions -->
+    <div class="actions" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+    <!-- BULK-RENEW-CERTIFICATE-MASSIVE -->
+    <button mat-icon-button
+    *ngIf = "selectedOrganizationalUnit.useRenewCertificate && showDetail && !isEmployeeSelected() && (isRRHH || isRRHHAdmin || isAdministrator) && !onlyisLeaveApprove()"
+    (click) = "renewMasiveCertificate()"
+    title="Renovación Masiva de Certificados" [disabled]="loading">
+
+    <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+      <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-fingerprint">
+      </mat-icon>
+
+    </div>
+    </button>
+    <button mat-stroked-button
+    *ngIf="selectedOrganizationalUnit.useRenewCertificate && !showDetail  && !isEmployeeSelected() && (isRRHH || isRRHHAdmin || isAdministrator)"
+    (click) = "renewMasiveCertificate()"
+    color="primary" [disabled]="loading">
+    <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-fingerprint">
+    </mat-icon>
+    Renovación Masiva de Certificados
+    </button>
+      <!-- BULK-PENDING-NOTIFICATION -->
+      <button mat-icon-button
+      *ngIf="(showDetail && !isEmployeeSelected() && (isRRHH || isRRHHAdmin) && useMassivePendingNotification) && !onlyisLeaveApprove()"
+      (click)="notifyMassive()" title="Notificar Pendientes"
+      [disabled]="loading || !showNotifyPendingButton"
+      matTooltip="La notificación masiva ya ha sido enviada el dia de hoy. Por favor, espere 24Hs para enviarla nuevamente"
+      [matTooltipDisabled]="showNotifyPendingButton">
+      <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+          <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-exclamation"></mat-icon>
+      </div>
+    </button>
+    <button mat-stroked-button
+      *ngIf="(!showDetail && !isEmployeeSelected() && (isRRHH || isRRHHAdmin) && useMassivePendingNotification) && !onlyisLeaveApprove()"
+      (click)="notifyMassive()" color="primary"
+      [disabled]="loading || !showNotifyPendingButton"
+      matTooltip="La notificación masiva ya ha sido enviada el dia de hoy. Por favor, espere 24Hs para enviarla nuevamente"
+      [matTooltipDisabled]="showNotifyPendingButton">
+      <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-exclamation"></mat-icon>
+      Notificar Pendientes
+    </button>
+      <!-- BULK-CERTIFICATE-DECLARATION -->
+      <button mat-icon-button *ngIf="(showDetail && showCertDec) && !onlyisLeaveApprove()" (click)="openCertificateDeclaration()"
+        title="Declarar Certificado" [disabled]="loading">
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-fingerprint" color="accent"></mat-icon>
+      </button>
+      <button mat-stroked-button *ngIf="(!showDetail && showCertDec) && !onlyisLeaveApprove()" (click)="openCertificateDeclaration()"
+        color="accent" [disabled]="loading">
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-fingerprint">
+        </mat-icon>
+        Declarar Certificado
+      </button>
+      <!-- BULK-SEND-PENDING-WELCOME -->
+      <button mat-icon-button
+        *ngIf="showDetail && (!isEmployeeSelected() && pendingUsers > 0 && isAdministrator) && !hasFiltersMetadataEMPLOYEE"
+        (click)="sendPendingWelcome()" [title]="useSaml ? 'Habilitar empleados' : 'Enviar Mail de Bienvenida'"
+        [disabled]="clickOnce">
+        <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+          <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-envelope">
+          </mat-icon>
+          <mat-icon class="fa-lg complex" fontSet="fas" fontIcon="fa-share">
+          </mat-icon>
+        </div>
+      </button>
+      <button mat-stroked-button
+        *ngIf="(!showDetail  && (!isEmployeeSelected() && pendingUsers > 0 && isAdministrator) && !hasFiltersMetadataEMPLOYEE) && !onlyisLeaveApprove()"
+        (click)="sendPendingWelcome()" color="primary" [disabled]="loading">
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-envelope">
+        </mat-icon>
+        {{ useSaml ? 'Habilitar empleados' : 'Enviar Bienvenida'}}
+      </button>
+      <!-- BULK-RE-SEND-PENDING-WELCOME -->
+      <button mat-icon-button
+        *ngIf="(showDetail && (!isEmployeeSelected() && neverLoggedInUsers > 0 && isAdministrator) && !hasFiltersMetadataEMPLOYEE) && !onlyisLeaveApprove()"
+        (click)="sendPendingWelcome(NeverLoggedIn)" title="Reenviar Mail de Bienvenida" [disabled]="loading">
+        <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+          <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-envelope">
+          </mat-icon>
+          <mat-icon class="fa-lg complex" fontSet="fas" fontIcon="fa-share-all">
+          </mat-icon>
+        </div>
+      </button>
+      <button mat-stroked-button
+        *ngIf="(!showDetail  && (!isEmployeeSelected() && neverLoggedInUsers > 0 && isAdministrator) && !hasFiltersMetadataEMPLOYEE) && !onlyisLeaveApprove()"
+        (click)="sendPendingWelcome(NeverLoggedIn)" color="primary" [disabled]="loading">
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-envelope">
+        </mat-icon>
+        Reenviar Bienvenida
+      </button>
+      <!-- BULK-EXPORT-LIST -->
+      <button mat-icon-button *ngIf="(showDetail && !isEmployeeSelected()) && !onlyisLeaveApprove()" (click)="exportAll()"
+        title="Exportar Listado a Excel" [disabled]="loading">
+        <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+          <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-file-spreadsheet">
+          </mat-icon>
+          <mat-icon class="fa-lg complex" fontSet="fas" fontIcon="fa-download">
+          </mat-icon>
+        </div>
+      </button>
+      <button mat-stroked-button *ngIf="(!showDetail && !isEmployeeSelected()) && !onlyisLeaveApprove()" (click)="exportAll()" color="primary"
+        [disabled]="loading">
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-file-spreadsheet">
+        </mat-icon>
+        Exportar Listado
+      </button>
+      <!-- BULK-EXPORT-SELECTED -->
+      <button mat-icon-button *ngIf="showDetail && isEmployeeSelected()" (click)="exportSelected()"
+        title="Exportar Seleccionados a Excel" [disabled]="loading">
+        <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+          <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-file-spreadsheet">
+          </mat-icon>
+          <mat-icon class="fa-lg complex" fontSet="fas" fontIcon="fa-download" color="accent">
+          </mat-icon>
+        </div>
+      </button>
+      <button mat-stroked-button *ngIf="(!showDetail && isEmployeeSelected()) && !onlyisLeaveApprove()" (click)="exportSelected()" color="accent"
+        [disabled]="loading">
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-file-spreadsheet">
+        </mat-icon>
+        Exportar Seleccionados
+      </button>
+      <!-- paginator -->
+      <app-cs-paginator [hidden]="employees?.length == 0" [pageCount]="itemsCount" [(pageIndex)]="pageIndex"
+        (pageChanged)="selectedPageChanged($event)">
+      </app-cs-paginator>
+    </div>
+    <mat-progress-bar mode="indeterminate" *ngIf="loading"></mat-progress-bar>
+  </div>
+  <!-- Empty (app chapa) -->
+  <ng-container *ngIf="!loading && employees?.length == 0">
+    <app-chapa [className]="'info-empty'" [icon]="'fa-meh'" [text]="'¡Ups! No hay Empleados aquí...'"
+      [subText]="organizationalUnits?.length > 1 ? 'Intenta hacer otra Búsqueda o prueba con otra Empresa' : 'Intenta hacer otra Búsqueda'">
+    </app-chapa>
+  </ng-container>
+  <!-- EMPLOYEE-SEARCH-TABLE -->
+  <div class="new-table w-main-action" [hidden]="!employees?.length">
+    <div class="mat-table">
+      <!-- EMPLOYEE-SEARCH-TABLE_HEAD -->
+      <div class="mat-header-row sticky" fxLayout="row" fxLayoutAlign="start center">
+        <div class="mat-header-cell w-1" fxLayout="row" fxLayoutAlign="center center">
+          <mat-checkbox [(ngModel)]="allSelected" (ngModelChange)="selectAllToogle()"></mat-checkbox>
+        </div>
+        <div class="w-12 multiple-selection dynamic-table" fxLayout="row" fxLayoutAlign="start center">
+          <div *ngFor="let column of columns" class="mat-header-cell " [ngClass]="'w-' + columnsClass" fxLayout="row"
+            fxLayoutAlign="start center" title="Ordenar por {{column.value.metadataLabel}}">
+            <div class="sorteable" fxLayout="row" fxLayoutAlign="start center" (click)="sortColumn(column.key)">
+              <span>{{column.value.metadataLabel}}</span>
+              <mat-icon [hidden]="orderBy === 'm.' + column.key" class="fal indication" fxLayout="row"
+                fxLayoutAlign="center center" fontSet="fal" fontIcon="fa-sort-alt"></mat-icon>
+              <div class="sort-icon" *ngIf="orderBy === 'm.' + column.key">
+                <mat-icon *ngIf="!orderAsc" class="fa" fontSet="fal" fontIcon="fa-arrow-down"></mat-icon>
+                <mat-icon *ngIf="orderAsc" class="fa" fontSet="fal" fontIcon="fa-arrow-up"></mat-icon>
+              </div>
+            </div>
+          </div>
+          <!-- col-select -->
+          <button class="col-selector" mat-icon-button [matMenuTriggerFor]="menuColSelect" title="Seleccionar Columnas"
+            *ngIf="(availableColumns?.length > 0) && !onlyisLeaveApprove()" [disabled]="loading">
+            <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+              <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-columns">
+              </mat-icon>
+              <mat-icon class="fa-lg complex" fontSet="fas" fontIcon="fa-eye">
+              </mat-icon>
+            </div>
+          </button>
+        </div>
+      </div>
+      <!-- EMPLOYEE-SEARCH-TABLE-ROWS -->
+      <div [id]="'employeeListRow'+i" class="mat-row" matRipple *ngFor="let emp of employees; let i= index"
+        fxLayout="row" fxLayoutAlign="start center"
+        [ngClass]="{'active': emp == selectedEmployee, 'selected': emp.selected, 'disabled': emp.getEmployeeClass() }">
+        <div [ngClass]="{'turn': emp.selected}" class="mat-cell w-1 off" fxLayout="row" fxLayoutAlign="center center">
+          <ngx-avatar (click)="checkEmployee(emp)" [name]="emp.lastName + ' ' + emp.name" [src]=" emp.preview" size="30"
+            [round]="true">
+          </ngx-avatar>
+          <mat-checkbox [(ngModel)]="emp.selected" (ngModelChange)="selectedChange()"></mat-checkbox>
+        </div>
+
+        <div class="w-12 multiple-selection dynamic-table w-sticky" fxLayout="row" fxLayoutAlign="start center" [ngClass]="loading ? 'no-clickable' : ''"
+          (click)="selectEmployee(emp)">
+          <div *ngFor="let column of columns" [ngClass]="'mat-cell w-' + columnsClass" fxLayoutAlign="start center"
+            [title]="emp.getMetadataValue(column.key)">
+            <ng-container [ngSwitch]="column.value.metadataType">
+              <span *ngSwitchCase="'date'">
+                {{ emp.getMetadataValue(column.key)}}
+              </span>
+              <span *ngSwitchCase="'period'">
+                {{ emp.getMetadataValue(column.key) | mask :'9999/99' }}
+              </span>
+              <span *ngSwitchCase="'comboKV'">
+                {{ emp.getMetadataValue(column.key) | ComboKv : column.value.optionValues }}
+              </span>
+              <span *ngSwitchDefault>
+                <ng-container *ngIf="!column.value.metadataMask">
+                  {{ emp.getMetadataValue(column.key)}}
+                </ng-container>
+                <!-- La siguiente mascara, se pone para que funcione cuando viene id Fiscal, con mascaras dinamicas de dos valores -->
+                <ng-container *ngIf="column.value.metadataMask">
+                  {{ emp.getMetadataValue(column.key) | mask:
+                  column.value.metadataMask.split("||")[column.value.metadataMask.split("||").length-1] }}
+                </ng-container>
+              </span>
+            </ng-container>
+          </div>
+        </div>
+        <div class="mat-cell sticky-actions" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+          <button name="btn_LeaveDraft" *ngIf="(isLeaveApprove && !hasAdjetivation && !allAdjetivationEmployee) && emp.state === ACTIVE && emp.hasLeaveConfig" mat-icon-button
+          title="Nueva Solicitud" (click)="createRequestLeaveDraft(emp)">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-calendar"></mat-icon>
+          </button>
+          <button name="btn_verDocumentacion"  mat-icon-button title="Ver Documentación" *ngIf="showFolderIcon"
+            (click)="gotoEmployeeDocumentView(emp)">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-folder">
+            </mat-icon>
+          </button>
+          <button name="btn_CargarDocumentacion" *ngIf="isRRHH && emp.state === ACTIVE" mat-icon-button
+            title="Cargar documentación" (click)="createDocumentation(emp)">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-file-upload"></mat-icon>
+          </button>
+          <button name="btn_Desactivar" *ngIf="emp.state === ACTIVE && isAdministrator" mat-icon-button
+            title="Desactivar" (click)="disableEmployee(emp)">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-user-slash"></mat-icon>
+          </button>
+          <button name="btn_Activar" *ngIf="emp.state !== ACTIVE && isAdministrator" mat-icon-button title="Activar"
+            (click)="enableEmployee(emp)">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-user">
+            </mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ADD-PERSON -->
+  <div id="employeeFind_newEmployeeBtn" class="main-action" fxLayout="row" fxLayoutAlign="center center"
+    *ngIf="isAdministrator || employeeManagement">
+    <button mat-raised-button class="main-btn" color="accent" (click)="showAddPerson()" [disabled]="loading">
+      <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-plus">
+      </mat-icon>
+      Nuevo Empleado
+    </button>
+  </div>
+</div>
+<!-- DETAILS -->
+<div class="new-detail-container" fxLayout="column" fxFill [ngClass]="{'cancelled':!selectedEmployee?.isActive}">
+  <!-- APP EMPLOYEE-DETAILS-->
+  <app-employee-detail [selectedEmployee]="selectedEmployee" (refreshGrid)="search($event)"
+    (updatePreview)="updatePreview($event)" (detailClose)="toggleEmployeeDetail()"></app-employee-detail>
+</div>
+
+<!-- APP SEARCH MENU -->
+<mat-menu #menu="matMenu" xPosition="before" yPosition="below" class="menu-options mat-card">
+  <div class="container" (click)="$event.stopPropagation()" fxLayout="column" fxLayoutAlign="start stretch">
+    <app-advanced-employee-search [filters]="employeeFilters" [containerType]="containerType"
+      (OnFilter)="!errorStatus() && !errorSignCondition()  ? filteredSearch() : false">
+    </app-advanced-employee-search>
+    <div class="slide-group" fxLayout="column" fxLayoutAlign="start stretch">
+      <div class="title" [ngClass]="{'mat-error': errorStatus()}" fxLayout="row" fxLayoutAlign="start center"
+        fxLayoutGap="16px">
+        <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+          <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-folder">
+          </mat-icon>
+          <mat-icon class="fa-lg complex" fontSet="fas" fontIcon="fa-heart-rate">
+          </mat-icon>
+        </div>
+        <div fxLayout="column">
+          <h4>Estado del Legajo</h4>
+          <h6 *ngIf="!errorStatus()">
+            {{activeEmployees && inactiveEmployees ? 'Buscar Todos' : (activeEmployees ? 'Buscar sólo los Activos' :
+            'Buscar sólo los Inactivos' )}}
+          </h6>
+          <h6 *ngIf="errorStatus()">{{errorStatus() ?'Selecciona una opción': ''}}</h6>
+        </div>
+      </div>
+      <mat-slide-toggle (click)="$event.stopPropagation()" [(ngModel)]="activeEmployees">
+        Activo
+      </mat-slide-toggle>
+      <mat-slide-toggle (click)="$event.stopPropagation()" [(ngModel)]="inactiveEmployees">
+        Inactivo
+      </mat-slide-toggle>
+    </div>
+    <div class="slide-group" fxLayout="column" fxLayoutAlign="start stretch">
+      <div class="title" [ngClass]="{'mat-error': errorSignCondition()}" fxLayout="row" fxLayoutAlign="start center"
+        fxLayoutGap="16px">
+        <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+          <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-fingerprint">
+          </mat-icon>
+          <mat-icon class="fa-lg complex" fontSet="fas" fontIcon="fa-traffic-light">
+          </mat-icon>
+        </div>
+        <div fxLayout="column">
+          <h4>Condición de Firma</h4>
+          <h6 *ngIf="!errorSignCondition() ">
+            {{withActiveCertificate && withPendingCertificate && withoutCertificate ? 'Buscar Todas' :
+            (withActiveCertificate && withPendingCertificate ? 'Buscar Todos excepto Inhabilitados' :
+            (withPendingCertificate &&withoutCertificate ? 'Buscar Todos excepto Habilitados'
+            : (withActiveCertificate && withoutCertificate ? 'Buscar Todos excepto Pendientes': (withPendingCertificate
+            ? 'Buscar sólo Pendientes': (withActiveCertificate ? 'Buscar sólo Habilitados':'Buscar sólo Inhabilitados'
+            )))))}}
+          </h6>
+          <h6 *ngIf="errorSignCondition()">{{errorSignCondition() ?'Selecciona una opción': ''}}</h6>
+        </div>
+      </div>
+      <mat-slide-toggle (click)="$event.stopPropagation()" [(ngModel)]="withActiveCertificate">
+        Habilitada
+      </mat-slide-toggle>
+      <mat-slide-toggle (click)="$event.stopPropagation()" [(ngModel)]="withPendingCertificate">
+        Pendiente
+      </mat-slide-toggle>
+      <mat-slide-toggle (click)="$event.stopPropagation()" [(ngModel)]="withoutCertificate">
+        Inhabilitada
+      </mat-slide-toggle>
+    </div>
+
+    <div class="slide-group" fxLayout="column" fxLayoutAlign="start stretch">
+      <div class="title" [ngClass]="{'mat-error': errorFilterLogin()}" fxLayout="row" fxLayoutAlign="start center"
+        fxLayoutGap="16px">
+        <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+          <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-user">
+          </mat-icon>
+          <mat-icon class="fa-lg complex" fontSet="fas" fontIcon="fa-sign-in-alt">
+          </mat-icon>
+        </div>
+        <div fxLayout="column">
+          <h4>Acceso a Humanage</h4>
+          <h6 *ngIf="!errorFilterLogin()">
+            {{hasLoginFilter && hasNotLoginFilter ? 'Buscar Todos' : (hasLoginFilter ? 'Buscar sólo los que ingresaron'
+            : 'Buscar sólo los que no ingresaron' )}}
+          </h6>
+          <h6 *ngIf="errorFilterLogin()">{{errorFilterLogin() ?'Selecciona una opción': ''}}</h6>
+        </div>
+      </div>
+      <mat-slide-toggle (click)="$event.stopPropagation()" [(ngModel)]="hasLoginFilter">
+        Ingresaron
+      </mat-slide-toggle>
+      <mat-slide-toggle (click)="$event.stopPropagation()" [(ngModel)]="hasNotLoginFilter">
+        No ingresaron
+      </mat-slide-toggle>
+    </div>
+  </div>
+  <div class="footer" fxLayout="row-reverse" fxLayoutAlign="start center" fxLayoutGap="16px">
+    <button [disabled]="errorStatus() || errorSignCondition() || errorFilterLogin()" mat-raised-button color="primary"
+      (click)="filteredSearch()">Buscar</button>
+    <button mat-button>Cerrar</button>
+    <div fxFlex></div>
+    <button (click)="cleanFilters();$event.stopPropagation()" color="primary" mat-raised-button>Limpiar Filtros</button>
+  </div>
+</mat-menu>
+<!-- COLUMN SELECTOR -->
+<mat-menu #menuColSelect="matMenu" xPosition="before" yPosition="below" class="menu-options mat-card">
+  <div class="container col-sel" fxLayout="column" (click)="$event.stopPropagation()">
+    <div class="title" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+      <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-columns">
+        </mat-icon>
+        <mat-icon class="fa-lg complex" fontSet="fas" fontIcon="fa-eye">
+        </mat-icon>
+      </div>
+      <div fxLayout="column">
+        <h4>Elige Datos para Ver y Exportar</h4>
+        <h6>Hasta 6 Datos para Ver, sin límite para la Exportación</h6>
+      </div>
+    </div>
+    <div class="slide-group" fxLayout="column" fxLayoutAlign="start stretch">
+      <mat-list>
+        <mat-list-item *ngFor="let col of availableColumns">
+          <div mat-list-icon class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+            <mat-icon [ngClass]="{'disabled' : !isColumnSelected(col)}" fxLayout="row" fxLayoutAlign="center center"
+              class="fa-lg" fontSet="fas" fontIcon="fa-eye">
+            </mat-icon>
+            <mat-icon [ngClass]="{'disabled' : !isExportColumnSelected(col)}" fxLayout="row"
+              fxLayoutAlign="center center" class="fa-lg complex" fontSet="fas" fontIcon="fa-file-spreadsheet">
+            </mat-icon>
+          </div>
+          <h4 matLine><b>{{col.metadataLabel}}</b></h4>
+          <span matLine [ngClass]="{'disabled' : !isColumnSelected(col)}">{{!isColumnSelected(col) ?
+            'Oculto':'Visible'}}</span>
+          <span matLine [ngClass]="{'disabled' : !isExportColumnSelected(col)}">{{!isExportColumnSelected(col) ?
+            'Exportación Inhabilitada':'Exportación Habilitada'}}</span>
+          <button [color]="isColumnSelected(col) ? 'primary' : ''" mat-icon-button title="Mostrar Columna"
+            [disabled]="columns?.length > 5 && !isColumnSelected(col)" (click)="selectColumn(col)">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-eye">
+            </mat-icon>
+          </button>
+          <button [color]="isExportColumnSelected(col) ? 'primary' :'' " mat-icon-button title="Exportar Columna"
+            (click)="selectExportColumn(col)">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-file-spreadsheet">
+            </mat-icon>
+          </button>
+        </mat-list-item>
+      </mat-list>
+    </div>
+  </div>
+  <div class="footer" fxLayout="row-reverse" fxLayoutAlign="start center" fxLayoutGap="16px">
+    <button mat-button>Ocultar</button>
+  </div>
+</mat-menu>
+<!-- APP SEARCH HELP -->
+<mat-menu #menuHelp="matMenu" yPosition="below" class="menu-options help mat-card">
+  <div class="container">
+    <div class="title" fxLayout="row" fxLayoutAlign="space-between center">
+      <span fxLayout="column">
+        <h6>Guía y Ejemplos de Uso</h6>
+        <h4 class="primary">Cómo funciona la búsqueda: Buscar Personas</h4>
+      </span>
+      <button mat-icon-button title="Ocultar Guía">
+        <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times">
+        </mat-icon>
+      </button>
+    </div>
+    <div class="slide-group">
+      <mat-accordion (click)="$event.stopPropagation()">
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <h4>Podés buscar por apellido y/o nombre.</h4>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <ul style="margin-top:16px">
+            <li>
+              <i>Si ingresas <b>José</b> encontrarás a las personas <b>con este apellido o nombre</b>.</i>
+            </li>
+            <li>
+              <i>Si ingresas <b>José Ignacio Salinas</b> encontrarás a las personas cuyo <b>apellido y/o
+                  nombre
+                  contengan alguna de las palabras</b> ingresadas.</i>
+            </li>
+          </ul>
+        </mat-expansion-panel>
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <h4>Podés buscar por número de legajo ingresando cifras de hasta 6 dígitos, o podés usar "n:" para
+                encontrar legajos de cualquier largo; además la "L:" (sea mayúscula o minúscula) interpretará cualquier
+                número que le siga como
+                un Legajo.
+              </h4>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <ul style="margin-top:16px">
+            <li>
+              <i>Si ingresas <b>000001</b> o <b>n:000001</b>, encontrarás a la persona <b> con este legajo</b>.</i>
+            </li>
+            <li>
+              <i>Si ingresas <b>000001 000012</b> o <b>n:000001 n:000012</b>, encontrarás a las personas cuyos
+                <b>legajos</b> se
+                encuentren dentro
+                <b>del rango ingresado</b>.</i>
+            </li>
+            <li>
+              <i>Si ingresas <b>000001 000006 000012</b> o <b>n:000001 n:000006 n:000012</b>, encontrarás a las personas
+                con <b>cada uno de
+                  estos
+                  legajos</b>.</i>
+            </li>
+            <li>
+              <i>Si ingresas <b>l:000001 000006 000012</b>, encontrarás a las personas <b>con cada
+                  uno de estos legajos</b>.</i>
+            </li>
+          </ul>
+        </mat-expansion-panel>
+        <mat-expansion-panel hideToggle="true">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <h4>Podés buscar por correo electrónico ingresando el dominio completo (persona@organizacion.com).
+              </h4>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+        </mat-expansion-panel>
+        <mat-expansion-panel hideToggle="true">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <h4>Podés buscar por el Identificador Fiscal ingresando una cifra a partir de 7 dígitos.</h4>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+        </mat-expansion-panel>
+      </mat-accordion>
+      <div class="title" fxLayout="row" fxLayoutAlign="space-between center">
+        <span fxLayout="column">
+          <h6>* Nota:</h6>
+          <h4 class="accent">¡Todos los casos de Búsqueda anteriormente mencionados son combinables!</h4>
+        </span>
+      </div>
+    </div>
+  </div>
+</mat-menu>

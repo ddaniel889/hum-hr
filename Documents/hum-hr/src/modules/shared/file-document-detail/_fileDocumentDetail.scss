@@ -1,0 +1,188 @@
+@import "../../../../assets/styles/img-management";
+
+app-file-document-detail {
+  display: block;
+  height: 100%;
+}
+
+.actions-footer-wrapper {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  margin: 0;
+}
+
+.actions-footer-container {
+  width: 100%;
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: center !important;
+  align-items: flex-end !important;
+  padding-bottom: 0;
+  pointer-events: none;
+
+  app-file-document-sign,
+  app-file-document-query {
+    pointer-events: all;
+    display: block;
+    transition: all 0.3s ease;
+    flex: 0 1 auto;
+    width: auto;
+    max-width: 100%;
+  }
+  &.flow-active {
+    app-file-document-sign,
+    app-file-document-query {
+      flex: 1;
+      width: 100%;
+    }
+  }
+  app-file-document-sign + app-file-document-query {
+    margin-left: 16px;
+  }
+}
+
+.upload-warning {
+  height: 100% !important;
+}
+
+.view-toolbar {
+  padding-left: 8px;
+
+  & + .view-content {
+    display: block;
+    height: calc(100% - 65px);
+  }
+
+  mat-toolbar-row {
+    display: grid;
+    grid-template-columns: minmax(0px, 1fr) auto;
+    grid-template-areas: "content sidebar ";
+
+    .view-description {
+      padding-right: 16px;
+      grid-area: content;
+      display: flex;
+      align-items: center;
+
+      mat-icon.mat-icon {
+        margin-right: 16px;
+      }
+
+      .view-description-text {
+        width: calc(100% - 56px);
+
+        h3 {
+          font-size: 20px;
+          line-height: 1.25;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          width: 100%;
+        }
+
+        h5 {
+          font-size: 12px;
+          line-height: 1.25;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          width: 100%;
+        }
+      }
+    }
+
+    .view-actions {
+      grid-area: sidebar;
+
+      .divider-vert {
+        margin: 0 16px;
+      }
+    }
+  }
+}
+
+.view-container {
+  display: block;
+  height: 100%;
+
+  .view-toolbar {
+    padding-left: 8px;
+
+    & + .view-content {
+      display: block;
+      height: calc(100% - 65px);
+    }
+
+    mat-toolbar-row {
+      display: grid;
+      grid-template-columns: minmax(0px, 1fr) auto;
+      grid-template-areas: "content sidebar ";
+
+      .view-description {
+        padding-right: 16px;
+        grid-area: content;
+        display: flex;
+        align-items: center;
+
+        mat-icon.mat-icon {
+          margin-right: 16px;
+        }
+
+        .view-description-text {
+          width: calc(100% - 56px);
+
+          h3 {
+            font-size: 20px;
+            line-height: 1.25;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            width: 100%;
+          }
+
+          h5 {
+            font-size: 12px;
+            line-height: 1.25;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            width: 100%;
+          }
+        }
+      }
+
+      .view-actions {
+        grid-area: sidebar;
+
+        .divider-vert {
+          margin: 0 16px;
+        }
+      }
+    }
+  }
+
+  .view-content {
+    display: block;
+    height: 100%;
+
+    .toggle-buttons-container {
+      height: 64px;
+      padding: 0 8px;
+    }
+  }
+}
+
+@mixin fileDocumentDetail($divider) {
+  .view-container {
+    .view-toolbar {
+      border-bottom: 1px solid $divider;
+    }
+  }
+}

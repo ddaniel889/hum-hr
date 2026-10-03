@@ -1,0 +1,52 @@
+<div class="related-dialog-container" >
+  <ng-container *ngIf="(loadingState$ | async) as state">
+    <!-- Loading -->
+    <div *ngIf="state.isLoading && !state.process">
+      <mat-progress-spinner mode="indeterminate" color="primary">
+      </mat-progress-spinner>
+    </div>
+
+    <ng-container *ngIf="state.process as process">
+      <div class="data">
+        <!-- Title -->
+        <div class="title-box" mat-dialog-title>
+          <h1 class="title">{{ process.type | processTypeName }} de {{  data.metadata | metadataDocName }}</h1>
+          <button mat-icon-button aria-label="close dialog" (click)="onClose()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+
+        <!-- User and Date -->
+        <div mat-dialog-content class="user-date">
+          <div fxLayout="column" fxLayout.gt-xs="row" fxLayoutGap="16">
+            <div *ngIf="process.createdByUserId" class="created-by" fxLayoutAlign="start center" fxLayoutGap="8">
+              <mat-icon
+                fontSet="fa"
+                fontIcon="fa-user-circle"
+                color="primary"
+              ></mat-icon>
+              <span>Creado por {{ process.createdByUserFullname ?? process.createdByUserId }}</span>
+            </div>
+            <div class="date" fxLayoutAlign="start center" fxLayoutGap="8">
+              <mat-icon
+                fontSet="fa"
+                fontIcon="fa-calendar-day"
+                color="primary"
+              ></mat-icon>
+              <span>{{ process.created | date: 'dd MMM yyyy - H:mm' | uppercase }} hs</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stages Card -->
+        <div class="history-wrapper">
+          <app-process-stage-history-card 
+            [process]="process" 
+            [isSmall]="true"
+          ></app-process-stage-history-card>
+        </div>
+
+      </div>
+    </ng-container>
+  </ng-container>
+</div>

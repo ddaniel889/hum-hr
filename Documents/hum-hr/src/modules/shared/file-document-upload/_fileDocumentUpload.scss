@@ -1,0 +1,115 @@
+@import '../../../../assets/styles/img-management';
+
+
+app-file-document-upload {
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: auto;
+  display: flex;
+  flex: 1;
+  height: 100%;
+
+  .preview-container {
+    padding: 32px;
+    overflow: auto;
+    overflow-y: overlay;
+    height: 100%;
+    display: flex;
+    box-sizing: border-box;
+    width: 100%;
+
+
+    h4 {
+      height: 100%;
+      margin: 0;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0 20%;
+      font-weight: 400;
+    }
+
+    img {
+      width: 100%;
+      object-fit: contain;
+    }
+  }
+
+  app-upload-form {
+    height: calc(100% - 32px);
+    width: 100%;
+    margin: 16px;
+  }
+
+  .dropzone {
+    margin: 0;
+    width: 100% !important;
+    box-sizing: border-box;
+  }
+
+  &.not-visible {
+    height: 0 !important;
+    padding: 0 !important;
+  }
+
+  &+app-pdf-wrapper {
+    height: 0;
+    flex: unset;
+  }
+
+  &.not-visible+app-pdf-wrapper {
+    height: 100%;
+    flex: unset;
+  }
+}
+
+.preview-container {
+  padding: 32px;
+  overflow: auto;
+  overflow-y: overlay;
+  height: 100%;
+  display: flex;
+  box-sizing: border-box;
+
+  h4 {
+    height: 100%;
+    margin: 0;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 20%;
+    font-weight: 400;
+  }
+
+  img {
+    width: 100%;
+    object-fit: contain;
+  }
+
+  .preview-container {
+    padding: 0;
+    overflow: unset;
+  }
+}
+
+@mixin fileDocumentUpload($bg-card-side, $bg-dark-blue) {
+  app-file-document-upload {
+    .preview-container {
+      background: $bg-dark-blue !important;
+
+      h4 {
+        color: $bg-card-side;
+      }
+    }
+  }
+
+  .preview-container {
+    background: $bg-dark-blue !important;
+
+    h4 {
+      color: $bg-card-side;
+    }
+  }
+}

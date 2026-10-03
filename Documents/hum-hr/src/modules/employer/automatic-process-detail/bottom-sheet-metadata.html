@@ -1,0 +1,28 @@
+<mat-toolbar color="grey">
+    <mat-toolbar-row>
+        <div class="toolbar-line" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+            <div class="mat-avatar" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                <mat-icon  class="fa-lg" fontSet="fa" fontIcon="fa-file-alt">
+                </mat-icon>
+                <div class="title" fxLayout="column" fxLayoutAlign="center start">
+                    <h3 matLine> {{this.data.documentationTypeSelected.description}} </h3>
+                    <h5 matLine> Id: {{data.processId}} - Fecha Documento: {{ data.processCreationDate | date :'dd/MM/yyyy' }}</h5>
+                </div>
+            </div>
+            <button mat-icon-button (click)="cancel()" title="Descargar">
+                <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+            </button>
+        </div>
+    </mat-toolbar-row>
+</mat-toolbar>
+<div fxLayout="column" fxLayoutGap="16px" fxLayoutAlign="center stretch">
+    <mat-list>
+        <h3 mat-subheader>Datos</h3>
+        <mat-list-item *ngFor="let metadata of getMetadataAditional(data.metadatas)">
+            <p matLine>{{metadata.metadataLabel}}</p>            
+            <h3 matLine *ngIf="metadata.metadataType ==='date'">{{metadata.metadataValue | date :'dd/MM/yyyy'}}</h3>
+            <h3 matLine *ngIf="metadata.metadataType ==='period'">{{formatMetadata(metadata) | date :'MMMM yyyy'}}</h3>
+            <h3 matLine *ngIf="metadata.metadataType !=='date' && metadata.metadataType !== 'period'">{{formatMetadata(metadata)}}</h3>            
+        </mat-list-item>        
+    </mat-list>
+</div>

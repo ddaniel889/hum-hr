@@ -1,0 +1,69 @@
+<mat-card class="process-card mat-elevation-z0" matRipple>
+  <mat-card-subtitle>
+    <div class="creation-date">
+      <span>{{ process?.created | date : "dd MMM yyyy" | uppercase }}</span>
+      <span>&nbsp;- {{ process?.created | date : "H:mm" | uppercase }} hs</span>
+    </div>
+  </mat-card-subtitle>
+  <mat-card-title>
+    <div
+      class="truncate-two-lines"
+      [matTooltip]="process?.metadata | metadataDocName"
+    >
+      {{ process?.metadata | metadataDocName }}
+    </div>
+  </mat-card-title>
+  <mat-card-content>
+    <div class="grow-container">
+      <div class="stages-container">
+        <ng-container
+          *ngFor="let stage of process.stageHistory; let last = last"
+        >
+          <div
+            class="stage"
+            [ngClass]="{
+              completed: stage.isFinished,
+              'on-going': stage.started && !stage.isFinished,
+              pending: !stage.started && !stage.isFinished,
+              'has-error': stage.totalErrors
+            }"
+            [matTooltip]="stage.code | processStageName : process.type"
+          >
+            <div class="icon-container">
+              <mat-icon
+                *ngIf="stage.started"
+                class="stage-icon"
+                fontSet="fas"
+                [fontIcon]="
+                  !stage.isFinished
+                    ? 'fa-hourglass-end'
+                    : stage.totalErrors
+                    ? 'fa-times'
+                    : 'fa-check'
+                "
+                [ngClass]="{
+                  'fa-fade': stage.started && !stage.isFinished
+                }"
+              ></mat-icon>
+            </div>
+          </div>
+        </ng-container>
+
+      </div>
+      <div class="current-stage-name">
+        {{ process.currentStage?.code | processStageName : process.type }}...
+      </div>
+    </div>
+    <div class="card-messages">
+      <div class="message warnings-count" *ngIf="process?.totalWarnings">
+        <mat-icon
+          class="fa-solid text-atention"
+          fontSet="fas"
+          fontIcon="fa-triangle-exclamation"
+        ></mat-icon>
+        <span>{{ process.totalWarnings }} actividades pendientes</span>
+      </div>
+    </div>
+  </mat-card-content>
+  <mat-card-footer></mat-card-footer>
+</mat-card>

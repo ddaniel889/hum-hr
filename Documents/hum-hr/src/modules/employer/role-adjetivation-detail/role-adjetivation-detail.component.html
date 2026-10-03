@@ -1,0 +1,116 @@
+<!-- Filtro de carpeta -->
+<div [class]="rol.enabled ? 'line editable': 'line'" fxLayout="row" fxLayoutAlign="space-between start"
+*ngIf="rol && rol.filtersAvaliable && selectedEditingControl !== 'employeeFolder' && rol.roleName != 'FIRMANTE'">
+<div class="header" fxLayout="row" fxLayoutGap="16px">
+  <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+    <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-folder-open">
+    </mat-icon>
+    <mat-icon class="fa-lg complex" fontSet="fas" fontIcon="fa-filter">
+    </mat-icon>
+  </div>
+  <div class="info" fxLayout="column" fxLayoutAlign="center start">
+    <h6>Filtros para Legajo</h6>
+    <h4 *ngIf="rol?.filters.length === 0">Todos Habilitados</h4>
+    <ng-container *ngIf="rol?.filters.length > 0">
+      <ul *ngFor="let filter of rol?.filters">
+        <li>
+          <h4>
+            {{filter.name}}
+          </h4>
+          <ul>
+            <li *ngFor="let meta of filter.values">
+              {{meta}}
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </ng-container>
+  </div>
+</div>
+<button *ngIf="rol.enabled" mat-icon-button fxLayout="row" fxLayoutAlign="center center"
+  (click)="editControl('employeeFolder')">
+  <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-pen">
+  </mat-icon>
+</button>
+</div>
+<div class="edition-line" *ngIf="selectedEditingControl === 'employeeFolder' && !isAdjetiveSigner">
+<div fxLayout="column">
+  <mat-checkbox [checked]="allFilters" (change)="toggleAllFilters()">Habilitar Todos*
+  </mat-checkbox>
+  <ng-container *ngFor="let meta of metadataFilters">
+    <app-autocomplete-chip [originalList]="meta.filters" [showIcons]="true" [iconName]="'fa-filter'"
+      [listView]="true" [placeHolderText]="meta.placeHolderDescription"
+      (OnItemSelected)="selectMetadata($event, meta)" (OnRemoveItem)="removeMetadata($event, meta)"
+      [selectedItemsList]="meta.selectedMetadatas" fxFlex="grow" fxLayout="row"
+      fxLayoutAlign="start center" *ngIf="!allFilters">
+    </app-autocomplete-chip>
+  </ng-container>
+  <h6 class="hint" [ngClass]="{'all' : allFilters}">
+    {{allFilters ? '*Quedan habilitados todos los Filtros para Legajo disponibles':'*Quedan habilitados
+    sólo
+    los Filtros para Legajo seleccionados'}}
+  </h6>
+</div>
+<div class="actions" fxLayout="row-reverse" fxLayoutGap="8px">
+  <button mat-button color="accent" (click)="save()" [disabled]="saving">
+    Guardar
+  </button>
+
+  <button mat-button (click)="cancel()" [disabled]="saving">
+    Cancelar
+  </button>
+</div>
+<mat-progress-bar mode="indeterminate" *ngIf="saving"> </mat-progress-bar>
+</div>
+<!-- Filtro de tipo documental -->
+<div [class]="rol.enabled ? 'line editable': 'line'" fxLayout="row" fxLayoutAlign="space-between start"
+*ngIf="rol && rol.filtersAvaliable && selectedEditingControl !== 'docTypes' && seeDocumentFilter">
+<div class="header" fxLayout="row" fxLayoutGap="16px">
+  <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+    <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-file">
+    </mat-icon>
+    <mat-icon class="fa-lg complex" fontSet="fas" fontIcon="fa-filter">
+    </mat-icon>
+  </div>
+  <div class="info" fxLayout="column" fxLayoutAlign="center start">
+    <h6>Filtros de Documentación</h6>
+    <h4 *ngIf="rol?.documentationTypes.length === 0">Todos Habilitados</h4>
+    <ul *ngIf="rol?.documentationTypes.length > 0">
+      <li *ngFor="let dt of rol?.documentationTypes">
+        <h4>
+          {{dt}}
+        </h4>
+      </li>
+    </ul>
+  </div>
+</div>
+<button  *ngIf="rol.enabled" mat-icon-button fxLayout="row" fxLayoutAlign="center center" (click)="editControl('docTypes')">
+  <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-pen">
+  </mat-icon>
+</button>
+</div>
+<div class="edition-line" *ngIf="selectedEditingControl === 'docTypes'">
+<div fxLayout="column">
+  <mat-checkbox [checked]="allDocumentations" (change)="toggleAllDocumentations()">Habilitar Todos
+  </mat-checkbox>
+  <app-autocomplete-chip [showIcons]="true" [iconName]="'fa-file'" [originalList]="documentationTypes"
+    [placeHolderText]="'Selecciona Tipos de Documentación'"
+    [selectedItemsList]="selectedDocumentationTypes" (OnItemSelected)="selectDocumentationType($event)"
+    (OnRemoveItem)="removeDocumentation($event)" fxFlex="grow" fxLayout="row"
+    fxLayoutAlign="start center" *ngIf="!allDocumentations" [listView]="true">
+  </app-autocomplete-chip>
+  <h6 class="hint" [ngClass]="{'all' : allDocumentations}">
+    {{allDocumentations ? '*Quedan habilitados todos los Filtros de Documentación disponibles':'*Quedan
+    habilitados sólo los Filtros de Documentación seleccionados'}}
+  </h6>
+</div>
+<div class="actions" fxLayout="row-reverse" fxLayoutGap="8px">
+  <button mat-button color="accent" (click)="save()" [disabled]="saving">
+    Guardar
+  </button>
+  <button mat-button (click)="cancel()" [disabled]="saving">
+    Cancelar
+  </button>
+</div>
+<mat-progress-bar mode="indeterminate" *ngIf="saving"> </mat-progress-bar>
+</div>

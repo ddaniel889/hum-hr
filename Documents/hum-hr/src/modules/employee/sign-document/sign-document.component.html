@@ -1,0 +1,124 @@
+<mat-progress-bar mode="indeterminate" [style.display]="loading ? 'block' : 'none'"></mat-progress-bar>
+<!-- accion -->
+<div *ngIf="!signing && signable" class="firmador">
+  <button mat-raised-button [disabled]="certificates.length === 0" color="accent"
+    (click)="signing=true; signingChanged.emit(true);">
+    <mat-icon fontSet="fa" fontIcon="fa-signature"></mat-icon>
+    Firmar
+  </button>
+</div>
+<!-- firmador -->
+<div class="sign-cycle" [hidden]="!signing">
+  <mat-divider [inset]="true"></mat-divider>
+  <mat-horizontal-stepper #stepper>
+    <!-- seleccion de certificado -->
+    <mat-step>
+      <div class="sign-content" fxLayout="row" fxLayoutAlign="space-between center">
+        <button mat-icon-button color="basic" (click)="signing=false; signingChanged.emit(false);">
+          <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+        </button>
+        <mat-form-field class="indications">
+          <mat-select placeholder="Seleccione su certificado" [(ngModel)]="selectedCertificate">
+            <mat-option *ngFor="let certificate of certificates" [value]="certificate">
+              {{certificate.providerDescription}}
+              <span *ngIf="certificate.expirationDate">
+                ({{certificate.expirationDate | date:'dd/MM/yyyy'}})
+              </span>
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <button mat-mini-fab fxLayout="row" fxLayoutAlign="center center" color="accent"
+          [disabled]="!selectedCertificate" matStepperNext>
+          <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-chevron-right"></mat-icon>
+        </button>
+      </div>
+    </mat-step>
+    <!-- firma conforme o disconforme -->
+    <mat-step>
+      <div class="sign-content" fxLayout="row" fxLayoutAlign="space-between center">
+        <button mat-icon-button matStepperPrevious *ngIf="certificates.length > 1">
+          <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-chevron-left"></mat-icon>
+        </button>
+        <button mat-icon-button color="basic" (click)="signing=false; signingChanged.emit(false);"
+          *ngIf="certificates.length === 1">
+          <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+        </button>
+        <div class="indications" fxLayout="column" fxLayoutAlign="center center">
+          <h2>Vamos a firmar tu recibo</h2>
+          <a *ngIf="selectedCertificate && selectedCertificate.supportDisagreement" mat-button
+            (click)="setDisagreement()">
+            <u>Firmá en disconformidad aquí</u>
+          </a>
+        </div>
+        <button mat-mini-fab fxLayout="row" fxLayoutAlign="center center" class="success" (click)="sign('C')"
+          [disabled]="loading">
+          <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-check"></mat-icon>
+        </button>
+      </div>
+    </mat-step>
+    <!-- motivos disconformidad -->
+    <mat-step *ngIf="showMotiveDisagreement && disagreementSelected">
+      <div class="sign-content" fxLayout="row" fxLayoutAlign="space-between center">
+        <button mat-icon-button (click)="revertMotive()">
+          <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-chevron-left"></mat-icon>
+        </button>
+        <mat-form-field class="indications">
+          <mat-select placeholder="Seleccione motivo" [(ngModel)]="selectedMotive">
+            <mat-option value="EL">Error de liquidación</mat-option>
+            <mat-option value="EDP">Error de datos personales</mat-option>
+            <mat-option value="ECL">Error de condición laboral</mat-option>
+            <mat-option value="O">Otros</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <button mat-mini-fab fxLayout="row" fxLayoutAlign="center center" class="success" (click)="sign('NC')">
+          <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-check"></mat-icon>
+        </button>
+      </div>
+    </mat-step>
+    <!-- confirmacion firma -->
+    <mat-step>
+      <div class="sign-content" fxLayout="row" fxLayoutAlign="space-between center">
+        <button mat-icon-button matStepperPrevious>
+          <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-chevron-left"></mat-icon>
+        </button>
+        <mat-form-field class="indications end">
+          <input matInput placeholder="Clave de firma" type="password" [(ngModel)]="password">
+        </mat-form-field>
+        <button mat-raised-button color="accent"
+          [disabled]="!password || (!selectedMotive && showMotiveDisagreement && disagreementSelected)"
+          (click)="onSigning()">
+          Firmar
+        </button>
+      </div>
+    </mat-step>
+  </mat-horizontal-stepper>
+</div>
+<!-- estados de firma (deprecado?) -->
+<div class="resume-status" *ngIf="!signable">
+  <mat-divider [inset]="true"></mat-divider>
+  <div fxLayout="row" fxLayoutAlign="center center" fxFill fxLayoutGap="32px">
+    <div class="title" fxLayout="column">
+      <h3
+        *ngIf="employeeProcess?.stateClass === 'firmado-conforme' || employeeProcess?.stateClass === 'firmado-no-conforme'">
+        Firmado el {{ employeeProcess?.stateDate | date :'dd/MM/yyyy' }}</h3>
+      <h3
+        *ngIf="employeeProcess?.stateClass != 'firmado-conforme' && employeeProcess?.stateClass != 'firmado-no-conforme'">
+        Visto el {{ employeeProcess?.stateDate | date :'dd/MM/yyyy' }}</h3>
+      <h5 *ngIf="motiveDisagreement" id='motiveDisagreement'>({{motiveDisagreement}})</h5>
+    </div>
+    <mat-chip-list>
+      <mat-basic-chip disabled class="signed-ok" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px"
+        *ngIf="employeeProcess?.stateClass === 'firmado-conforme'"
+        matTooltip="{{employeeProcess?.stateDate | date :'dd/MM/yyyy'}}">
+        <mat-icon  fontSet="fa" fontIcon="fa-check"></mat-icon>
+        <span>Conforme</span>
+      </mat-basic-chip>
+      <mat-basic-chip disabled class="signed-not-ok" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px"
+        *ngIf="employeeProcess?.stateClass === 'firmado-no-conforme'"
+        matTooltip="{{employeeProcess?.stateDate | date :'dd/MM/yyyy'}}">
+        <mat-icon  fontSet="fa" fontIcon="fa-times"></mat-icon>
+        <span>No conforme</span>
+      </mat-basic-chip>
+    </mat-chip-list>
+  </div>
+</div>

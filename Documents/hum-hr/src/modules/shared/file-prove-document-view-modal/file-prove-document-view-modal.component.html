@@ -1,0 +1,74 @@
+<div class="employee-deetail-dialog" mat-dialog-content>
+  <!-- LOADER -->
+  <span class="view-container" *ngIf="doc"> 
+    <mat-toolbar class="view-toolbar">
+      <mat-toolbar-row>
+        <!-- document-selected-header-info -->
+        <div class="view-description">
+          <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-file-certificate">
+          </mat-icon>
+          <div class="view-description-text" fxLayout="column" fxLayoutAlign="center start">
+            <h3 matLine [title]="doc.name"> Evidencia de Firmas </h3>
+            <h5 matLine> Id: {{doc.id}} - Fecha Documento: {{ data.documentDate | date :'dd/MM/yyyy' }}</h5>
+          </div>
+        </div>
+        <div class="view-actions">
+          <div fxLayout="row" fxLayoutAlign="end center">          
+            <!-- PDF-controls -->
+            <app-pdf-wrapper-controls [pdfWrapper]="pdfWrapper" [showPrint]="true" [showSave]="true"
+              [showZoomIn]="filePdf" [showZoomOut]="filePdf">
+            </app-pdf-wrapper-controls>        
+        
+            <div class="divider-vert"></div>
+            <!-- close-modal-only -->
+            <button mat-icon-button (click)="dialogClose()" title="Cerrar">
+              <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+            </button>
+          </div>
+        </div>
+      </mat-toolbar-row>
+    </mat-toolbar>
+    <span class="view-content">
+      <mat-action-list   fxLayout="column" >
+
+   <mat-list-item *ngFor="let item of items" (click)="onOpenDocument(item)">      
+    <mat-icon matListAvatar fxLayout="row" fxLayoutAlign="center center" fontSet="fa"
+    fontIcon="fa-file"  matBadgePosition="before" matBadgeColor="warn">
+    </mat-icon>
+    <div matLine   fxLayout="column" fxLayoutgap="14px" *ngIf="item.signedBy == 'Firmante'">
+      <span #listItem><b title="{{contentTitle}}">Firma Empleador </b> </span>
+      <span #listItem>Firmado por :<b title="{{contentTitle}}"> {{item.userName}}</b> </span>   
+    </div> 
+    <div matLine   fxLayout="column" fxLayoutgap="14px" *ngIf="item.signedBy == 'Empleado'">
+      <span #listItem><b title="{{contentTitle}}">Firma Empleado</b> </span>
+      <span #listItem>Firmado por :<b title="{{contentTitle}}">{{item.userName}}</b> </span>   
+    </div> 
+  
+    <div mat-line class="chip-line">
+     <mat-chip-list>
+      <mat-basic-chip disabled class="signed-ok" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px" *ngIf="this.item?.signedBy == 'Empleado'"
+   matTooltip="Firmado el {{this.item?.signedDate | date :'dd/MM/yyyy'}}">
+   <mat-icon  fontSet="fa" fontIcon="fa-smile">
+   </mat-icon>   
+   <span>Firmado  {{this.item?.signedDate | date :'dd/MM/yyyy'}}
+</span>
+</mat-basic-chip>
+
+<mat-basic-chip disabled  fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px" matTooltip="Firmado el {{this.item?.signedDate | date :'dd/MM/yyyy'}}" *ngIf="this.item?.signedBy == 'Firmante'">
+  <mat-icon  fontSet="fa" fontIcon="fa-check">
+  </mat-icon>
+  <span>Firmado el {{this.item?.signedDate | date :'dd/MM/yyyy'}}</span>
+</mat-basic-chip>
+</mat-chip-list>
+    </div>
+  </mat-list-item>
+  </mat-action-list> 
+      <span fxFlex.lt-md="130" fxFlex.gt-sm="70" fxFill>         
+      <!-- PDF-viewer -->
+      <app-pdf-wrapper [showControls]="false" #pdfWrapper [doc]="doc" [file]="filePdf" [fileName]="fileName"
+      [autoView]="false">
+      </app-pdf-wrapper>    
+    </span>
+  </span>
+</span>
+</div>

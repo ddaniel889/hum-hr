@@ -1,0 +1,263 @@
+<!-- TEXTAREA_YES_NO -->
+<div class="bottom_sheet-content" fxLayout="column" fxLayoutGap="16px" fxLayoutAlign="center stretch"
+  *ngIf="data?.type == 0">
+  <h3 *ngIf="data?.bodyText">{{data?.bodyText}}</h3>
+  <p *ngIf="data?.infoText">{{data?.infoText}} </p>
+  <mat-form-field *ngIf="data?.inputLabel">
+    <mat-label>{{data?.inputLabel}}</mat-label>
+    <textarea matTextareaAutosize matAutosizeMinRows="1" matAutosizeMaxRows="5" matInput maxlength="2000"
+      [placeholder]="data?.placeHolder" [(ngModel)]="textArea"></textarea>
+    <mat-hint *ngIf="textArea?.value < 1">{{data?.inputHint}}</mat-hint>
+  </mat-form-field>
+  <div fxLayout="row-reverse" fxLayoutGap="12px">
+    <button mat-raised-button (click)="action(true)" color="accent" class="btn">Sí</button>
+    <button mat-button (click)="action(false)">No</button>
+  </div>
+</div>
+
+<!-- YES_NO -->
+<div class="bottom_sheet-content" fxLayout="column" fxLayoutGap="16px" fxLayoutAlign="center stretch"
+  *ngIf="data?.type == 1">
+  <h3 *ngIf="data?.bodyText">{{data?.bodyText}}</h3>
+  <p *ngIf="data?.infoText">{{data?.infoText}} </p>
+  <br>
+  <div fxLayout="row-reverse" fxLayoutGap="12px">
+    <button mat-raised-button (click)="action(true)" color="accent" class="btn">Si</button>
+    <button mat-button (click)="action(false)">No</button>
+  </div>
+</div>
+
+<!-- YES_NO_CANCELAR -->
+<div class="bottom_sheet-content" fxLayout="column" fxLayoutGap="16px" fxLayoutAlign="center stretch"
+  *ngIf="data?.type == 2">
+  <h3 *ngIf="data?.bodyText">{{data?.bodyText}}</h3>
+  <p *ngIf="data?.infoText">{{data?.infoText}} </p>
+  <br>
+  <div fxLayout="row-reverse " fxLayoutGap="12px">
+    <button mat-raised-button (click)="action(true)" color="accent" class="btn">Si</button>
+    <button mat-button (click)="action(false)">No</button>
+    <button mat-button (click)="action(null)">Cancelar</button>
+  </div>
+</div>
+
+<!-- OK_CANCELAR -->
+<div class="bottom_sheet-content" fxLayout="column" fxLayoutGap="16px" fxLayoutAlign="center stretch"
+  *ngIf="data?.type == 3">
+  <h3 *ngIf="data?.bodyText">{{data?.bodyText}}</h3>
+  <p *ngIf="data?.infoText">{{data?.infoText}} </p>
+  <br>
+  <div fxLayout="row-reverse " fxLayoutGap="12px">
+    <button mat-raised-button (click)="action(true)" color="accent" class="btn">Ok</button>
+    <button mat-button (click)="action(null)">Cancelar</button>
+  </div>
+</div>
+
+<!-- PROBAR/RECHAZAR MOTIVO -->
+<div class="bottom_sheet-content" fxLayout="column" fxLayoutGap="16px" fxLayoutAlign="center stretch"
+  *ngIf="data?.type == 10" [ngClass]="data.approve ? 'ok':'not-ok'">
+  <div *ngIf="data?.bodyText" class="bottom_sheet-title" fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+    <mat-icon class="bottom_sheet-icon fa-solid" fontSet="fas"
+      [fontIcon]="data.approve ? 'fa-thumbs-up':'fa-thumbs-down'"></mat-icon>
+    <h3>
+      {{data?.bodyText}}
+    </h3>
+  </div>
+  <p *ngIf="data?.infoText">{{data?.infoText}}</p>
+  <mat-form-field *ngIf="data?.inputLabel && !data.approve" appearance="fill">
+    <mat-label>{{data?.inputLabel}}</mat-label>
+    <input type="text" matInput maxlength="2000" [(ngModel)]="textArea"/>
+  </mat-form-field>
+  <div fxLayout="row-reverse" fxLayoutGap="12px">
+    <button mat-raised-button class="bottom_sheet-main_btn" (click)="action(true)" [disabled]="disableButton() && !data.approve">{{data?.buttonText}}</button>
+    <button mat-button (click)="action(null)">Cancelar</button>
+  </div>
+</div>
+
+
+<!-- CANCELAR MOTIVO -->
+<div class="bottom_sheet-content" fxLayout="column" fxLayoutGap="16px" fxLayoutAlign="center stretch"
+  *ngIf="data?.type == 12" [ngClass]="'cancel'">
+  <div *ngIf="data?.bodyText" class="bottom_sheet-title" fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+    <mat-icon class="bottom_sheet-icon fa-solid" fontSet="fas"
+      [fontIcon]="'fa-times-circle'"></mat-icon>
+    <h3>
+      {{data?.bodyText}}
+    </h3>
+  </div>
+  <p *ngIf="data?.infoText">{{data?.infoText}}</p>
+  <mat-form-field *ngIf="data?.inputLabel" appearance="fill">
+    <mat-label>{{data?.inputLabel}}</mat-label>
+    <input data-testid="cancel-reason-input" type="text" matInput maxlength="2000" [(ngModel)]="textArea"/>
+  </mat-form-field>
+  <div fxLayout="row-reverse" fxLayoutGap="12px">
+    <button mat-raised-button class="bottom_sheet-main_btn" (click)="action(true)" [disabled]="disableButton()">{{data?.buttonText}}</button>
+    <button data-testid="accept-cancel-button" mat-button (click)="action(null)">Cancelar</button>
+  </div>
+</div>
+
+<!-- INFO -->
+<div class="bottom_sheet-content" fxLayout="column" fxLayoutGap="16px" fxLayoutAlign="center stretch"
+  *ngIf="data?.type == 4">
+  <h3 *ngIf="data?.bodyText">{{data?.bodyText}}</h3>
+  <p *ngIf="data?.infoText">{{data?.infoText}}</p>
+  <div fxLayout="row-reverse " fxLayoutGap="12px">
+    <button mat-raised-button (click)="action()" color="accent" class="btn">Entendido</button>
+  </div>
+</div>
+
+<!-- Help Stepper-->
+<ng-container *ngIf="data?.type == 5">
+  <span class="bottom_sheet-content" fxLayout="column" fxLayoutGap="16px" fxLayoutAlign="center stretch"
+    *ngIf="!showHelp">
+    <!-- TITULO-->
+    <h3 *ngIf="data?.bodyText" [innerHTML]="data?.bodyText"></h3>
+    <p *ngIf="data?.infoText" [innerHTML]="data?.infoText"></p>
+    <br>
+    <!--ACCION-->
+    <div fxLayout="row-reverse " fxLayoutGap="12px">
+      <button mat-raised-button (click)="action(true)" color="accent" class="btn">Entendido</button>
+      <button mat-button (click)="showHelp = true">Necesito Ayuda</button>
+    </div>
+  </span>
+  <app-help-stepper [model]="data?.helpModel" (helpFinish)="action(true)" *ngIf="showHelp">
+  </app-help-stepper>
+</ng-container>
+
+<!-- HELP INDEX -->
+<div *ngIf="data?.type == 6">
+  <span class="bottom_sheet-content" fxLayout="column" fxLayoutGap="16px" fxLayoutAlign="center stretch"
+    *ngIf="!showHelp">
+    <!-- PASO 8 LOTE CREADO TITULO-->
+    <h3 *ngIf="data?.bodyText" [innerHTML]="data?.bodyText"></h3>
+    <p *ngIf="data?.infoText" [innerHTML]="data?.infoText"></p>
+    <br>
+    <!-- PASO 8 LOTE CREADO ACCION-->
+    <div fxLayout="row-reverse " fxLayoutGap="12px">
+      <button mat-raised-button (click)="action(true)" color="accent" class="btn">Entendido</button>
+      <button mat-button (click)="showHelp = true">Necesito Ayuda</button>
+    </div>
+  </span>
+  <app-help-index [model]="data?.helpModel[0]" (helpFinish)="action(true)" *ngIf="showHelp"></app-help-index>
+</div>
+
+<!-- NUMEROS RANDOM -->
+<div class="bottom_sheet-content" fxLayout="column" fxLayoutGap="16px" fxLayoutAlign="center stretch"
+  *ngIf="data?.type == 7">
+  <h3 *ngIf="data?.bodyText">{{data?.bodyText}}</h3>
+  <span [innerHTML]="data?.infoText"></span>
+  <div class="verification-code" fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="space-between center">
+    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+      <h2 id="codeGenerated" name="codeGeneratedName">{{codeGenerated}}</h2>
+      <span>Código de verificación</span>
+    </div>
+    <button mat-icon-button (click)="refresh()" title="Acualizar Código">
+      <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-redo"></mat-icon>
+    </button>
+  </div>
+  <div fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="space-between center">
+    <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+      <input (keyup.enter)="validate()" type="text" id="codeInput" name="codigo" #codeInput [(ngModel)]="code" matInput
+        placeholder="Ingresa el Código de verificación" autofocus="true" #codeFormControl="ngModel" pattern="^[0-9]+$"
+        [required]="true" maxlength="4">
+      <mat-error>
+        {{!isMatching ? ' Código inválido, intenta nuevamente' : '' }}
+        <b>{{codeFormControl.hasError('pattern') ? ' Ingresa sólo números': '' }}</b>
+      </mat-error>
+    </mat-form-field>
+    <div fxLayout="row" fxLayoutGap="12px">
+      <button mat-button (click)="action(null)">Cancelar</button>
+      <button mat-raised-button *ngIf="data?.candidate" (click)="promoteConfirmed()" color="accent" class="btn"
+        [disabled]="!code">Promover</button>
+      <button mat-raised-button *ngIf="!data?.candidate" (click)="validate()" color="accent" class="btn"
+        [disabled]="!code">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Spam_notification -->
+<div class="bottom_sheet-content" fxLayout="column" fxLayoutGap="16px" fxLayoutAlign="center stretch"
+  *ngIf="data?.type == 8">
+  <h3 *ngIf="data?.bodyText">{{data?.bodyText}}</h3>
+  <h4 *ngIf="data?.valueText" class="accent">{{data?.valueText}} </h4>
+  <p *ngIf="data?.infoText">{{data?.infoText}} </p>
+  <br>
+  <div fxLayout="row-reverse " fxLayoutGap="12px">
+    <button mat-raised-button (click)="action(true)" color="accent" class="btn">Enviar</button>
+    <button mat-button (click)="action(null)">Cancelar</button>
+  </div>
+</div>
+
+<!-- multiple_actions -->
+<div class="bottom_sheet-content" fxLayout="column" fxLayoutGap="16px" fxLayoutAlign="center"
+  *ngIf="data?.type == 9">
+  <h3 *ngIf="data?.bodyText">{{data?.bodyText}}</h3>
+  <p *ngIf="data?.infoText">{{data?.infoText}} </p>
+  <br>
+  <div fxLayout="row-reverse" fxLayoutGap="12px">
+    <ng-container *ngFor="let act of data?.actions">
+      <button mat-raised-button (click)="action(act)" [color]="act.color" class="btn">{{ act.label }}</button>
+    </ng-container>
+    <button mat-button (click)="action(false)">Cancelar</button>
+  </div>
+</div>
+
+<!-- ASSIGN MASSIVE TIMELINES -->
+<div class="bottom_sheet-content" fxLayout="column" fxLayoutGap="16px" fxLayoutAlign="center stretch" *ngIf="data?.type == 13">
+  <h3 *ngIf="data?.bodyText">{{data?.bodyText}}</h3>
+  <p *ngIf="data?.infoText">{{data?.infoText}}</p>
+  <br>
+  <mat-radio-group [(ngModel)]="selectedOption" fxLayout="column">
+    <mat-radio-button fxFlex value="all">{{data?.firstOption}}</mat-radio-button>
+    <br>
+    <mat-radio-button fxFlex value="withoutValidity">{{data?.secondOption}}</mat-radio-button>
+  </mat-radio-group>
+  <br>
+  
+  <div fxLayout="row-reverse" fxLayoutGap="12px">
+    <button mat-raised-button (click)="action(selectedOption)" color="accent" class="btn">Aplicar</button>
+    <button mat-button (click)="action(null)">Cancelar</button>
+  </div>
+</div>
+
+<!-- Exportar Formularios en Excel -->
+<div class="bottom_sheet-content" fxLayout="column" fxLayoutGap="16px" fxLayoutAlign="center stretch"
+  *ngIf="data?.type == 11">
+  <h3 class="bottom_sheet-exp-h3" *ngIf="data?.bodyText">{{data?.bodyText}}</h3>
+  <p *ngIf="data?.infoText">{{data?.infoText}} </p>
+  <p>Seleccione el período</p>
+  <!-- FORM-->
+  <ng-container>
+    <form [formGroup]="durationFormLeave" fxLayout="row"
+      fxLayoutGap="16px">
+      <mat-form-field class="mat-form-field-infix-export-left">
+        <mat-label>Seleccione la fecha desde</mat-label>
+        <input class="mat-input-element-export" readonly matInput [min]="MinDate" [max]="MaxDate" [matDatepicker]="fechaInicia" (dateChange)="setHastaMaxDate($event)" formControlName="StartDate">
+        <mat-datepicker-toggle matIconSuffix [for]="fechaInicia">        
+        </mat-datepicker-toggle>
+        <mat-datepicker #fechaInicia></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field class="mat-form-field-infix-export-right">
+        <mat-label>Seleccione la fecha hasta</mat-label>
+        <input class="mat-input-element-export" readonly matInput  [min]="HastaMinDate" [max]="MaxDate" [matDatepicker]="fechaFin" formControlName="EndDate">
+        <mat-datepicker-toggle matIconSuffix [for]="fechaFin">       
+        </mat-datepicker-toggle>
+        <mat-datepicker #fechaFin></mat-datepicker>
+      </mat-form-field>
+     
+</form>
+<p class="choose-forms">Elije los tipos de Formularios</p>
+<div class="card-container">
+<mat-card fxLayout="row" *ngFor="let form of inForms">  
+  <mat-checkbox (change)="setForm(form, $event)">{{form.name}}</mat-checkbox>
+</mat-card>
+</div>
+</ng-container>
+
+  
+<div fxLayout="row-reverse" fxLayoutGap="12px"> 
+  <button mat-raised-button (click)="action(true)" [color]="accent" class="bottom_sheet_exp_btn" [disabled]="exportbuttonEnabled()">Exportar</button>
+  <button mat-button (click)="action(false)" class="bottom_sheet_canc_btn">Cancelar</button>
+</div>
+</div>

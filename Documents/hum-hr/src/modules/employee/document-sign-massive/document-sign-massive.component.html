@@ -1,0 +1,153 @@
+<mat-toolbar class="mat-elevation-z1 app-toolbar" color="primary" fxFlex="grow">
+  <mat-toolbar-row></mat-toolbar-row>
+  <mat-toolbar-row></mat-toolbar-row>
+</mat-toolbar>
+<div class="floating-container" fxLayout="row" fxLayoutAlign="center center" fxFill>
+  <mat-card class="card-1-1">
+    <mat-sidenav-container fxLayout="row" fxFill mode="push">
+      <mat-sidenav-content fxFill>
+        <div fxLayout="row" fxFill>
+          <div class="inbox-container employee my-documents" fxFlex.lt-md="100" fxFlex.gt-sm="30" fxFill>
+            <!-- LOADER -->
+            <div class="window-spinner" *ngIf="!loaded">
+              <mat-progress-spinner mode="indeterminate" color="primary">
+              </mat-progress-spinner>
+            </div>
+            <mat-toolbar class="inbox-toolbar" color="grey" fxLayout="row" fxLayoutAlign="start center">
+              <mat-toolbar-row fxLayout="row" fxLayoutAlign="space-between center" fxFill>
+                <div class="mat-avatar two-icons" fxLayout="row" fxLayoutAlign="space-between center">
+                  <div class="toolbar-line" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                    <button mat-icon-button title="Ver" (click)='goBack()'>
+                      <mat-icon  class="fa-lg" fontSet="fa"
+                        fontIcon="fa-arrow-left"></mat-icon>
+                    </button>
+                    <div class="title" fxLayout="column">
+                      <h3>Pendientes de Firma</h3>
+                      <h5>Resolver todos</h5>
+                    </div>
+                  </div>
+                </div>
+                <button mat-icon-button (click)="refresh()">
+                  <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-redo" fxLayout="row" fxLayoutAlign="center center">
+                  </mat-icon>
+                </button>
+              </mat-toolbar-row>
+            </mat-toolbar>
+            <mat-divider class="false-divider" [inset]="true"></mat-divider>
+            <div class="pending-container">
+              <div class="pending-items" fxLayout="column" fxLayoutGap="16px" *ngIf="fileDocuments.length > 0">
+                <span class="pending-item" *ngFor="let item of fileDocuments" (click)="viewtDocument(item)">
+                  <div class="mat-card content mat-elevation-z2" matRipple
+                    [ngClass]="{'selected' : item?.id === selectedDoc?.id}" fxLayout="row" fxLayoutAlign="start center">
+                    <div (click)="selectedChange(item);$event.stopPropagation()">
+                      <mat-checkbox [ngModel]="item.isSelected" ></mat-checkbox>
+                    </div>
+                    <div class="item-data" fxLayout="column">
+                      <b title="{{ item.contentTitle | titlecase }}" #listItem>
+                        {{ item.contentTitle | titlecase }}
+                      </b>
+                      <span> {{ item.temporalityTitle }} </span>
+                    </div>
+                    <!-- <button mat-icon-button title="Ver" >
+                      <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-eye" fxLayout="row"
+                        fxLayoutAlign="center center"></mat-icon>
+                    </button> -->
+                  </div>
+                </span>
+              </div>
+              <!-- Empty (app chapa) -->
+              <ng-container *ngIf="fileDocuments.length < 1">
+                <app-chapa [className]="'info-empty'" [icon]="'fa-smile-beam'"
+                  [text]="'Genial, no tenés tareas pendientes'"></app-chapa>
+              </ng-container>
+              <div fxLayout="column" fxLayoutAlign="space-between center" class="signer mobile">
+                <app-chapa class="minimized" [className]="'info-empty'" [icon]="'fa-info'"
+                  [text]="'Vamos a Firmar ' +  countSelected +  (countSelected > 1 ? ' Documentos' : ' Documento')"
+                  [subText]="'Podés elegir cualquier documento de la lista para verlo en detalle'"
+                  *ngIf="countSelected > 0">
+                </app-chapa>
+                <app-chapa class="minimized" [className]="'info-empty'" [icon]="'fa-info'"
+                  text="Selecciona al menos un Documento"
+                  [subText]="'Podés elegir cualquier documento de la lista para verlo en detalle'"
+                  *ngIf="countSelected < 1">
+                </app-chapa>
+                <mat-form-field fxFlex="grow" *ngIf="certificates.length > 1" class="signer-ou-selector">
+                  <mat-select placeholder="Certificado" [(ngModel)]="selectedCertificate">
+                    <mat-option *ngFor="let certificate of certificates" [value]="certificate">
+                      {{certificate.provider}}
+                      <span *ngIf="certificate.expirationDate && !certificate.isPending">
+                        ({{certificate.expirationDate | date:'dd/MM/yyyy'}})
+                      </span>
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+                <mat-form-field fxFlex="grow" class="signer-password">
+                  <input matInput [placeholder]="selectedCertificate?.providerId == '1' ? 'Clave de Certificado':
+                    (selectedCertificate?.providerId == '4' || selectedCertificate?.providerId == '5' ? 'Clave de Login':
+                    (selectedCertificate?.providerId == '6' ? 'Clave de Firma':'Clave'))" type="password"
+                    [(ngModel)]="password" [disabled]="certificates.length > 1 && !selectedCertificate" />
+                </mat-form-field>
+
+                <button mat-raised-button class="signer-btn" (click)="onSigning()"
+                  [disabled]="!password || countSelected === 0">
+                  <span fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="8px">
+                    <mat-icon class="fa-lg" fontSet="fa" [fontIcon]="'fa-thumbs-up'">
+                    </mat-icon>
+                    <span>Firmar Todos</span>
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+          <mat-divider [vertical]="true"></mat-divider>
+          <div class="detail" fxFlex.lt-md="100" fxFlex.gt-sm="70" fxFill [ngClass]="detailClass()">
+            <div class="window-spinner" *ngIf="docOpenning">
+              <mat-progress-spinner mode="indeterminate" color="primary"></mat-progress-spinner>
+            </div>
+            <app-chapa [class]="!selectedDoc ? '':'minimized'" [className]="'info-empty'" [icon]="'fa-info'"
+              [text]="'Vamos a Firmar ' +  countSelected + (countSelected > 1 ? ' Documentos' : ' Documento')"
+              [subText]="'Podés elegir cualquier documento de la lista para verlo en detalle'" *ngIf="countSelected > 0">
+            </app-chapa>
+            <app-chapa [class]="!selectedDoc ? '':'minimized'" [className]="'info-empty'" [icon]="'fa-info'"
+              text="Selecciona al menos un Documento"
+              [subText]="'Podés elegir cualquier documento de la lista para verlo en detalle'" *ngIf="countSelected < 1">
+            </app-chapa>
+            <app-file-document-detail *ngIf="selectedDoc" [showDelete]="false" [showFileDocumentHeader]="true"
+              [doc]="selectedDoc" [filePdf]="filePdf" [showMetadatas]="false" [showWelcome]="false" [showPrint]="false"
+              [showSave]="false" [showAll]="false" (mobileCloseEvent)="this.setIsOpen(false)">
+            </app-file-document-detail>
+            <mat-progress-bar mode="indeterminate" [style.display]="isProcessing ? 'block' : 'none'"></mat-progress-bar>
+            <div fxLayout="row" fxLayoutAlign="space-between center" class="signer desktop" fxLayoutGap="32px">
+              <mat-form-field fxFlex="grow" *ngIf="certificates.length > 1" class="signer-ou-selector">
+                <mat-select placeholder="Certificado" [(ngModel)]="selectedCertificate">
+                  <mat-option *ngFor="let certificate of certificates" [value]="certificate">
+                    {{certificate.provider}}
+                    <span *ngIf="certificate.expirationDate && !certificate.isPending">
+                      ({{certificate.expirationDate | date:'dd/MM/yyyy'}})
+                    </span>
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field fxFlex="grow" class="signer-password">
+                <input matInput
+                  [placeholder]="selectedCertificate?.providerId == '1' ? 'Ingresa tu Clave de Certificado para Firmar':
+                  (selectedCertificate?.providerId == '4' || selectedCertificate?.providerId == '5' ? 'Ingresa tu Clave de Login para Firmar':
+                  (selectedCertificate?.providerId == '6' ? 'Ingresa tu Clave de Firma':'Ingresa tu Clave para Firmar'))"
+                  type="password" [(ngModel)]="password" [disabled]="certificates.length > 1 && !selectedCertificate" />
+              </mat-form-field>
+
+              <button mat-raised-button color="accent" (click)="onSigning()"
+                [disabled]="!password || countSelected === 0 || isProcessing" class="signer-btn">
+                <span fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="8px">
+                  <mat-icon class="fa-lg" fontSet="fa" [fontIcon]="'fa-thumbs-up'">
+                  </mat-icon>
+                  <span>Firmar Todos</span>
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+  </mat-card>
+</div>

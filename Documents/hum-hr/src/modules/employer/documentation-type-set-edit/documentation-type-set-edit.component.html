@@ -1,0 +1,213 @@
+<span [class]="{'add-open': addDefaultFileOpen}">
+  <div class="title-description" fxLayout="row" fxLayoutAlign="space-between center">
+    <div class="header" fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+      <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+        <mat-icon fxLayoutAlign="center center" class="fa-lg" fontSet="fas" fontIcon="fa-layer-group">
+        </mat-icon>
+        <mat-icon class="fa-lg complex" fontSet="fas" fontIcon="fa-pen">
+        </mat-icon>
+      </div>
+      <div fxLayout="column">
+        <h3>{{documentationTypeSet.name}}</h3>
+        <h5 *ngIf="!isAdding && !isEdittingName">Edición del Set</h5>
+        <h5 *ngIf="isAdding && !isEdittingName">Agregar Documentación al Set</h5>
+        <h5 *ngIf="!isAdding && isEdittingName">Editar información del set</h5>
+      </div>
+    </div>
+    <div fxLayout="row">
+      <button mat-icon-button title="Editar información del set"
+        *ngIf="setDocumentationTypes?.length > 0 && !isEdittingName" (click)="openNameEdition()">
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-pen">
+        </mat-icon>
+      </button>
+      <button mat-icon-button title="Agregar Documentación al Set"
+        *ngIf="setDocumentationTypes?.length > 0 && !isAdding" (click)="openAddItems()">
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-layer-plus">
+        </mat-icon>
+      </button>
+    </div>
+  </div>
+  <div class="load-window fixed" *ngIf="isLoading">
+    <mat-progress-spinner style="z-index: 1" mode="indeterminate" color="primary">
+    </mat-progress-spinner>
+  </div>
+  <button mat-raised-button color="primary" class="btn set-create-add" (click)="openAddItems()"
+    *ngIf="setDocumentationTypes?.length < 1 && !isAdding && !isEdittingName">
+    Agregar Documentos al set
+  </button>
+  <ng-container *ngIf="!isAdding && !isEdittingName">
+    <div class="sets-content" fxLayout="column">
+      <mat-list>
+        <mat-list-item *ngFor="let dt of setDocumentationTypes">
+          <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center" mat-list-icon>
+            <mat-icon fxLayoutAlign="center center" class="fa-lg" fontSet="fas" fontIcon="fa-file">
+            </mat-icon>
+            <mat-icon *ngIf="dt.documentationTypeSetItemFiles && dt.documentationTypeSetItemFiles.length > 0"
+              fxLayout="row" fxLayoutAlign="center center" class="fa-lg complex" fontSet="fas" fontIcon="fa-paperclip">
+            </mat-icon>
+          </div>
+          <div mat-line>
+            <b>{{dt.description}}{{dt.required?'*':''}}</b>
+          </div>
+          <div mat-line *ngIf="dt.required">
+            Obligatorio
+          </div>
+          <div mat-line>
+            <mat-chip [removable]="true" (removed)="removeFile(dt)" (click)="addDefaultFile(dt)"
+              *ngIf="dt.documentationTypeSetItemFiles && dt.documentationTypeSetItemFiles.length > 0"
+              [title]="dt.documentationTypeSetItemFiles[0].name" [disabled]="!canRemove(dt)">
+              <span>{{dt.documentationTypeSetItemFiles[0].name}}</span>
+              <mat-icon matChipRemove>cancel</mat-icon>
+            </mat-chip>
+          </div>
+          <div class="floating-action" fxLayout="row" fxLayoutAlign="start center"
+            *ngIf="!selectedDocumentationTypeSetItem || selectedDocumentationTypeSetItem !== dt">
+            <button mat-icon-button fxLayout="row" [title]="dt.required? 'Quitar requerido' : 'Requerido'"
+              fxLayoutAlign="center center" (click)="required(dt)">
+              <mat-icon matPrefix fxLayout="row" fxLayoutAlign="center center" class="fa-lg"
+                [fontSet]="dt.required ? 'fas' : 'fal'" fontIcon="fa-asterisk">
+              </mat-icon>
+            </button>
+            <button mat-icon-button fxLayout="row"
+              [title]="canRemove(dt)?'Agregar archivo default':'No podés Agregar archivo default a un elemento elegido para Enviar'"
+              fxLayoutAlign="center center" (click)="addDefaultFile(dt)"
+              *ngIf="(!dt.documentationTypeSetItemFiles || dt.documentationTypeSetItemFiles.length < 1) && dt.canAddDefaultFile"
+              [disabled]="!canRemove(dt)">
+              <mat-icon matPrefix fxLayout="row" fxLayoutAlign="center center" class="fa-lg" fontSet="fas"
+                fontIcon="fa-paperclip">
+              </mat-icon>
+            </button>
+            <button mat-icon-button fxLayout="row" [title]="dt.order > 0 ? 'Quitar favorito' : 'Agregar favorito'"
+              fxLayoutAlign="center center" (click)="favouriteToogle(dt)">
+              <mat-icon matPrefix fxLayout="row" fxLayoutAlign="center center" class="fa-lg"
+                [fontSet]="dt.order > 0 ? 'fas' : 'fal'" fontIcon="fa-star">
+              </mat-icon>
+            </button>
+            <button mat-icon-button fxLayout="row"
+              [title]="canRemove(dt)?'Eliminar item':'No podés eliminar un elemento elegido para Enviar'"
+              fxLayoutAlign="center center" (click)="removeItem(dt)" [disabled]="!canRemove(dt)">
+              <mat-icon fxLayoutAlign="center center" class="fa-lg" fontSet="fas" fontIcon="fa-minus">
+              </mat-icon>
+            </button>
+          </div>
+        </mat-list-item>
+      </mat-list>
+      <div class="main-action" fxLayout="row-reverse" fxLayoutGap="8px" fxLayoutAlign="start center">
+        <button mat-raised-button color="primary" (click)="save()" class="btn"
+          [disabled]="setDocumentationTypes?.length < 1">
+          Guardar Cambios
+        </button>
+        <button mat-button (click)="closeEdit()">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </ng-container>
+  <ng-container *ngIf="isAdding && !isEdittingName">
+    <mat-selection-list>
+      <mat-list-option *ngFor="let dt of availableDocumentationTypes" [value]="dt" (click)="addToSet(dt)">
+        <mat-icon mat-list-icon fxLayout="row" fxLayoutAlign="center center" class="fa-lg" fontSet="fas"
+          fontIcon="fa-file">
+        </mat-icon>
+        <div mat-line>
+          {{!dt.description || dt.description.length < 1 ? 'Cargando...' : dt.description}} </div>
+      </mat-list-option>
+    </mat-selection-list>
+    <div class="main-action" fxLayout="row-reverse" fxLayoutGap="8px" fxLayoutAlign="start center">
+      <button mat-raised-button color="primary" aria-label="Cerrar edicion" (click)="addItems()"
+        [disabled]="this.addingItems.length < 1">
+        Agregar
+      </button>
+      <button mat-raised-button color="secodnary" aria-label="Cerrar edicion" (click)="cancelAdd()">
+        Cancelar
+      </button>
+    </div>
+  </ng-container>
+  <ng-container *ngIf="!isAdding && isEdittingName">
+    <form [formGroup]="editNameFormGroup" class="form-steped" *ngIf="!loading">
+      <div class="form-steped-body" fxLayout="column">
+        <div class="asisted-input" fxLayout="row-reverse" fxLayoutAlign="start center">
+          <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+            <input matInput autofocus placeholder="Nombre del Set" formControlName="nameFrmCtrl" required>
+            <mat-error *ngIf="editNameFormGroup.invalid">Completa este campo</mat-error>
+            <!-- <mat-hint *ngIf="!addSetFormGroup.invalid" >ingresa un nombre descriptivo para el nuevo Set de documentos</mat-hint> -->
+          </mat-form-field>
+          <div class="indicator">
+            <div class="guide top" hidden></div>
+            <div class="bubble">1</div>
+            <div class="guide bottom"></div>
+          </div>
+        </div>
+        <div class="asisted-input" fxLayout="row-reverse" fxLayoutAlign="start center">
+          <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+            <textarea matInput cdkTextareaAutosize placeholder="Descripción (opcional)"
+              formControlName="descriptionFrmCtrl"></textarea>
+            <!-- <mat-hint>esta descripción servirá de ayuda en el menú de selección de Sets</mat-hint> -->
+          </mat-form-field>
+          <div class="indicator">
+            <div class="guide top"></div>
+            <div class="bubble">2</div>
+            <div class="guide" hidden></div>
+          </div>
+        </div>
+      </div>
+      <div class="main-action" fxLayout="row-reverse" fxLayoutGap="8px" fxLayoutAlign="start center">
+        <button mat-raised-button (click)="saveName()" [disabled]="editNameFormGroup.invalid" color="primary"
+          class="btn">Guardar Cambios</button>
+        <button mat-button (click)="isEdittingName = !isEdittingName">
+          Cancelar
+        </button>
+      </div>
+    </form>
+  </ng-container>
+</span>
+<ng-container *ngIf="addDefaultFileOpen">
+  <div class="upload-content" fxLayout="row" [class]="{'pdf-visible': viewDetail}">
+    <div class="upload-container" fxLayout="column">
+      <div class="title-description" fxLayout="row" fxLayoutAlign="space-between center">
+        <div class="header" fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+          <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+            <mat-icon fxLayoutAlign="center center" class="fa-lg" fontSet="fas" fontIcon="fa-file">
+            </mat-icon>
+            <mat-icon class="fa-lg complex" fontSet="fas" fontIcon="fa-paperclip">
+            </mat-icon>
+          </div>
+          <div fxLayout="column">
+            <h3>{{selectedDocumentationTypeSetItem.documentationTypeSetItemFiles &&
+              selectedDocumentationTypeSetItem.documentationTypeSetItemFiles.length > 0?'Archivo Default':'Cargar
+              Archivo Default'}}</h3>
+            <h5> {{selectedDocumentationTypeSetItem?.description}}</h5>
+          </div>
+        </div>
+      </div>
+      <app-upload-form
+        *ngIf="!selectedDocumentationTypeSetItem.documentationTypeSetItemFiles || selectedDocumentationTypeSetItem.documentationTypeSetItemFiles.length < 1"
+        canViewFile="true" canRemove="true" [multipleSelection]="false" acceptedExtensions="{{aceptedExtensions}}"
+        [files]="files" [maxFile]="1" (fileSelected)="onSelectedFile($event, null)"
+        (filesChanged)="onFilesChanged($event)" (seeFileDefault)="onSelectedFile($event, true)">
+      </app-upload-form>
+      <app-chapa [className]="'info-empty'" [icon]="'fa-paperclip'" [text]="'Estás viendo el archivo Default'"
+        [subText]="'Eliminalo para asociar uno nuevo'"
+        *ngIf="selectedDocumentationTypeSetItem.documentationTypeSetItemFiles && selectedDocumentationTypeSetItem.documentationTypeSetItemFiles.length > 0">
+      </app-chapa>
+      <div class="main-action" fxLayout="row-reverse" fxLayoutGap="8px" fxLayoutAlign="start center">
+        <button mat-raised-button color="primary" (click)="saveFile()" class="btn"
+          *ngIf="!selectedDocumentationTypeSetItem.documentationTypeSetItemFiles || selectedDocumentationTypeSetItem.documentationTypeSetItemFiles.length < 1"
+          [disabled]="files.length < 1">
+          Guardar Cambios
+        </button>
+        <button mat-raised-button color="warn" (click)="removeFile(selectedDocumentationTypeSetItem)" class="btn"
+          *ngIf="selectedDocumentationTypeSetItem.documentationTypeSetItemFiles && selectedDocumentationTypeSetItem.documentationTypeSetItemFiles.length > 0">
+          Eliminar
+        </button>
+        <button mat-raised-button (click)="closeDefaultFile()">
+          Cancelar
+        </button>
+      </div>
+    </div>
+    <app-file-document-detail *ngIf="viewDetail" [showDelete]="false" [showFileDocumentHeader]="false"
+      [doc]="documentation" [filePdf]="fileBase64" [showMetadatas]="false" [showWelcome]="false" [showPrint]="false"
+      [fileBlob]="fileBlob" [showSave]="false" [showAll]="false">
+    </app-file-document-detail>
+  </div>
+</ng-container>

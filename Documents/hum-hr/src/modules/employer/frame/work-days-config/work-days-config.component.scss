@@ -1,0 +1,81 @@
+.panel-title-with-icon {
+  display: flex;
+  align-items: center;
+}
+
+.panel-title-with-icon mat-icon {
+  margin-right: 8px;
+  color: #3F51B5;
+}
+
+.work-days-config-container {
+  padding: 16px;
+}
+.form-fields-container{
+  max-width: 50vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.checkbox-container {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.buttons-container {
+  margin: 2vh 0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.large-checkbox {
+  margin: 4px 8px;
+}
+
+.info {
+  margin-right: 16px;
+  width: 100%;
+
+  mat-icon + div {
+    width: calc(100% - 56px);
+
+    h3 {
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    h5 {
+      font-weight: 400;
+    }
+  }
+}
+.btn-container{
+  margin: 2vh 0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.rounded-button span {
+  font-family: 'Helvetica Neue',Arial, Helvetica, sans-serif;
+}
+
+ span{
+  padding: 0 25px !important;
+} 
+
+.rounded-button {
+  border-radius: 25px;
+  text-transform: none;
+  font-size: 10px;
+  font-family: 'Helvetica Neue',Arial, Helvetica, sans-serif;
+  vertical-align: middle;
+}
+
+.rounded-button mat-icon {
+  margin-right: 8px;
+  vertical-align: middle;
+}
+

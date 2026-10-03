@@ -1,0 +1,66 @@
+<mat-toolbar>
+  <mat-toolbar-row fxLayout="row" fxLayoutAlign="space-between center">
+      <div class="mat-avatar" fxLayout="row" fxLayoutAlign="space-between center">
+          <div class="toolbar-line" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+              <mat-icon  class="fa-lg" fontSet="fa" fontIcon="fa-history">
+              </mat-icon>
+              <div class="title" fxLayout="column" fxLayoutAlign="center start">
+                  <h4>Histórico de Estados</h4>
+                  <h5>Ejecutado por el usuario: {{data.process.createdByUserName}}</h5>
+              </div>
+          </div>
+      </div>
+      <button mat-icon-button (click)="this.closeDialog()" title="Cerrar">
+    <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-times"></mat-icon>
+  </button>
+  </mat-toolbar-row>
+</mat-toolbar>
+<mat-divider></mat-divider>
+<!-- DEFERED-PROCESS-TABLE -->
+<div class="status-table">
+  <div class="mat-table">
+      <!-- DEFERED-PROCESS-TABLE_HEAD -->
+      <div class="mat-header-row sticky" fxLayout="row" fxLayoutAlign="start center">
+          <div class="w-12" fxLayout="row" fxLayoutAlign="start center">
+              <div class="mat-header-cell w-6" fxLayout="row" fxLayoutAlign="start center">
+                  <span>Estado</span>
+              </div>
+              <div class="mat-header-cell w-3" fxLayout="row" fxLayoutAlign="start center">
+                  <span>Inicio</span>
+              </div>
+              <div class="mat-header-cell w-3" fxLayout="row" fxLayoutAlign="start center">
+                  <span>Fin</span>
+              </div>
+
+          </div>
+      </div>
+      <!-- DEFERED-PROCESS-TABLE-ROWS -->
+      <div class="mat-row" matRipple *ngFor="let state of data.process.history" fxLayout="row" fxLayoutAlign="start center">
+          <div class="w-12" fxLayout="row" fxLayoutAlign="start center">
+              <div class="mat-cell w-6" fxLayoutAlign="start center" title="{{ translateStateName(state.stateName) }}">
+                  <span>
+          {{ translateStateName(state.stateName) }}
+        </span>
+              </div>
+              <div class="mat-cell w-3" fxLayout="column" fxLayoutAlign="center start" title=" {{ state.startDate | date :'dd/MM/yyyy HH:mm:ss' }}">
+                  <span>
+          {{ state.startDate | date :'dd/MM/yyyy' }}
+        </span>
+                  <span>
+          {{ state.startDate | date :'HH:mm:ss' }}
+        </span>
+
+              </div>
+              <div class="mat-cell w-3" fxLayout="column" fxLayoutAlign="center start" title="  {{ state.endDate | date :'dd/MM/yyyy HH:mm:ss'}}">
+                  <span>
+          {{ state.endDate | date :'dd/MM/yyyy'}}
+        </span>
+                  <span>
+          {{ state.endDate | date :'HH:mm:ss'}}
+        </span>
+              </div>
+
+          </div>
+      </div>
+  </div>
+</div>

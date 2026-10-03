@@ -1,0 +1,52 @@
+<div class="leave_detail">
+  <ng-container *ngIf="!isLoading">
+    <div class="leave_detail-title" fxLayout="row" fxLayoutAlign="start center">
+      <div class="info" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+        <mat-icon class="fa-lg" fontSet="fas" [fontIcon]=" !isHollyday ? 'fa-money-check':'fa-umbrella-beach'">
+        </mat-icon>
+        <div fxLayout="column">
+          <h3>{{ !isHollyday ? 'Solicitud de Vacaciones vencidas' : 'Solicitud de Vacaciones'}}</h3>
+          <h5 class="daysInfo">
+            <b>
+              {{ daysRequests + 
+              (leaveRequestDraft === true
+                ? (daysRequests > 1 ? ' días propuestos' : ' día propuesto') 
+                : (daysRequests > 1 ? ' días solicitados' : ' día solicitado')) 
+              }}
+            </b>
+            <ng-container *ngIf="isHollyday">
+              desde el <b>{{' ' + (dateFrom | date:'dd/MM/yyyy')}}</b> hasta el <b>{{' ' + (dateTo |
+                date:'dd/MM/yyyy')}}</b>
+            </ng-container>
+          </h5>
+        </div>
+      </div>
+    </div>
+    <div class="leave_detail-container">
+      <app-chapa 
+      [className]="getLeaveClassName()" 
+      [icon]="getLeaveIcon()" 
+      [text]="getLeaveText()"
+      [subText]="getLeaveSubtext()"  
+      [actionIcon]="((this.stateName === 'PENDIENTE' || this.stateName === 'BORRADOR') && validDate) ? 'fa-times-circle' : null" 
+      [buttonColor]="'accent'"
+      [leaveDetail]="leaveDetail"
+      [leaveRequestDraft]="leaveRequestDraft"
+      [textDraft]="this.stateName === 'BORRADOR' ? 'Seleccioná una opción' : ''"
+      [headerDraft]="headerDraftText()"
+      [isApprover]="getIsApprover()"
+      [actionText]="((this.stateName === 'PENDIENTE') && validDate) ? 'Cancelar Solicitud' : null" 
+      (actionClick)="cancelLeave()" 
+      (ApproveRejectClick)="approveReject($event)" 
+      (ViewDocumentClick)="viewDocument()" 
+      [hasDocument]="leaveDetail?.documentId > 0"
+      [isValidated]="isValidated">
+    </app-chapa>
+    </div>
+  </ng-container>
+  <!-- loading -->
+  <div class="leave_detail-loading" *ngIf="isLoading" fxLayout="row" fxLayoutAlign="center center">
+    <mat-progress-spinner mode="indeterminate" color="primary">
+    </mat-progress-spinner>
+  </div>
+</div>

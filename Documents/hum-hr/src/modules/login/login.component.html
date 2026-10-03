@@ -1,0 +1,332 @@
+<app-login-browser></app-login-browser>
+<div class="login" fxLayout="row" fxLayoutAlign="center center" fxFill>
+  <img class="login-bg" [src]="backgroundSrc" alt="/">
+  <mat-card class="login-card" [ngClass]="cardClass" fxLayout="column" fxFlex.xl="30" fxFlex.lg="30" fxFlex.md="40"
+    fxFlex.sm="70" fxFlex.xs="90">
+    <!-- Brand header -->
+    <mat-card-header>
+      <mat-card-title fxLayout="column" fxLayoutGap="12px">
+        <div *ngIf="logoSrc" class="brand" fxLayout="column" fxLayoutAlign="center center" style="min-height: 150px;">
+          <img [src]="logoSrc" alt="/">
+        </div>
+        <div *ngIf="!logoSrc" class="brand" fxLayout="column" fxLayoutAlign="center center" style="min-height: 150px;">
+          <img [src]="humanageSrc" alt="/">
+        </div>
+        <div *ngIf="showStepper" class="description" fxHide.lt-sm="true">Humanage es una herramienta de RRHH y
+          gestión
+          documental
+        </div>
+      </mat-card-title>
+    </mat-card-header>
+    <mat-horizontal-stepper (selectionChange)="onChange($event)" *ngIf="showStepper" #stepper>
+      <!-- Stepper User -->
+      <mat-step [stepControl]="userFormGroup">
+        <form [formGroup]="userFormGroup" fxFlex="grow">
+          <mat-card-content fxLayout="column">
+            <h3 fxFlex="grow">Acceder al sistema</h3>
+            <mat-form-field fxFlex="grow">
+              <input matInput data-testid="username-input" placeholder="Ingresa tu usuario o correo electrónico" formControlName="username"
+                id="step0" #username focus required>
+            </mat-form-field>
+            <mat-card-footer fxLayout="row-reverse" fxLayoutAlign="space-between center">
+              <div fxLayout="row-reverse" fxLayoutGap="12px">
+                <button mat-raised-button matStepperNext color="primary" class="btn" [disabled]="userFormGroup.invalid">
+                  Siguiente
+                </button>
+              </div>
+              <a color="accent" (click)="openHelp()">
+                Necesito Ayuda
+              </a>
+            </mat-card-footer>
+          </mat-card-content>
+        </form>
+      </mat-step>
+      <!-- Stepper Password -->
+      <mat-step [stepControl]="passwordFormGroup">
+        <form [formGroup]="passwordFormGroup" fxFlex="grow">
+          <mat-card-content fxLayout="column">
+            <h3 fxFlex="grow">Hola {{username.value}}!</h3>
+            <mat-form-field fxFlex="grow">
+              <input matInput data-testid="password-input" placeholder="Ingresá tu contraseña" id="step1" type="password" formControlName="password" required />
+              <button mat-button matSuffix matStepperPrevious [disabled]="reCaptchaActive && !reCaptchaTokenValidated" (click)="forgotPassword(stepper)">
+                olvidé mi contraseña
+              </button>
+            </mat-form-field>
+            <re-captcha #captchaRef fxLayout="row" fxLayoutAlign="center center" *ngIf="reCaptchaActive" formControlName="captcha"  (resolved)="resolved($event)" siteKey="{{reCaptchaSiteKey}}"></re-captcha>
+            <mat-card-footer fxLayout="row-reverse" fxLayoutAlign="space-between center">
+              <div fxLayout="row-reverse" fxLayoutGap="12px">
+                <button mat-raised-button data-testid="send-btn-data" (click)="login()" color="primary" class="btn">Ingresar</button>
+                <button mat-button matStepperPrevious>Volver</button>
+              </div>
+              <a color="accent" (click)="openHelp()">
+                Necesito Ayuda
+              </a>
+            </mat-card-footer>
+          </mat-card-content>
+        </form>
+      </mat-step>
+      <!-- Stepper OU selection -->
+      <mat-step [stepControl]="ouFormGroup"  >
+        <form [formGroup]="ouFormGroup" fxFlex="grow">
+          <mat-card-content fxLayout="column">
+            <h3 fxFlex="grow">Hola {{username.value}}!</h3>
+            <mat-form-field fxFlex="grow" *ngIf="organizationalUnits.length <= minOuLogins">
+              <mat-select placeholder="Empresa" [(ngModel)]="selectedOrganizationalUnit" id="step2"
+                formControlName="organizationalUnit" required>
+                <mat-option *ngFor="let organizationalUnit of organizationalUnits" [value]="organizationalUnit">
+                  {{organizationalUnit.name}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <app-autocomplete-chip  [showIcons]="true"  *ngIf="organizationalUnits.length > minOuLogins"
+            [iconName]="'fa-home'" [OrganizationList]="organizationalUnits"  title="Ingrese la unidad Organizacional"
+            [placeHolderText]="'Empresa'" [OuView]="true"
+             fxFlex="grow" fxLayout="row"
+             (OnOuSelected)="ouSelectComplete($event)" (OnValidSelected)="ouSelectComplete($event)">
+           </app-autocomplete-chip>
+            <mat-card-footer fxLayout="row-reverse" fxLayoutGap="12px" fxLayoutAlign="start center">
+              <button mat-raised-button (click)="setOrganizationalUnit()" color="primary" class="btn"
+                [disabled]="ouFormGroup.invalid  || inProcess">
+                Ingresar
+              </button>
+              <button mat-button matStepperPrevious>Volver</button>
+            </mat-card-footer>
+          </mat-card-content>
+        </form>
+
+
+
+      </mat-step>
+      <!-- Stepper TyC -->
+      <mat-step [stepControl]="tycFormGroup">
+        <form [formGroup]="tycFormGroup" fxFlex="grow">
+          <mat-card-content fxLayout="column">
+            <app-terms-and-conditions [showPrint]="true" [showSave]="true" [showZoomIn]="true" [showZoomOut]="true"
+              [termsAndConditions]="termsAndConditions"></app-terms-and-conditions>
+            <mat-card-footer fxLayout="row-reverse" fxLayoutAlign="space-between center">
+              <div fxLayout="row" fxLayoutGap="12px">
+                <button mat-raised-button class="btn" (click)="exitTermAndConditions()">
+                  Salir
+                </button>
+                <button id="agree" mat-raised-button color="primary" type="submit" class="btn"
+                  [disabled]="tycFormGroup.invalid || inProcess" (click)="acceptTermAndConditions()">
+                  Acepto
+                </button>
+              </div>
+              <mat-checkbox [(ngModel)]="isTermAndConditionsAccepted" formControlName="isTermAndConditionsAccepted"
+                required *ngIf="!isTermAndConditionsAccepted || !termsAndConditions?.askCredentialsForApproval"
+                (click)="setFocus('agree')">
+                He leído los Términos y Condiciones
+              </mat-checkbox>
+              <mat-form-field *ngIf="termsAndConditions?.askCredentialsForApproval && isTermAndConditionsAccepted">
+                <input matInput placeholder="Ingresá tu contraseña" type="password" formControlName="userCredentials"
+                  [required]=!showCredential>
+              </mat-form-field>
+            </mat-card-footer>
+          </mat-card-content>
+        </form>
+      </mat-step>
+      <!-- Stepper OTP -->
+      <mat-step [stepControl]="OTPFormGroup">
+        <form [formGroup]="OTPFormGroup" fxFlex="grow">
+          <mat-card-content fxLayout="column">
+            <h3 fxFlex="grow">Escribe tu código de verificación de OTP.</h3>
+            <mat-form-field fxFlex="grow">
+              <input matInput placeholder="Ingresá tu código (6 dígitos)" type="text" formControlName="otp" required>
+            </mat-form-field>
+            <mat-card-footer fxLayout="row-reverse" fxLayoutAlign="space-between center">
+              <div fxLayout="row-reverse" fxLayoutGap="12px">
+                <button mat-raised-button (click)="loginOTP()" color="primary" class="btn"
+                  [disabled]="OTPFormGroup.invalid   || inProcess">Ingresar</button>
+                <button mat-button (click)="back()">Volver</button>
+              </div>
+              <a (click)="confirmOTP()" routerLink="">No tengo mi código OTP</a>
+            </mat-card-footer>
+          </mat-card-content>
+        </form>
+      </mat-step>
+    </mat-horizontal-stepper>
+    <!-- Stepper help -->
+    <mat-horizontal-stepper *ngIf="showHelp" #stepper class="help-stepper">
+      <mat-step [stepControl]="helpIndex">
+        <mat-card-content fxLayout="column" fxFlex="grow">
+          <h3 class="align-16" fxFlex="grow">Índice de Ayuda</h3>
+          <h5 class="align-16" fxFlex="grow">
+            A continuación encontrarás las soluciones a los <b>problemas más comunes de
+              acceso.</b><br>
+            Si ninguno de estos es tu problema, podés <b>contactar al departamento de RRHH</b> de tu
+            empresa.
+          </h5>
+          <mat-action-list>
+            <button mat-list-item class="option-btn" (click)="move(1)">
+              <div class="help-options" fxLayout="row" fxLayoutAlign="start center" fxFlex="grow" fxLayoutGap="16px">
+                <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-arrow-right"></mat-icon>
+                <span>Olvidé mi usuario</span>
+              </div>
+            </button>
+            <button mat-list-item class="option-btn" (click)="move(2)">
+              <div class="help-options" fxLayout="row" fxLayoutAlign="start center" fxFlex="grow" fxLayoutGap="16px">
+                <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-arrow-right"></mat-icon>
+                <span>Olvidé mi contraseña</span>
+              </div>
+            </button>
+            <button mat-list-item class="option-btn" (click)="move(3)">
+              <div class="help-options" fxLayout="row" fxLayoutAlign="start center" fxFlex="grow" fxLayoutGap="16px">
+                <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-arrow-right"></mat-icon>
+                <span>No me llegan mails</span>
+              </div>
+            </button>
+            <button mat-list-item class="option-btn" (click)="move(4)">
+              <div class="help-options" fxLayout="row" fxLayoutAlign="start center" fxFlex="grow" fxLayoutGap="16px">
+                <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-arrow-right"></mat-icon>
+                <span>Registrarme en Humanage</span>
+              </div>
+            </button>
+          </mat-action-list>
+          <mat-card-footer fxLayout="row-reverse" fxLayoutAlign="start center">
+            <button mat-raised-button color="primary" (click)="closeHelp()">Volver al login</button>
+          </mat-card-footer>
+        </mat-card-content>
+      </mat-step>
+      <mat-step [stepControl]="help-1">
+        <mat-card-content fxLayout="column" fxFlex="grow">
+          <div class="help-title" fxFlex="grow" fxLayout="row" fxLayoutAlign="start center">
+            <button mat-icon-button (click)="stepper.reset()" title="Volver">
+              <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-arrow-left"></mat-icon>
+            </button>
+            <h3 class="align-16">
+              Ayuda: "Olvidé mi usuario"
+            </h3>
+          </div>
+          <h5 class="align-16" fxFlex="grow">El usuario es el identificador con el que podés ingresar a la
+            herramienta. <br>
+            <br>
+            <b>Tenés dos formas:</b>
+            <ul>
+              <li>El nombre de usuario que se te envió en el correo de Bienvenida a Humanage.</li>
+              <br>
+              <li>Tu correo electrónico.</li>
+            </ul>
+          </h5>
+          <mat-card-footer fxLayout="row" fxLayoutAlign="space-between center">
+            <b>¿Te fue útil la info?</b>
+            <div fxLayout="row-reverse" fxLayoutGap="12px">
+              <button mat-raised-button color="primary" (click)="move(5)">Sí</button>
+              <button mat-button (click)="move(6)">No</button>
+            </div>
+          </mat-card-footer>
+        </mat-card-content>
+      </mat-step>
+      <mat-step [stepControl]="help-2">
+        <mat-card-content fxLayout="column" fxFlex="grow">
+          <div class="help-title" fxFlex="grow" fxLayout="row" fxLayoutAlign="start center">
+            <button mat-icon-button (click)="stepper.reset()" title="Volver">
+              <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-arrow-left"></mat-icon>
+            </button>
+            <h3 class="align-16">
+              Ayuda: "Olvidé mi contraseña"
+            </h3>
+          </div>
+          <h5 class="align-16" fxFlex="grow">
+            Si olvidaste tu contraseña, no te preocupes.<br>
+            Cuando ingreses tu usuario, presiona la opción <b>"olvidé mi contraseña"</b> y de inmediato te
+            enviaremos las indicaciones a tu correo para modificar la clave.
+            <br><br>
+            Ojo 👀: <br>
+            Asegúrate de ingresar el usuario correctamente, de lo contrario te saldrá un letrero que dice:
+            "No existe el usuario".
+          </h5>
+          <mat-card-footer fxLayout="row" fxLayoutAlign="space-between center">
+            <b>¿Te fue útil la info?</b>
+            <div fxLayout="row-reverse" fxLayoutGap="12px">
+              <button mat-raised-button color="primary" (click)="move(5)">Sí</button>
+              <button mat-button (click)="move(6)">No</button>
+            </div>
+          </mat-card-footer>
+        </mat-card-content>
+      </mat-step>
+      <mat-step [stepControl]="help-3">
+        <mat-card-content fxLayout="column" fxFlex="grow">
+          <div class="help-title" fxFlex="grow" fxLayout="row" fxLayoutAlign="start center">
+            <button mat-icon-button (click)="stepper.reset()" title="Volver">
+              <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-arrow-left"></mat-icon>
+            </button>
+            <h3 class="align-16">
+              Ayuda: "No me llegan mails"
+            </h3>
+          </div>
+          <h5 class="align-16" fxFlex="grow">Lo primero que tenés que hacer es <b>revisar la bandeja de
+              Spam.</b><br>
+            Si el correo no está allí, es probable que estés registrado con otro mail.
+            <br><br>
+            Ojo 👀: <br>
+            Para saber con qué correo estás registrado, consulta a tu departamento de Recursos Humanos.
+          </h5>
+          <mat-card-footer fxLayout="row" fxLayoutAlign="space-between center">
+            <b>¿Te fue útil la info?</b>
+            <div fxLayout="row-reverse" fxLayoutGap="12px">
+              <button mat-raised-button color="primary" (click)="move(5)">Sí</button>
+              <button mat-button (click)="move(6)">No</button>
+            </div>
+          </mat-card-footer>
+        </mat-card-content>
+      </mat-step>
+      <mat-step [stepControl]="help-4">
+        <mat-card-content fxLayout="column" fxFlex="grow">
+          <div class="help-title" fxFlex="grow" fxLayout="row" fxLayoutAlign="start center">
+            <button mat-icon-button (click)="stepper.reset()" title="Volver">
+              <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-arrow-left"></mat-icon>
+            </button>
+            <h3 class="align-16">
+              Ayuda: "Registrarme en Humanage"
+            </h3>
+          </div>
+          <h5 class="align-16" fxFlex="grow">
+            <b>No podés registrarte en Humanage por tu cuenta.</b><br><br>
+            Tuviste que haber recibido un correo electrónico con las instrucciones para ingresar, de no ser así, debés
+            contactarte con tu departamento de Recursos Humanos.
+            <br><br>
+            Info 📣: <br>
+            Para saber más sobre el registro en Humanage <a href="{{urlRegisterHelp}}" target="_blank"
+              rel="noopener noreferrer">click aquí</a>
+          </h5>
+          <mat-card-footer fxLayout="row" fxLayoutAlign="space-between center">
+            <b>¿Te fue útil la info?</b>
+            <div fxLayout="row-reverse" fxLayoutGap="12px">
+              <button mat-raised-button color="primary" (click)="move(5)">Sí</button>
+              <button mat-button (click)="move(6)">No</button>
+            </div>
+          </mat-card-footer>
+        </mat-card-content>
+      </mat-step>
+      <mat-step [stepControl]="helpEndOk">
+        <mat-card-content fxLayout="column" fxFlex="grow">
+          <h3 class="align-16" fxFlex="grow">¡Enhorabuena!</h3>
+          <h5 class="align-16" fxFlex="grow"><b>Nos alegra que te hayamos podido ayudar 🙂</b>
+            <br>
+            <br>Cualquier otra duda, podés consultar a tu departamento de RRHH.
+          </h5>
+          <mat-card-footer fxLayout="row-reverse" fxLayoutAlign="start center">
+            <button mat-raised-button color="accent" (click)="closeHelp()">Volver al login</button>
+          </mat-card-footer>
+        </mat-card-content>
+      </mat-step>
+      <mat-step [stepControl]="helpEndNotOk">
+        <mat-card-content fxLayout="column" fxFlex="grow">
+          <h3 class="align-16" fxFlex="grow">Lamentamos no poder ayudarte desde aquí 🙁</h3>
+          <h5 class="align-16" fxFlex="grow">Te recomendamos comunicarte con el <b>departamento de RRHH</b> de
+            tu empresa.</h5>
+          <mat-card-footer fxLayout="row-reverse" fxLayoutGap="12px" fxLayoutAlign="start center">
+            <button mat-raised-button color="primary" (click)="stepper.reset()">
+              Volver al índice
+            </button>
+            <button mat-button (click)="closeHelp()">Volver al login</button>
+          </mat-card-footer>
+        </mat-card-content>
+      </mat-step>
+    </mat-horizontal-stepper>
+    <mat-progress-bar mode="indeterminate" [style.display]="isLoading ? 'block' : 'none'">
+    </mat-progress-bar>
+  </mat-card>
+  <img *ngIf="logoSrc && subdomain" class="humanage-icon" [src]="humanageSrc" alt="/">
+</div>

@@ -1,0 +1,23 @@
+<div class="ux-modal" *ngIf="isBrwoserOld">
+    <div class="card">
+        <div class="main-title">Lamentablemente tu navegador no es compatible :(</div>
+        <div class="sub-title">Te recomendamos que utilices la última versión de Google Chrome</div>
+        <div class="cad-row">
+            <a href="https://www.google.com/intl/es-419/chrome/" target="_blank" class="icon big chr"></a>
+        </div>
+        <div class="sub-title">o cualquiera de estos navegadores</div>
+        <div class="cad-row">
+            <a href="https://www.mozilla.org/es-AR/firefox/new/" target="_blank" class="icon fir"></a>
+            <div class="divider"></div>
+            <a href="https://www.microsoft.com/es-es/windows/microsoft-edge" target="_blank" class="icon edg"></a>
+            <div class="divider"></div>
+            <a href="https://www.opera.com/es-419/download" target="_blank" class="icon ope"></a>
+            <div class="divider"></div>
+            <a href="https://www.apple.com/la/safari/" target="_blank" class="icon saf"></a>
+        </div>
+        <div class="card-footer">
+            <a (click)="toggleOption()" [ngClass]="{'hide' : toggle }">Opciones avanzadas<i class="chevron"></i></a>
+            <a class="hide" [ngClass]="{'show' : toggle }" (click)="ok()">Entiendo, pero igualmente quiero ingresar</a>
+        </div>
+    </div>
+</div>

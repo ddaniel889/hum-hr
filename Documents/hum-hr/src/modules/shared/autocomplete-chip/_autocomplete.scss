@@ -1,0 +1,68 @@
+@import '../../../../assets/styles/img-management';
+
+.mat-form-field-wrapper .clean-autocomple  .mat-form-field
+{
+  width: 80% !important;
+}
+.clean-autocomple {
+  margin-bottom: 24px;
+  .mat-form-field-wrapper {
+    padding-bottom: 0;
+    
+  }
+
+  mat-list {
+    width: 100%;
+    border-radius: 4px;
+    overflow: hidden;
+    border-top: unset !important;
+    box-sizing: border-box;
+
+    .mat-list-item {
+      height: 48px !important;
+      max-height: 48px !important;
+
+      &:hover {
+        .mat-list-item-content {
+          button {
+            opacity: 1;
+            pointer-events: all;
+          }
+        }
+      }
+
+      .mat-list-item-content {
+        padding: 0 8px !important;
+
+        button {
+          width: 40px;
+          height: 40px;
+          opacity: 0;
+          pointer-events: none;
+        }
+      }
+    }
+  }  
+}
+
+@mixin autocomplete($bg-card, $primary-text, $hover) {
+
+  .clean-autocomple {
+    mat-list {
+      background: $bg-card;
+
+      .mat-list-item {
+        &:hover {
+          background: $hover !important;
+        }
+
+        .mat-list-item-content {
+          .mat-list-text {
+            color: $primary-text;
+          }
+        }
+      }
+    }
+ 
+  }
+}

@@ -1,0 +1,39 @@
+<div class="catcher">
+  <div class="wizard-add mat-elevation-z3">
+      <mat-horizontal-stepper class="add-menu" #stepper>
+          <mat-step [stepControl]="certificateFormGroup">
+              <form [formGroup]="certificateFormGroup">
+                  <mat-toolbar color="grey" fxLayout="row" fxLayoutAlign="start center">
+                      <mat-toolbar-row fxLayout="row" fxLayoutAlign="space-between center" fxFill>
+                        <div class="mat-avatar" fxLayout="row" fxLayoutAlign="space-between center" >
+                          <div class="toolbar-line" fxLayout="row">
+                              <div class="title" fxLayout="column" fxLayoutAlign="center start">
+                                  <h3>Renovar certificado de firma</h3>
+                              </div>
+                          </div>
+                        </div>
+                          <button mat-icon-button (click)="cancel()" title="Cerrar">
+                                      <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+                          </button>
+                      </mat-toolbar-row>
+                  </mat-toolbar>
+                  <mat-divider></mat-divider>
+                  <div class="add-menu-form-body">
+                      <h5 class="stepper-title">Selecciona el certificado a renovar</h5>
+                      <mat-form-field>
+                          <mat-select placeholder="Certificado expirado" id="step1" formControlName="selectedCertificate" required>
+                              <mat-option *ngFor="let certificate of expiredCertificate" [value]="certificate" (click)="seletedCertificate()">
+                                  {{certificate.providerDescription}}
+                              </mat-option>
+                          </mat-select>
+                      </mat-form-field>
+                  </div>
+                  <div class="add-menu-form-actions">
+                      <button mat-raised-button (click)="save()" color="primary" [disabled]="!isSave" class="btn">Aceptar</button>
+                      <button mat-button (click)="cancel()">Cancelar</button>
+                  </div>
+              </form>
+          </mat-step>
+      </mat-horizontal-stepper>
+  </div>
+</div>

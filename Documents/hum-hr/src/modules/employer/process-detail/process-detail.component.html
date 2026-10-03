@@ -1,0 +1,125 @@
+<app-chapa *ngIf="deferedProcess && deferedProcess.stateId == '001'" [className]="'wellcome-bk'"
+  [text]="'Proceso en Ejecución'"></app-chapa>
+<app-chapa *ngIf="deferedProcess && deferedProcess.stateId == '008'" [icon]="'fa-meh'" [className]="'info-empty'"
+  [text]="'El proceso ha finalizado'" [subText]="'No tenemos mas información para darte'"></app-chapa>
+<app-chapa [ngClass]="{'fa minimize purged':showPurged}" *ngIf="deferedProcess && isPurged" [className]="'info-empty'"
+  [text]="'El proceso ha Vencido'"
+  [subText]="'Pasados 90 días el proceso vence, podés ver la información del proceso, sin embargo ya no podrás reprocesarlo ni descargar sus archivos asociados'"
+  [actionIcon]="'fa-eye'" [actionIcon]="false" [actionText]="'Ver información'" [icon]="'fa-fire-alt'"
+  (actionClick)="purgedChapaClick()">
+</app-chapa>
+<ng-container *ngIf="deferedProcess.stateId != '008'">
+  <mat-toolbar class="detail-toolbar">
+    <mat-toolbar-row>
+      <div class="mat-avatar" fxLayout="row" fxLayoutAlign="space-between center">
+        <div class="toolbar-line container-ou" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+          <div class="invisible-container ou-selector" fxLayout="row" fxLayoutAlign="start center">
+            <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+              <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-industry-alt">
+              </mat-icon>
+              <div class="title" fxLayout="column" fxLayoutAlign="center start">
+                <h3><b>{{deferedProcess?.OUNameDestination}}</b></h3>
+              </div>
+            </div>
+          </div>
+          <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-users-cog"
+              *ngIf="deferedProcess.processTypeId == '002' || deferedProcess.processTypeId == '010'">
+            </mat-icon>
+            <mat-icon fontSet="fa" fontIcon="fa-file-contract" *ngIf="deferedProcess.processTypeId == '003'">
+            </mat-icon>
+
+            <div class="title" fxLayout="column" fxLayoutAlign="center start">
+              <h3>{{deferedProcess?.documentationType ? deferedProcess?.documentationType.name : '' }}
+              </h3>
+              <h5>{{deferedProcess?.processTypeName}} </h5>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-toolbar-row>
+  </mat-toolbar>
+  <mat-divider [inset]="true"></mat-divider>
+  <mat-toolbar class="secondary-toolbar">
+    <mat-toolbar-row fxLayout="row" fxLayoutAlign="space-between center">
+      <div class="mat-avatar" fxLayout="row" fxLayoutAlign="space-between center">
+        <div class="toolbar-line" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+          <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-tasks">
+          </mat-icon>
+          <div class="title" fxLayout="column" fxLayoutAlign="center start">
+            <h4>Detalle de Ejecución</h4>
+          </div>
+        </div>
+      </div>
+      <button mat-icon-button (click)="downloadFile(processFileWithError)"
+        *ngIf="processFileWithError && processFileWithError.length > 0" title="Descargar">
+        <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-download"></mat-icon>
+      </button>
+      <button mat-icon-button (click)="openBottomSheetDelete()"
+        *ngIf="showDelete && !isDeleted && !loading && !isPurged && (isRRHH() || !isGestorDocumental())" title="Eliminar Documentos">
+        <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-trash-alt"></mat-icon>
+      </button>
+      <button mat-icon-button (click)="downloadFile(processFileOK)"
+        *ngIf="processFileOK && processFileOK.length > 0 && !isPurged" title="Descargar Todos">
+        <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-arrow-to-bottom"></mat-icon>
+      </button>
+      <app-cs-paginator [pageCount]="itemsCount" [(pageIndex)]="filters.page"
+        (pageChanged)="selectedPageChanged($event)">
+      </app-cs-paginator>
+    </mat-toolbar-row>
+  </mat-toolbar>
+  <!-- DEFERED-PROCESS-TABLE -->
+  <div class="status-table">
+    <div class="mat-table">
+      <!-- DEFERED-PROCESS-TABLE_HEAD -->
+      <div class="mat-header-row sticky" fxLayout="row" fxLayoutAlign="start center">
+        <div class="mat-header-cell w-1 icon" fxLayout="row" fxLayoutAlign="center center">
+          <span>Tipo</span>
+        </div>
+        <div class="w-12 multiple-selection icon" fxLayout="row" fxLayoutAlign="start center">
+          <div class="mat-header-cell w-2" fxLayout="row" fxLayoutAlign="start center">
+            <span>Fecha</span>
+          </div>
+          <div class="mat-header-cell w-7" fxLayout="row" fxLayoutAlign="start center">
+            <span>Descripción</span>
+          </div>
+          <div class="mat-header-cell w-3" fxLayout="row" fxLayoutAlign="start center">
+            <span>Acción</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- DEFERED-PROCESS-TABLE-ROWS -->
+      <div class="mat-row" matRipple *ngFor="let log of processLogs" fxLayout="row" fxLayoutAlign="start center">
+        <div class="mat-header-cell w-1 icon" fxLayout="row" fxLayoutAlign="center center" title=" {{ log.type }}">
+          <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-info-circle" *ngIf="log.type.toLowerCase() ==='info'">
+          </mat-icon>
+          <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-exclamation-triangle"
+            *ngIf="log.type.toLowerCase() ==='error'">
+          </mat-icon>
+        </div>
+        <div class="w-12 multiple-selection icon" fxLayout="row" fxLayoutAlign="start center"
+          title="{{ log.creationDate | date :'dd/MM/yyyy HH:mm:ss' }}">
+          <div class="mat-cell w-2" fxLayout="column" fxLayoutAlign="center start">
+            <span>
+              {{ log.creationDate | date :'dd/MM/yyyy'}}
+            </span>
+            <span>
+              {{ log.creationDate | date :'HH:mm:ss'}}
+            </span>
+          </div>
+          <div class="mat-cell w-7" fxLayoutAlign="start center" title="  {{ log.description }}">
+            <span>
+              {{ log.description }}
+            </span>
+          </div>
+          <div class="mat-cell w-3" fxLayoutAlign="start center" title="{{ log.action }}">
+            <span>
+              {{ log.action }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>

@@ -1,0 +1,449 @@
+<!-- VACATION-SEARCH -->
+<div class="main" fxLayout="column" fxFill [ngClass]="{'w-detail': showDetail}">
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <!-- info -->
+    <div class="header">
+      <div class="content" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px" fxFlex="100">
+        <!-- Ou selector -->
+        <div class="ou-select" (click)='selectOU.open()' matRipple fxLayout="row" fxLayoutAlign="start center"
+          title="Cambiar de Empresa" *ngIf="organizationalUnits?.length > 1">
+          <div class="info" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-industry-alt">
+            </mat-icon>
+            <div fxLayout="column">
+              <h5>Empresa</h5>
+              <h3>{{loading && !selectedOrganizationalUnit ? 'Cargando...': selectedOrganizationalUnit?.name}}
+              </h3>
+            </div>
+          </div>
+          <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-caret-down">
+          </mat-icon>
+          <mat-select class="invisible-item" #selectOU (click)="$event.stopPropagation()"
+            [(ngModel)]="selectedOrganizationalUnit">
+            <mat-option *ngFor="let organizationalUnit of organizationalUnits" [value]="organizationalUnit"
+              (click)="filteredSearchRefresh(organizationalUnit.id)">
+              {{organizationalUnit?.name}}
+            </mat-option>
+          </mat-select>
+        </div>
+        <!-- app selector -->
+        <div class="module-title" *ngIf="views?.length < 2 " fxLayout="row" fxLayoutAlign="start center">
+          <div class="info" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+            <mat-icon class="fa-lg" fontSet="far" fontIcon="fa-calendar-alt">
+            </mat-icon>
+            <div fxLayout="column">
+              <h3>{{selectedView.key}}</h3>
+              <h5 *ngIf="organizationalUnits?.length == 1">
+                {{selectedOrganizationalUnit?.name}}
+              </h5>
+              <h5 *ngIf="organizationalUnits?.length > 1">
+                Gestión de Tiempos
+              </h5>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div class="search-container">
+      <div class="search" fxLayout="row" fxLayoutAlign="start center" fxFlex="100">
+        <div class="content" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px" fxFlex="100">
+          <mat-icon class="fa" fontSet="fal" fontIcon="fa-search">
+          </mat-icon>
+          <input id="employeeFind_searchField" data-testid="leave-find-search" type="search" [(ngModel)]="filterName" placeholder="Buscar Empleados"
+            (keydown.enter)="filteredSearch()" />
+          <button *ngIf="!showDetail" mat-button color="primary" [matMenuTriggerFor]="menu"
+            [disabled]="!selectedOrganizationalUnit" #menuTrigger="matMenuTrigger">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-caret-down">
+            </mat-icon>
+            Búsqueda Avanzada
+          </button>
+          <button id="employeeFind_advancedSearchBtn" *ngIf="showDetail" mat-icon-button color="primary"
+            [matMenuTriggerFor]="menu" #menuTrigger="matMenuTrigger" title="Búsqueda Avanzada"
+            [disabled]="!selectedOrganizationalUnit">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-caret-down">
+            </mat-icon>
+          </button>
+          <button [disabled]="loading" mat-icon-button title="Ver Guía de Búsqueda" [matMenuTriggerFor]="menuHelp"
+            *ngIf="!showDetail">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-question-circle"></mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- helper -->
+  <div class="helper" fxLayout="row" fxLayoutAlign="space-between center">
+    <!-- hint -->
+    <mat-hint fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="space-between center">
+      <!-- ACTUALIZAR -->
+      <button mat-icon-button (click)='search(true)' title="Actualizar Listado" [disabled]="loading">
+        <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-redo"></mat-icon>
+      </button>
+      <h4 *ngIf="!loading" name="lbl_TotEmpleadosBusqueda">
+        {{itemsCount >= 2 ? itemsCount + ' Solicitudes encontradas': (itemsCount == 0 ? 'Sin solicitudes': '1 Solicitud
+        encontrada')}}
+      </h4>
+      <h4 *ngIf="loading">Cargando...</h4>
+    </mat-hint>
+    <!-- actions -->
+    <div class="actions" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+      <!-- BULK-APPROVE-LEAVE REQUEST -->
+      <button mat-icon-button *ngIf="showDetail && showApproveLeaves" color="primary"
+        title="Aprobar Solicitudes Seleccionadas" [disabled]="loading" (click)="ApproveLeaveRequests()">
+        <mat-icon class="fa-solid" fontSet="fas" fontIcon="fa-thumbs-up"></mat-icon>
+      </button>
+      <button mat-stroked-button *ngIf="!showDetail && showApproveLeaves" (click)="ApproveLeaveRequests()"
+        color="primary" [disabled]="loading">
+        <mat-icon class="fa-solid" fontSet="fas" fontIcon="fa-thumbs-up">
+        </mat-icon>
+        Aprobar Solicitudes Seleccionadas
+      </button>
+      <!-- BULK-EXPORT-LIST -->
+      <button mat-icon-button *ngIf="showDetail" (click)="exportAll()"
+        title="Exportar Listado a Excel" [disabled]="loading || leaves.length === 0">
+        <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+          <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-file-spreadsheet">
+          </mat-icon>
+          <mat-icon class="fa-lg complex" fontSet="fas" fontIcon="fa-download">
+          </mat-icon>
+        </div>
+      </button>
+      <button mat-stroked-button *ngIf="!showDetail" (click)="exportAll()" color="primary"
+        [disabled]="loading || leaves.length === 0">
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-file-spreadsheet">
+        </mat-icon>
+        Exportar Listado
+      </button>
+      <!-- FILTER-STATE -->
+    <div class="filters-bar">
+      <button class="filter-chip" mat-stroked-button color="primary" [disabled]="loading"  [ngClass]="loading ? 'no-clickable' : ''" (click)="selectState.open()" title="Filtrar">
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-filter"></mat-icon>
+        <mat-select #selectState (click)="$event.stopPropagation()" (keydown)="filteredSearch()" [(ngModel)]="selectedLeaveStateFind">
+          <mat-option *ngFor="let state of statesFilters" [value]="state.key" (click)="filteredSearch()" (keydown)="filteredSearch()">
+                {{state?.value}}
+          </mat-option>
+        </mat-select>
+      </button>
+    </div>      
+      <!-- paginator -->
+      <app-cs-paginator [hidden]="leaves?.length == 0" [pageCount]="itemsCount" [(pageIndex)]="pageIndex"
+        (pageChanged)="selectedPageChanged($event)">
+      </app-cs-paginator>
+    </div>
+    <mat-progress-bar mode="indeterminate" *ngIf="loading"></mat-progress-bar>
+  </div>
+  <!-- LOADER -->
+  <div class="load-window new" *ngIf="loading && !leaves?.length">
+    <mat-progress-spinner mode="indeterminate" color="primary">
+    </mat-progress-spinner>
+  </div>
+  <!-- Empty (app chapa) -->
+  <ng-container *ngIf="!loading && leaves?.length == 0">
+    <app-chapa [className]="'info-empty'" [icon]="'fa-meh'" [text]="'¡Ups! No hay solicitudes de licencias aquí...'"
+      [subText]="organizationalUnits?.length > 1 ? 'Intenta hacer otra Búsqueda o prueba con otra Empresa' : 'Intenta hacer otra Búsqueda'">
+    </app-chapa>
+  </ng-container>
+
+  <!-- LEAVE-SEARCH-TABLE -->
+  <div class="new-table" [hidden]="!leaves?.length">
+    <div class="mat-table">
+      <!-- LEAVE-SEARCH-TABLE_HEAD -->
+      <div class="mat-header-row sticky" fxLayout="row" fxLayoutAlign="start center">
+        <div class="mat-header-cell w-1" fxLayout="row" fxLayoutAlign="start">
+          <mat-checkbox *ngIf="this.selectedLeaveStateFind == 1 && showMassiveApproveCheck" [(ngModel)]="allSelected"
+            (ngModelChange)="selectAllToogle()"></mat-checkbox>
+        </div>
+        <div class="w-12 multiple-selection dynamic-table" fxLayout="row" fxLayoutAlign="start center">
+          <div class="mat-header-cell w-1-5" fxLayout="row" fxLayoutAlign="start center" title="Ordenar por Estado">
+            <span>Estado</span>
+          </div>
+          <div class="mat-header-cell w-2" fxLayout="row" fxLayoutAlign="start center" title="Ordenar por Estado">
+            <span>Tipo</span>
+          </div>
+          <div class="mat-header-cell w-2" fxLayout="row" fxLayoutAlign="start center" title="Ordenar por Estado">
+            <span>Solicitante</span>
+          </div>
+          <div class="mat-header-cell w-2" fxLayout="row" fxLayoutAlign="start center" title="Ordenar por Estado">
+            <span>Id Fiscal</span>
+          </div>
+          <div class="mat-header-cell w-2" fxLayout="row" fxLayoutAlign="start center" title="Ordenar por Estado">
+            <span>Fecha Creación</span>
+          </div>
+          <div class="mat-header-cell w-1-5" fxLayout="row" fxLayoutAlign="center" title="Ordenar por Estado">
+            <span>Duración</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- LEAVE-SEARCH-TABLE-ROWS -->
+      <div [id]="'leaveRequestListRow'+i" class="mat-row" matRipple *ngFor="let leave of leaves; let i= index"
+        fxLayout="row" fxLayoutAlign="start center"
+        [ngClass]="{'active': leave == selectedLeaveRequest, 'selected': leave.selected}">
+        <div class="mat-header-cell w-0-8" fxLayout="row" fxLayoutAlign="start">
+          <mat-checkbox [(ngModel)]="leave.selected" *ngIf="this.selectedLeaveStateFind == 1 && isLeaveApprovedByValidator(leave)"
+            (ngModelChange)="selectedChange()"></mat-checkbox>
+        </div>
+        <div class="w-12 w-sticky" fxLayout="row" fxLayoutAlign="start center" (click)="selectLeaveRequest(leave)">
+          <div class="mat-cell w-1-5 status-cell" fxLayout="row" fxLayoutAlign="start scenter" fxLayoutGap="12px"
+            [title]="leave.stateName">
+            <mat-icon *ngIf="!shouldShowCheck(workflowApproveType?.id,leave.stateId,leave.actionApprovers)"></mat-icon>
+            <mat-icon *ngIf="shouldShowCheck(workflowApproveType?.id,leave.stateId,leave.actionApprovers)" class="fa-lg" fontSet="fas" [fontIcon]=getLeaveValidationIcon(leave)
+              [ngClass]=getLeaveValidationClass(leave)>
+            </mat-icon>
+            <mat-icon *ngIf="(leave.actionApprovers.length == 0 && leave.stateId != '0') && shouldShowCheck(workflowApproveType?.id,leave.stateId,leave.actionApprovers)"></mat-icon>
+            <mat-icon class="fa-lg" fontSet="fas" [fontIcon]=getLeaveStatusIcon(leave)
+              [ngClass]=getLeaveStatusClass(leave)>
+            </mat-icon>
+            <span>{{getLeaveStatusName(leave)}}</span>
+          </div>
+          <div class="mat-cell w-2" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="12px"
+            [title]="getLeaveTypeName(leave)">
+            <mat-icon class="fa-lg" fontSet="fas" [fontIcon]=getLeaveTypeIcon(leave)></mat-icon>
+            <span>{{getLeaveTypeName(leave)}}</span>
+          </div>
+          <div class="mat-cell w-2" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="12px"
+            [title]="leave.userName">
+            <span>{{leave.userName}}</span>
+          </div>
+          <div class="mat-cell w-2" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="12px"
+            [title]="leave.userIdFiscal">
+            <span>{{leave.userIdFiscal | mask: idFiscalMask }}</span>
+          </div>
+          <div class="mat-cell w-2" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="12px"
+            [title]="leave.requestDate | date: 'full'">
+            <span>{{leave.requestDate | date: 'dd/MM/yyyy'}}</span>
+          </div>
+          <div class="mat-cell w-2" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="12px" title="Duración">
+            <span>
+              {{leave.startDate != leave.endDate ? (leave?.startDate | date: 'dd/MM/yyyy')
+              + ' a ' +
+              (leave?.endDate | date: 'dd/MM/yyyy')
+              + '(' + leave.daysConsumed + ' días)' : ''}}
+            </span>
+          </div>
+        </div>
+
+        <div class="mat-cell sticky-actions" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+          <button id="btn_Ver" name="btn_Ver" mat-icon-button title="Ver" (click)="viewDocument(leave)" *ngIf="leave.documentId">
+                        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-eye"></mat-icon>
+          </button>
+
+          <button *ngIf="canReject(leave) && leave.stateId != 4 && isLeaveApprovedByValidator(leave)" class="not-ok" name="btn_RechazarSolicitud" mat-icon-button
+          title="Rechazar Solicitud" (click)="approveReject(false, leave)">
+          <mat-icon class="fa-solid" fontSet="fas" fontIcon="fa-thumbs-down"></mat-icon>
+          </button>
+
+          <button *ngIf="leave.stateId == 1 && leave.state != 4 && isLeaveApprovedByValidator(leave)" class="ok" name="btn_AprobarSolicitud" mat-icon-button
+          title="Aceptar Solicitud" (click)="approveReject(true, leave)">
+          <mat-icon class="fa-solid" fontSet="fas" fontIcon="fa-thumbs-up"></mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- DETAILS -->
+<div class="new-detail-container" fxLayout="column" *ngIf="selectedLeaveRequest != null && selectedLeaveRequest != undefined">
+  <!-- APP LEAVE-DETAILS-->
+  <div class="load-window new" *ngIf="loadingDetail">
+    <mat-progress-spinner mode="indeterminate" color="primary">
+    </mat-progress-spinner>
+  </div>
+  <app-leave-request-detail (detailClose)="toggleLeaveDetail()" (detailloading)="hidedetailLoading()" (refreshGrid)="search()"
+    [selectedLeaveRequest]="selectedLeaveRequest"></app-leave-request-detail>
+</div>
+
+<!-- APP SEARCH MENU -->
+<mat-menu #menu="matMenu" xPosition="before" yPosition="below" class="menu-options mat-card">
+  <div class="container" (click)="$event.stopPropagation()" fxLayout="column" fxLayoutAlign="start stretch">
+    <div class="title" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+      <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-cog">
+        </mat-icon>
+        <mat-icon class="fa-lg complex" fontSet="fas" fontIcon="fa-search">
+        </mat-icon>
+      </div>
+      <h4>Búqueda Avanzada</h4>
+    </div>
+    <div class="mat-form-field-wrapper">
+      <form [formGroup]="filterDateFormLeave" fxLayout="column" fxLayoutAlign="center start" fxLayoutGap="16px">
+        <div class="title" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px" style="padding-left: 40px !important;">
+          <h4>Estado</h4>
+        </div>
+        <mat-form-field class="new_leave_modal-field" appearance="fill" fxFill>
+          <mat-select placeholder="Sin seleccionar" formControlName="selectState" [(ngModel)]="selectedLeaveSearchAdvancedStateFind" (selectionChange)="onStateSelected($event.value)">
+            <mat-option *ngFor="let state of statesFilters" [value]="state.key">
+              {{ state.value }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="new_leave_modal-field" appearance="fill" fxFill *ngIf="selectedLeaveStateFind !== 0 && workflowApproveType?.id == 1">
+          <mat-select placeholder="Sin seleccionar" formControlName="selectApproverAccion" [(ngModel)]="selectApproverAccion">
+            <mat-option *ngFor="let accion of approversOptions" [value]="accion.value">
+              {{ accion.viewValue }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <div class="title" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+          <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-filter">
+            </mat-icon>
+            <mat-icon class="fa-lg complex" fontSet="fas" fontIcon="fa-calendar">
+            </mat-icon>
+          </div>
+          <div>
+            <h4>Fecha inicio de Vacación</h4>
+            <p class="filter_range">Ingresa la fecha desde/hasta</p>
+          </div>
+        </div>
+        <mat-form-field class="new_leave_modal-field" appearance="fill" fxFill>
+          <mat-label>Fecha Desde</mat-label>
+          <input readonly matInput [min]="MinFromStart" [max]="MaxFromStart" [matDatepicker]="dateFromStart"
+            formControlName="FromDateStart" (dateChange)="setDateEndStart($event)">
+          <mat-datepicker-toggle matIconSuffix [for]="dateFromStart">
+            <mat-datepicker #dateFromStart></mat-datepicker>
+          </mat-datepicker-toggle>
+        </mat-form-field>
+        <mat-form-field class="new_leave_modal-field" appearance="fill" fxFill>
+          <mat-label>Fecha Hasta</mat-label>
+          <input readonly matInput [min]="MinUntilStart" [max]="MaxUntilStart" [matDatepicker]="dateUntilStart"
+            formControlName="UntilDateStart">
+          <mat-datepicker-toggle matIconSuffix [for]="dateUntilStart">
+            <mat-datepicker #dateUntilStart></mat-datepicker>
+          </mat-datepicker-toggle>
+        </mat-form-field>
+        <div class="title" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px" style="padding-left: 40px !important;">
+          <div>
+            <h4>Fecha creación</h4>
+            <p class="filter_range">Ingresa la fecha desde/hasta</p>
+          </div>
+        </div>
+        <mat-form-field class="new_leave_modal-field" appearance="fill" fxFill>
+          <mat-label>Fecha Desde</mat-label>
+          <input readonly matInput [min]="MinFromCreate" [max]="MaxFromCreate" [matDatepicker]="dateFromCreate"
+            formControlName="FromDateCreate" (dateChange)="setDateEndCreate($event)">
+          <mat-datepicker-toggle matIconSuffix [for]="dateFromCreate">
+            <mat-datepicker #dateFromCreate></mat-datepicker>
+          </mat-datepicker-toggle>
+        </mat-form-field>
+        <mat-form-field class="new_leave_modal-field" appearance="fill" fxFill>
+          <mat-label>Fecha Hasta</mat-label>
+          <input readonly matInput [min]="MinUntilCreate" [max]="MaxUntilCreate" [matDatepicker]="dateUntilCreate"
+            formControlName="UntilDateCreate">
+          <mat-datepicker-toggle matIconSuffix [for]="dateUntilCreate">
+            <mat-datepicker #dateUntilCreate></mat-datepicker>
+          </mat-datepicker-toggle>
+        </mat-form-field>
+      </form>
+      <div *ngIf="workflowApproveType?.id != 2">
+          <h4 style="padding-left: 40px;"><strong>Aprobador de Equipo</strong></h4>
+         <app-autocomplete-chip appearance="fill" fxFill fxLayout="row" fxLayoutAlign="start start" [originalList]="filterApprovers" [placeHolderText]="placeHolder"
+          (OnActiveList)= "filterApprovers"
+          (OnItemSelected)="selectApprover($event)"
+          (OnRemoveItem)="removeApprover($event)"
+          [selectedItemsList]="selectedApprovers"
+          [listView]="true">
+          </app-autocomplete-chip>
+      </div>
+        <div class="new_leave_modal-actions" fxLayout="row-reverse" fxLayoutAlign="start center" fxLayoutGap="12px"
+          fxFill>
+          <button mat-raised-button color="primary" (click)="filteredAdvancedSearch()"
+            [disabled]="findButtonEnable()">Buscar</button>
+          <button mat-button (click)="closeFindAdvanced()">Cerrar </button>
+        </div>
+        <div class="new_leave_modal-actions" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="12px" fxFill>
+          <button mat-raised-button color="primary" (click)="resetDateForm()">Limpiar filtros</button>
+        </div>
+
+      </div>
+  </div>
+</mat-menu>
+<!-- Guia de Busqueda de Licencias -->
+<mat-menu #menuHelp="matMenu" yPosition="below" class="menu-options help mat-card">
+  <div class="container">
+    <div class="title" fxLayout="row" fxLayoutAlign="space-between center">
+      <span fxLayout="column">
+        <h6>Guía y Ejemplos de Uso</h6>
+        <h4 class="primary">Cómo funciona la búsqueda: Buscar Solicitudes</h4>
+      </span>
+      <button mat-icon-button title="Ocultar Guía">
+        <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times">
+        </mat-icon>
+      </button>
+    </div>
+    <div class="slide-group">
+      <mat-accordion (click)="$event.stopPropagation()">
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <h4>Podés buscar por apellido y/o nombre de una persona</h4>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <ul style="margin-top:16px">
+            <li>
+              <i>Si ingresas <b>José</b> encontrarás las solicitudes de las personas <b>con este apellido o
+                  nombre</b>.</i>
+            </li>
+            <li>
+              <i>Si ingresas <b>José Ignacio Salinas</b> encontrarás las solicitudes de las personas cuyos <b>apellido
+                  y/o
+                  nombre
+                  contengan alguna de las palabras</b> ingresadas.</i>
+            </li>
+          </ul>
+        </mat-expansion-panel>
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <h4>Podés buscar por número de legajo ingresando cifras de hasta 6 dígitos, o podés usar "L:" (sea
+                mayúscula o minúscula) interpretará cualquier número que le siga como un Legajo.
+              </h4>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <ul style="margin-top:16px">
+            <li>
+              <i>Si ingresas <b>000001</b>, encontrarás las solicitudes de la persona<b> con este legajo</b>.</i>
+            </li>
+            <li>
+              <i>Si ingresas <b>000001 000012</b>, encontrarás las solicitudes de las personas cuyos
+                <b>legajos</b> se
+                encuentren dentro
+                <b>del rango ingresado</b>.</i>
+            </li>
+            <li>
+              <i>Si ingresas <b>000001 000006 000012</b>, encontrarás las solicitudes de las personas
+                con <b>cada uno de
+                  estos
+                  legajos</b>.</i>
+            </li>
+            <li>
+              <i>Si ingresas <b>l:000001 000006 000012</b>, encontrarás las solicitudes de las personas <b>con cada
+                  uno de estos legajos</b>.</i>
+            </li>
+          </ul>
+        </mat-expansion-panel>
+        <mat-expansion-panel hideToggle="true">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <h4>Podés buscar por correo electrónico ingresando el dominio completo (persona&#64;organizacion.com).
+              </h4>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+        </mat-expansion-panel>
+        <mat-expansion-panel hideToggle="true">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <h4>Podés buscar por el Identificador Fiscal ingresando una cifra a partir de 7 dígitos.</h4>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+        </mat-expansion-panel>
+      </mat-accordion>
+    </div>
+  </div>
+</mat-menu>

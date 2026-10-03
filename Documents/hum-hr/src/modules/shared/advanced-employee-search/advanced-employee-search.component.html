@@ -1,0 +1,84 @@
+<ng-container *ngIf="isEmployee">
+    <div class="title" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+        <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-cog">
+            </mat-icon>
+            <mat-icon class="fa-lg complex" fontSet="fas" fontIcon="fa-search">
+            </mat-icon>
+        </div>
+        <h4>Búsqueda Avanzada</h4>
+    </div>
+    <div class="slide-group" fxLayoutAlign="start stretch">
+        <mat-tab-group mat-align-tabs="center" dynamicHeight #advSearchTab (selectedIndexChange)="switchSearchType()">
+            <mat-tab label="Filtros de Carpeta" *ngIf="showSegmentTab">
+                <app-autocomplete-chip [showIcons]="true" [iconName]="'fa-filter'" [originalList]="segmentList"
+                    title="{{placeHolderDescription}}" [placeHolderText]="placeHolderDescription" [listView]="true"
+                    [selectedItemsList]="filters.selectedEmployeeFind" (OnItemSelected)="selectEmployeeFind($event)" (OnRemoveItem)="removeItem($event)"
+                    fxFlex="grow" fxLayout="row" fxLayoutAlign="start center"
+                    *ngIf="(filters.segmentSearch && segmentList?.length > 0) || filters.selectedEmployeeFind?.length > 0">
+                </app-autocomplete-chip>
+            </mat-tab>
+            <mat-tab label="Datos del Empleado">
+                <ng-container *ngIf="!filters.segmentSearch || segmentList?.length < 1 ">
+                    <mat-form-field fxFlex="grow">
+                        <mat-icon matPrefix class="fa-lg" fxLayout="row" fxLayoutAlign="center center" fontSet="fas"
+                            fontIcon="fa-passport">
+                        </mat-icon>
+                        <input matInput [(ngModel)]="filters.cuilSearch" placeholder="{{containerType?.label}}"
+                            mask="{{containerType?.mask}}" (keydown.enter)="filteredSearch()" />
+                    </mat-form-field>
+                    <mat-form-field fxFlex="grow">
+                        <mat-icon matPrefix class="fa-lg" fxLayout="row" fxLayoutAlign="center center" fontSet="fas"
+                            fontIcon="fa-book-user">
+                        </mat-icon>
+                        <input matInput [(ngModel)]="filters.nroLegSearch" placeholder="Número de Legajo"
+                            (keydown.enter)="filteredSearch()" />
+                    </mat-form-field>
+                </ng-container>
+            </mat-tab>
+        </mat-tab-group>
+        <!-- <div fxLayout="row" *ngIf="uniqueOption" fxLayoutAlign="start center" fxLayoutGap="8px">
+      <button mat-button (click)="notFiltering()">
+        Ocultar
+      </button>
+      <button mat-raised-button color="accent" (click)="filteredSearch()">
+        Buscar
+      </button>
+    </div> -->
+    </div>
+</ng-container>
+
+<ng-container *ngIf="!isEmployee">
+    <div class="container" (click)="$event.stopPropagation()" fxLayout="column" fxLayoutAlign="start stretch">
+        <div class="title" [ngClass]="{'mat-error': errorStatus()}" fxLayout="row" fxLayoutAlign="start center"
+            fxLayoutGap="16px">
+            <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+                <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-alien">
+                </mat-icon>
+                <mat-icon class="fa-lg complex" fontSet="fas" fontIcon="fa-heart-rate">
+                </mat-icon>
+            </div>
+            <div fxLayout="column">
+                <h4>Estado del Candidato</h4>
+                <h6 *ngIf="!errorStatus()">
+                    {{filters?.activeSearch && filters?.inactiveSearch ? 'Buscar Todos' : (filters?.activeSearch ?
+                    'Buscar sólo los Activos' : 'Buscar sólo los Cancelados' )}}
+                </h6>
+                <h6 *ngIf="errorStatus()">{{errorStatus() ?'Selecciona una opción': ''}}</h6>
+            </div>
+        </div>
+        <div class="slide-group" fxLayoutAlign="start stretch" fxLayout="column">
+            <mat-slide-toggle [(ngModel)]="filters.activeSearch">
+                Activo
+            </mat-slide-toggle>
+            <mat-slide-toggle [(ngModel)]="filters.inactiveSearch">
+                Cancelado
+            </mat-slide-toggle>
+        </div>
+    </div>
+    <div class="footer" fxLayout="row-reverse" fxLayoutAlign="start center" fxLayoutGap="16px">
+        <button mat-raised-button color="primary" [disabled]="errorsCandidate()"
+            (click)="filteredSearch()">Buscar</button>
+        <button mat-button>Cerrar</button>
+    </div>
+</ng-container>

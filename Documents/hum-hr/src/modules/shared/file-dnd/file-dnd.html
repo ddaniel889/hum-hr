@@ -1,0 +1,34 @@
+<div class="dropzone" appFileDrop (hovered)="toggleHover($event)" (dropped)="startUpload($event)" [class.hovering]="isHovering" *ngIf="showDropZone">
+    <div class="file" fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="16px">
+        <div fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="8px">
+            <h3>{{title}}</h3>
+            <h6 class="stepper-title">(Cantidad Maxima de Archivos: {{maxFile}})</h6>
+        </div>
+        <div fxLayout="column" fxLayoutAlign="center center">
+            <button mat-stroked-button [disabled]="disabled" (click)="fileInput.click()">Seleccionar</button>
+            <input hidden type="file" (change)="startUpload($event.target.files)" [accept]="acceptedExtensions" [multiple]="multipleSelection" #fileInput>
+        </div>
+        <div>
+            <h6 class="stepper-title">Elige un archivo {{acceptedExtensions}}</h6>
+        </div>
+    </div>
+</div>
+<mat-list class="file-upload-list" *ngIf="files.length > 0">
+    <h3 mat-subheader>Archivos Seleccionados</h3>
+    <mat-list-item *ngFor="let file of files; index as i" (click)="view(file)">
+        <mat-icon mat-list-icon class="fa-lg" fontSet="fa" fontIcon="fa-paperclip" fxLayout="row" fxLayoutAlign="center center"></mat-icon>
+
+        <h4 mat-line>{{file.name}}</h4>
+        <p mat-line> {{file.size | fileSize}}</p>
+        <div *ngIf="canViewFile" class="sliding-actions view" fxlayout="row" fxlayoutgap="16px">
+            <button mat-icon-button (click)="viewBigFile($event, file)" title="Ver">
+                <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-eye"></mat-icon>
+            </button>
+        </div>
+        <div class="sliding-actions remove" fxlayout="row" fxlayoutgap="16px">
+            <button *ngIf="canRemove" mat-icon-button (click)="remove(i)" title="Eliminar">
+                <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+            </button>
+        </div>
+    </mat-list-item>
+</mat-list>

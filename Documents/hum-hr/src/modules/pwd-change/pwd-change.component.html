@@ -1,0 +1,39 @@
+<div class="login" fxLayout="row" fxLayoutAlign="center center" fxFill>
+  <img class="login-bg" [src]="backgroundSrc" alt="/">
+    <mat-card class="login-card" fxLayout="column" fxFlex.xl="20" fxFlex.lg="30" fxFlex.md="40" fxFlex.sm="70"
+        fxFlex.xs="90">
+        <mat-card-header>
+            <mat-card-title fxLayout="column" fxLayoutGap="12px">
+              <div class="brand" fxLayout="column" fxLayoutAlign="center center" style="min-height: 150px;">
+                <img *ngIf="logoSrc" [src]="logoSrc" alt="/">
+                </div>
+            </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <div class="description">
+                <b>A continuación ingresa tu nueva contraseña.</b>
+                <br> Puedes guardarla en un lugar seguro para no perderla y que puedas ingresar a la plataforma sin problema.
+            </div>
+            <form [formGroup]="passwordFormGroup" fxLayout="column" fxflex="grow">
+                <mat-form-field fxFlex="grow">
+                    <input matInput placeholder="Ingrese su contraseña actual" type="password"
+                        [(ngModel)]="pwdmodel.oldPassword" formControlName="oldPassword" required autofocus>
+                </mat-form-field>
+                <mat-form-field fxFlex="grow">
+                    <input matInput placeholder="Nueva contraseña" type="password"
+                        [(ngModel)]="pwdmodel.newPassword" formControlName="newPassword" required autofocus>
+                </mat-form-field>
+                <mat-form-field fxFlex="grow">
+                    <input matInput placeholder="Confirma tu contraseña" type="password"
+                        [(ngModel)]="pwdmodel.confirmPassword" formControlName="confirmPassword" required>
+                </mat-form-field>
+                <mat-card-footer fxLayout="row-reverse " fxLayoutGap="12px">
+                    <button mat-raised-button (click)="save()" [disabled]="!isValidModel()" color="primary"
+                        class="btn">Establecer contraseña</button>
+                    <button mat-button (click)="cancel()">Cancelar</button>
+                </mat-card-footer>
+            </form>
+        </mat-card-content>
+    </mat-card>
+    <img *ngIf="logoSrc && subdomain" class="humanage-icon" [src]="humanageSrc" alt="/">
+</div>

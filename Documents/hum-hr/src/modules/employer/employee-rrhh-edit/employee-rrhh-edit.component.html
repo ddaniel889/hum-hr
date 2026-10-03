@@ -1,0 +1,44 @@
+<div class="catcher">
+    <div class="wizard-add mat-elevation-z3">
+        <mat-horizontal-stepper class="add-menu" #stepper>
+            <mat-step>
+                <mat-toolbar color="grey">
+                    <mat-toolbar-row>
+                        <div class="toolbar-line" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+                            <div class="title" fxLayout="column" fxLayoutAlign="center start">
+                                <h3>Edición de Usuarios</h3>
+                            </div>
+                            <button mat-icon-button (click)="cancel()" title="Cerrar">
+                <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+              </button>
+                        </div>
+                    </mat-toolbar-row>
+                </mat-toolbar>
+                <mat-divider></mat-divider>
+                <mat-progress-bar mode="indeterminate" [style.display]="clickOnce ? 'block' : 'none'"></mat-progress-bar>
+                <div class="add-menu-form-body" fxLayout="column" fxLayoutGap="16px" fxLayoutAlign="center stretch " style="padding:16px">
+                    <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+                        <input matInput placeholder="Empresa" [(ngModel)]="selectedUser.organizationalUnitName" disabled>
+                    </mat-form-field>
+                    <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+                        <input matInput placeholder="Nombre" [(ngModel)]="selectedUser.firstName" required [disabled]="clickOnce">
+                    </mat-form-field>
+                    <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+                        <input matInput placeholder="Apellido" [(ngModel)]="selectedUser.lastName" required [disabled]="clickOnce">
+                    </mat-form-field>
+                    <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+                        <input matInput placeholder="Correo Electrónico" [(ngModel)]="selectedUser.mail" [disabled] required="true" [email]="true">
+                    </mat-form-field>
+                    <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+                        <input matInput placeholder="Usuario" [(ngModel)]="selectedUser.nickName" [disabled] [ngModelOptions]="{standalone: true}">
+                    </mat-form-field>
+                </div>
+                <div class="add-menu-form-actions">
+                    <button [disabled]="clickOnce || validateData()" mat-raised-button (click)="save()" color="primary" class="btn">Finalizar
+          </button>
+                    <button mat-button (click)="cancel()">Cancelar</button>
+                </div>
+            </mat-step>
+        </mat-horizontal-stepper>
+    </div>
+</div>

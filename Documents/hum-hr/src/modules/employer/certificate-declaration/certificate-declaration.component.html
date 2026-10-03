@@ -1,0 +1,42 @@
+<div class="catcher">
+    <div class="wizard-add mat-elevation-z3">
+        <mat-horizontal-stepper class="add-menu" #stepper>
+            <mat-step *ngFor="let ou of organizationalUnits">
+                <form [formGroup]="certificateFormGroup">
+                    <mat-toolbar color="grey">
+                        <mat-toolbar-row>
+                            <div class="toolbar-line" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                                <div class="title" fxLayout="column" fxLayoutAlign="center start">
+                                    <h3>Agregar Tipo de Firma{{ isEmployeeFileUser ? '':' - [' + ou.name + ']'}}</h3>
+                                </div>
+                            </div>
+                            <button mat-icon-button (click)="cancel()" title="Cerrar">
+                                <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+                            </button>
+                        </mat-toolbar-row>
+                    </mat-toolbar>
+                    <div class="add-menu-form-body">
+                        <mat-form-field>
+                            <mat-select placeholder="Proveedor" formControlName="certificateProvider">
+                                <mat-option *ngFor="let provider of certificateProviders" [value]="provider" (click)=validationProvider(provider)>
+                                    {{provider.description}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <mat-form-field *ngIf="showExpirationDate">
+                            <input matInput [min]="minDate" [matDatepicker]="picker" placeholder="Fecha Vencimiento dd/mm/aaaa" formControlName="expirationDate">
+                            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                            <mat-datepicker #picker></mat-datepicker>
+                        </mat-form-field>
+                    </div>
+
+                    <div class="add-menu-form-actions">
+                        <button mat-raised-button matStepperNext color="primary" class="btn" [disabled]="certificateFormGroup.invalid" (click)="saveAndContinue(ou)">{{stepper.selectedIndex == (organizationalUnits.length - 1)? 'Finalizar': 'Siguiente'}}</button>
+                        <button *ngIf="stepper.selectedIndex < (organizationalUnits.length - 1)" mat-button matStepperNext>Omitir</button>
+                        <button mat-button (click)="cancel()">Cerrar</button>
+                    </div>
+                </form>
+            </mat-step>
+        </mat-horizontal-stepper>
+    </div>
+</div>

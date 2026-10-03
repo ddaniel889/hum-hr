@@ -1,0 +1,75 @@
+<div class="employee-deetail-dialog" mat-dialog-content>
+
+    <!--loadin spinner-->
+    <div [ngClass]="{'visible': loading }" class="mat-loading-window">
+        <mat-progress-spinner style="z-index: 1" mode="indeterminate" color="primary">
+        </mat-progress-spinner>
+    </div>
+    <div class="dialog-content" [ngClass]="{'visible': !loading }">
+        <mat-toolbar class="side-bar" color="grey">
+            <mat-toolbar-row class="mobile-height">
+                <div class="toolbar-line-container" fxLayout="row" fxLayoutAlign="space-between center" fxFill>
+                    <div class="toolbar-line" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+                        <div class="mat-avatar" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-folder-open">
+                            </mat-icon>
+                            <div class="title" fxLayout="column" fxLayoutAlign="center start">
+                                <h3 matLine>{{documentationFind.documentationTypeName}}</h3>
+                                <h5 matLine> Filtrar datos</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- CERRAR DIALOGO -->
+                    <button mat-icon-button (click)="close()" title="Cerrar">
+                        <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+                    </button>
+                </div>
+            </mat-toolbar-row>
+        </mat-toolbar>
+        <mat-divider></mat-divider>
+        <div class="scroller" fxLayout="column">
+            <div fxLayout="column">
+            <!-- Si tiene busqueda avanzada debe no mostrar los campos -->
+
+                 <mat-form-field class="list-align" fxLayout="row" fxLayoutAlign="center center" fxFlex="100"
+                    *ngIf="!enableEnhancedSearch && showRestrictionFilter">
+                    <mat-select placeholder="Estado" [(ngModel)]="documentationFind.restrictionFilter"
+                        name="advancedFilter">
+                        <mat-option>Sin Selección</mat-option>
+                        <mat-option value="0">Visto</mat-option>
+                        <mat-option value="1">Sin Firmar</mat-option>
+                        <mat-option value="4">Pendiente de firma de firmante</mat-option>
+                        <mat-option value="2">Firmado en Disconformidad</mat-option>
+                        <mat-option value="3">Firmado en Conformidad</mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                 <mat-form-field class="list-align" fxLayout="row" fxLayoutAlign="center center" fxFlex="100"
+                    *ngIf="!enableEnhancedSearch && onlyViewFilter">
+                    <mat-select placeholder="Estado" [(ngModel)]="documentationFind.filterNonViewed"
+                        name="advancedFilter">
+                        <mat-option>Sin Selección</mat-option>
+                        <mat-option value="false">Visto</mat-option>
+                        <mat-option value="true">No Visto</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <app-search-custom-control class="list-align" fxLayout="column" *ngFor="let item of metadatas"
+                [metadata]="item" [findEntity]="documentationFind.metadatas" [enableEnhancedSearch]="enableEnhancedSearch">
+            </app-search-custom-control>
+            <span *ngIf="metadatas && ShowNOFilter()">No se encontró ningún criterio de búsqueda para el tipo de
+                documentación seleccionada</span>
+        </div>
+        <mat-divider></mat-divider>
+        <div class="dialog-footer" fxLayout="row-reverse" fxLayoutGap="12px" fxLayoutAlign="space-between center">
+            <div fxLayout="row-reverse" fxLayoutGap="12px">
+                <button *ngIf="metadatas && metadatas.length > 0 && !ShowNOFilter()" mat-raised-button (click)="close()"
+                    color="primary" class="btn">Aplicar Filtro</button>
+                <button *ngIf="metadatas && metadatas.length > 0 && ShowNOFilter()" mat-raised-button (click)="close()" color="primary"
+                    class="btn">Aceptar</button>
+                <button *ngIf="metadatas && metadatas.length > 0 && !ShowNOFilter()" (click)="cleanFilter()"
+                    mat-button>Limpiar Filtro</button>
+            </div>
+        </div>
+    </div>
+</div>

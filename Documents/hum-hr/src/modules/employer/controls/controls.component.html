@@ -1,0 +1,68 @@
+<mat-sidenav #sidenavOut mode="side" opened="true" [ngClass]="{'open': isExpanded}">
+    <mat-nav-list>
+
+        <button mat-icon-button (click)="sidenav.toggle()" title="Ver Perfil">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-user-circle"></mat-icon>
+        </button>
+        <div class="title">
+            <h3>Inbox</h3>
+            <h5>{{userlastname | titlecase }}, {{userFirstname | titlecase }}</h5>
+        </div>
+
+
+        <mat-divider></mat-divider>
+        <mat-icon (click)="isExpanded = !isExpanded">menu</mat-icon>
+        <span></span>
+
+        <a mat-list-item (click)="toggleActive($event)">
+            <mat-icon mat-list-icon>inbox</mat-icon>
+            <p matLine>Inbox</p>
+        </a>
+        <a mat-list-item (click)="toggleActive($event)">
+            <mat-icon mat-list-icon>star</mat-icon>
+            <p matLine>Starred</p>
+        </a>
+        <a mat-list-item (click)="toggleActive($event)">
+            <mat-icon mat-list-icon>drafts</mat-icon>
+            <p matLine>Drafts</p>
+        </a>
+
+        <mat-divider></mat-divider>
+
+        <a mat-list-item (click)="toggleActive($event)">
+            <mat-icon mat-list-icon>mail</mat-icon>
+            <p matLine>All Mail</p>
+        </a>
+        <a mat-list-item (click)="toggleActive($event)">
+            <mat-icon mat-list-icon>delete</mat-icon>
+            <p matLine>Trash</p>
+        </a>
+        <a mat-list-item (click)="toggleActive($event)">
+            <mat-icon mat-list-icon>warning</mat-icon>
+            <p matLine>Spam</p>
+        </a>
+    </mat-nav-list>
+</mat-sidenav>
+
+<mat-sidenav #sidenav>
+    <mat-toolbar color="grey">
+        <mat-toolbar-row>
+            <div class="mat-avatar" fxLayout="row" fxLayoutAlign="space-between center" >
+                <div class="toolbar-line" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                    <button mat-icon-button (click)="sidenav.toggle()" title="Cerrar">
+                        <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+                    </button>
+                    <div class="title" fxLayout="column" fxLayoutAlign="center start">
+                        <h3>Menú</h3>
+                        <h5>Opciones personales</h5>
+                    </div>
+                </div>
+            </div>
+            <button mat-icon-button (click)="editingMode()" title="Editar">
+                <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-pen"></mat-icon>
+            </button>
+        </mat-toolbar-row>
+    </mat-toolbar>
+    <mat-divider [inset]="true"></mat-divider>
+    <app-profile *ngIf="sidenav.opened" [isEditable]="editMode" (editingMode)="editingMode($event)"></app-profile>
+</mat-sidenav>

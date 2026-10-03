@@ -1,0 +1,247 @@
+<mat-progress-bar mode="indeterminate" [style.display]="loading ? 'block' : 'none'">
+</mat-progress-bar>
+<ng-container *ngIf="!loading">
+  <ng-container *ngIf="!isEditable">
+    <ng-container *ngIf="userProfile">
+      <ng-container *ngIf="!showAvatarUpload && !showHolosignUpload">
+        <div class="avatar-profile" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px"
+          *ngIf="!isEmployerFrame || avatar">
+          <img class="user-avatar" *ngIf="!avatar" src="../assets/img/user-avatar.png">
+          <img *ngIf="avatar" [src]="avatar">
+          <button *ngIf="ouAccessConfig?.canEditAvatar" mat-stroked-button color="primary"
+            (click)="showAvatarUpload = !showAvatarUpload">
+            {{!avatar ? 'Agregar Imagen':'Cambiar Imagen'}}
+          </button>
+        </div>
+        <mat-list>
+          <mat-list-item name="nickname">
+            <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+              fontIcon="fa-industry-alt"></mat-icon>
+            <h3 matLine> {{organizationalUnitDescription}} </h3>
+          </mat-list-item>
+          <mat-list-item name="fullName">
+            <mat-icon mat-list-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" fontSet="fa"
+              fontIcon="fa-user"></mat-icon>
+            <h3 matLine> {{userProfile.lastName + ", " + userProfile. firstName }} </h3>
+          </mat-list-item>
+          <mat-list-item name="nickname" *ngIf="userProfile.nickName !== userProfile.mail">
+            <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fas"
+              fontIcon="fa-id-badge"></mat-icon>
+            <h3 matLine> {{userProfile.nickName }} </h3>
+          </mat-list-item>
+          <mat-list-item name="email">
+            <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+              fontIcon="fa-envelope"></mat-icon>
+            <h3 matLine>{{userProfile.mail }}</h3>
+          </mat-list-item>
+          <mat-list-item name="nrolegajo" *ngIf="nrolegajo != undefined">
+            <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fas"
+              fontIcon="fa-file"></mat-icon>
+            <h3 matLine>{{nrolegajo}}</h3>
+          </mat-list-item>
+          <mat-list-item name="cellPhone" *ngIf="useCellPhone">
+            <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fas"
+              fontIcon="fa-mobile-android-alt"></mat-icon>
+            <h3 matLine>{{cellPhone}}</h3>
+          </mat-list-item>
+        </mat-list>
+        <mat-divider></mat-divider>
+        <ng-container *ngIf="activeCertificates.length > 0 || canCertificateFirmanteDeclarationOpen">
+          <mat-toolbar color="white">
+            <mat-toolbar-row>
+              <div class="mat-avatar" fxLayout="row" fxLayoutAlign="space-between center">
+                <div class="toolbar-line" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                  <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+                    fontIcon="fa-fingerprint"></mat-icon>
+                  <div class="title" fxLayout="column" fxLayoutAlign="center start">
+                    <h3>Tipo de Firma</h3>
+                  </div>
+                </div>
+              </div>
+              <button mat-icon-button title="Declarar Certificado"
+                *ngIf="canCertificateFirmanteDeclarationOpen && isEmployerFrame && isFirmante()"
+                (click)="openDeclareCertificate()">
+                <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-plus"></mat-icon>
+              </button>
+            </mat-toolbar-row>
+          </mat-toolbar>
+          <mat-divider></mat-divider>
+          <ng-container *ngIf="puedeFirmar">
+            <div class="signature-profile" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+              <img class="user-signature" *ngIf="!holographicSign" src="../assets/img/user-signature.png">
+              <img *ngIf="holographicSign" [src]="holographicSign">
+              <button *ngIf="ouAccessConfig?.canEditSignature" mat-stroked-button color="primary"
+                (click)="showHolosignUpload = !showHolosignUpload">
+                {{!holographicSign ? 'Agregar Firma ':'Editar Firma'}}</button>
+            </div>
+          </ng-container>
+          <mat-list class="profile-certificates">
+            <mat-list-item *ngFor="let certificate of activeCertificates">
+              <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+                fontIcon="fa-industry-alt" *ngIf="certificate.typeId === 1"></mat-icon>
+              <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+                fontIcon="fa-file-certificate" *ngIf="certificate.typeId === 0"></mat-icon>
+              <span matLine *ngIf="certificate.organizationalUnitId === 0">{{certificate.providerDescription}}</span>
+              <span matLine *ngIf="certificate.organizationalUnitId !== 0">{{certificate.providerDescription}} para
+                {{certificate.organizationalUnitDescription}}</span>
+              <span matLine *ngIf="certificate.expirationDate">Válido hasta {{certificate.expirationDate |
+                date:'dd/MM/yyyy'}}</span>
+              <span matLine *ngIf="!certificate.expirationDate">Sin caducidad indicada</span>
+            </mat-list-item>
+          </mat-list>
+        </ng-container>
+        <app-certificate-declaration *ngIf="isCertificateDeclarationOpen" [certificateType]="certificateType()"
+          (addFinish)="closeAdd($event)">
+        </app-certificate-declaration>
+        <app-certificate-renew *ngIf="isCertificateRenewOpen" [certificateType]="certificateType()"
+        (addExpFinish)="closeRenewAdd($event)">
+        </app-certificate-renew>
+        <mat-divider></mat-divider>
+        <div *ngIf="useRenewCertificate && isExpiredCertificate && this.isEmployeeFrame">
+          <mat-toolbar color="white">
+            <mat-toolbar-row>
+              <div class="mat-avatar" fxLayout="row" fxLayoutAlign="space-between center">
+                <div class="toolbar-line" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                  <div class="title" fxLayout="column" fxLayoutAlign="center start">
+                    <a color="primary" (click)="openRenewCertificate()">
+                      Renovar Certificado de Firma
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </mat-toolbar-row>
+          </mat-toolbar>
+        </div>
+      </ng-container>
+
+      <div class="cropper" *ngIf="showAvatarUpload">
+        <mat-toolbar color="grey">
+          <mat-toolbar-row>
+            <div class="mat-avatar" fxLayout="row" fxLayoutAlign="space-between center">
+              <div class="toolbar-line" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-camera">
+                </mat-icon>
+                <div class="title" fxLayout="column" fxLayoutAlign="center start">
+                  <h3> {{!avatar ? 'Agregar Imagen':'Cambiar Imagen'}}</h3>
+                </div>
+              </div>
+            </div>
+            <button mat-icon-button (click)="showAvatarUpload = !showAvatarUpload" title="Cerrar">
+              <mat-icon class="fa-xs" fontSet="fa" fontIcon="fa-times"></mat-icon>
+            </button>
+          </mat-toolbar-row>
+        </mat-toolbar>
+        <mat-divider></mat-divider>
+        <div class="edition" fxLayout="column" fxLayoutAlign="space-between center">
+          <app-cs-upload-cropper-control [uploadedImage]="preview" (uploadImage)="uploadAvatar($event)"
+            [widthSize]="100" [heightSize]="100" [roundCropper]="true">
+          </app-cs-upload-cropper-control>
+        </div>
+      </div>
+      <div class="cropper" *ngIf="showHolosignUpload">
+        <mat-toolbar color="grey">
+          <mat-toolbar-row>
+            <div class="mat-avatar" fxLayout="row" fxLayoutAlign="space-between center">
+              <div class="toolbar-line" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-signature">
+                </mat-icon>
+                <div class="title" fxLayout="column" fxLayoutAlign="center start">
+                  <h3>{{!holographicSign ? 'Agregar Firma Ológrafa':'Editar Firma Ológrafa'}}</h3>
+                </div>
+              </div>
+            </div>
+            <button mat-icon-button (click)="showHolosignUpload = !showHolosignUpload" title="Cerrar">
+              <mat-icon class="fa-xs" fontSet="fa" fontIcon="fa-times"></mat-icon>
+            </button>
+          </mat-toolbar-row>
+        </mat-toolbar>
+        <mat-divider></mat-divider>
+        <div class="edition" fxLayout="column" fxLayoutAlign="space-between center">
+          <app-cs-upload-cropper-control [uploadedImage]="holographicSignPreview"
+            (uploadImage)="setHolographicSign($event)" [widthSize]="100" [heightSize]="100" [roundCropper]="false">
+          </app-cs-upload-cropper-control>
+          <button mat-raised-button color="accent" *ngIf="holographicSign" (click)="DeleteOlographicSign()">
+            Eliminar Firma
+          </button>
+        </div>
+      </div>
+    </ng-container>
+  </ng-container>
+  <ng-container *ngIf="isEditable">
+    <span [ngClass]="{'maximize': isEditable }" fxLayout="column" fxLayoutAlign="space-between" fxLayoutGap="16px"
+      style="padding:16px">
+      <form [formGroup]="profileForm" fxFlex="grow" (submit)="save()" (reset)="cancel()">
+        <mat-form-field fxLayout="row" fxLayoutAlign="start center">
+          <mat-label>Apellido</mat-label>
+          <mat-icon matPrefix class="fa-lg" fxLayout="row" fxLayoutAlign="center center" fontSet="fa"
+            fontIcon="fa-user">
+          </mat-icon>
+          <input matInput type="text" [ngModel]="userProfile.lastName" formControlName="lastName" required>
+          <mat-error *ngIf="valid(DATA.LASTNAME)">
+            Apellido es <strong>requerido</strong>
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field fxLayout="row" fxLayoutAlign="start center">
+          <mat-label>Nombre</mat-label>
+          <mat-icon matPrefix class="fa-lg" fxLayout="row" fxLayoutAlign="center center" fontSet="fa"
+            fontIcon="fa-user">
+          </mat-icon>
+          <input matInput type="text" [ngModel]="userProfile.firstName" formControlName="firstName" required>
+          <mat-error *ngIf="valid(DATA.FIRSTNAME)">
+            Nombre es <strong>requerido</strong>
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field fxLayout="row" fxLayoutAlign="start center" *ngIf="false">
+          <mat-label>Usuario</mat-label>
+          <mat-icon matPrefix class="fa-lg" fxLayout="row" fxLayoutAlign="center center" fontSet="fas"
+            fontIcon="fa-id-badge"></mat-icon>
+          <input matInput type="text" [ngModel]="userProfile.nickName" formControlName="nickName" required>
+          <mat-error *ngIf="valid(DATA.NICKNAME)">
+            Usuario es <strong>requerido</strong>
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field fxLayout="row" fxLayoutAlign="start center ">
+          <mat-label>Correo electrónico</mat-label>
+          <mat-icon matPrefix class="fa-lg" fxLayout="row " fxLayoutAlign="center center" fontSet="fa"
+            fontIcon="fa-envelope "></mat-icon>
+          <input matInput type="text" [ngModel]="userProfile.mail" formControlName="email" required>
+          <mat-error *ngIf="validEmail()">
+            Por favor, ingrese una dirección de correo electrónico válida
+          </mat-error>
+          <mat-error *ngIf="valid(DATA.EMAIL)" id="mailrequired">
+            Correo electrónico es <strong>requerido</strong>
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Telefono -->
+        <mat-form-field fxLayout="row" fxLayoutAlign="start center" *ngIf="useCellPhone">
+          <mat-label>Teléfono Movil</mat-label>
+          <mat-icon matPrefix class="fa-lg" fxLayout="row " fxLayoutAlign="center center" fontSet="fas"
+            fontIcon="fa-mobile-android-alt"></mat-icon>
+          <input matInput placeholder="Ej: +541125455441" type="text" [ngModel]="cellPhone" formControlName="phoneNumber"
+            [required]="cellPhoneRequired">
+          <mat-hint>Cod País + Teléfono (+541125455441)</mat-hint>
+          <mat-error *ngIf="profileForm.controls.phoneNumber.errors?.pattern">
+            Por favor, ingrese teléfono movil válido
+          </mat-error>
+          <mat-error *ngIf="valid(DATA.PHONENUMBER)" id="phonerequired">
+            Teléfono Movil es <strong>requerido</strong>
+          </mat-error>
+        </mat-form-field>
+
+
+        <div fxLayout="row-reverse">
+          <button id="profile_saveEditBtn" mat-raised-button type="submit" [disabled]="loading" color="accent">
+            Guardar
+          </button>
+          <button id="profile_cancelEditBtn" mat-button (click)="cancel()" type="reset">
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </span>
+  </ng-container>
+</ng-container>

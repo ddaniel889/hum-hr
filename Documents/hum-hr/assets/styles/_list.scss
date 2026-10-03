@@ -1,0 +1,91 @@
+@import 'img-management';
+
+
+.mat-list-base {
+  padding-top: 0 !important;
+}
+
+.mat-list-base .mat-subheader:first-child {
+  margin-top: 0 !important;
+}
+
+.mat-list-icon.mat-icon {
+  padding: 8px !important;
+}
+
+.mat-list .mat-list-item.active {
+  transition: all .4s cubic-bezier(.25, .8, .25, 1);
+}
+
+.mat-list .mat-list-item {
+  transition: all .4s cubic-bezier(.25, .8, .25, 1);
+}
+
+.mat-list-item:hover:not(.active) {
+  transition: all .4s cubic-bezier(.25, .8, .25, 1);
+}
+
+.mat-list .mat-list-item {
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  height: auto !important;
+}
+
+.mat-list-item .mat-list-item-content {
+  padding: 16px !important;
+  box-sizing: content-box;
+}
+
+.mat-list app-file-document-inbox-item .mat-list-item .mat-list-text {
+  width: 100% !important;
+}
+
+
+@mixin list($bg-toolbar-light, $divider, $text-main-solid, $text-side, $primary-text, $hover, $row-odd, $row-even) {
+
+
+
+  .mat-list .mat-list-item.active {
+    .mat-line {
+      color: $text-main-solid;
+
+      b {
+        color: $primary-text;
+      }
+    }
+
+    .mat-list-avatar {
+      color: $primary-text;
+    }
+  }
+
+  .mat-list .mat-list-item {
+    .mat-line {
+      color: $text-side;
+    }
+
+    .mat-list-avatar {
+      color: $text-side;
+    }
+  }
+
+  .mat-list-item:hover:not(.active) {
+    background: $hover !important;
+  }
+
+  mat-list-item:nth-child(even),
+  app-file-document-inbox-item:nth-child(even) mat-list-item,
+  app-file-document-inbox-item-documentation:nth-child(even) mat-list-item {
+    background: $row-odd !important
+  }
+
+  mat-list-item:nth-child(odd),
+  app-file-document-inbox-item:nth-child(odd) mat-list-item,
+  app-file-document-inbox-item-documentation:nth-child(odd) mat-list-item {
+    background: $row-even !important
+  }
+
+  .mat-list-avatar.mat-icon {
+    background: $bg-toolbar-light;
+    border: 1px solid $divider;
+  }
+}

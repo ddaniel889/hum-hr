@@ -1,0 +1,112 @@
+<mat-progress-bar mode="indeterminate" [style.display]="loaded ? 'none' : 'block'"></mat-progress-bar>
+<mat-accordion class="two-options">
+  <mat-expansion-panel expanded (click)="changeExpander(grupoState.EnProceso)">
+    <mat-progress-bar mode="indeterminate"
+      [style.display]="loadingDeferedProcess && this.selectedState == grupoState.EnProceso  ? 'block' : 'none'">
+    </mat-progress-bar>
+    <mat-expansion-panel-header>
+      <mat-panel-title fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+        <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+          fontIcon="fa-hourglass-half"></mat-icon>
+        <span>En Curso</span>
+      </mat-panel-title>
+      <mat-divider></mat-divider>
+    </mat-expansion-panel-header>
+
+    <mat-action-list *ngIf="loaded && !loadingDeferedProcess">
+      <mat-list-item *ngIf="items?.length == 0 && loaded">
+        <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+          fontIcon="fa-info-circle"></mat-icon>
+        <span matLine>No tenés procesos en ejecución.</span>
+      </mat-list-item>
+    </mat-action-list>
+    <mat-action-list *ngIf="!loadingDeferedProcess">
+      <mat-list-item *ngFor="let item of items" [ngClass]="[activeRow == item.id ? 'active' : '']"
+        (click)="openProcess(item)" class="in-process-inbox">
+        <mat-icon matListAvatar fxLayout="row" fxLayoutAlign="center center" fontSet="fa" fontIcon="fa-play"
+          *ngIf="item.stateId == '002'">
+        </mat-icon>
+        <mat-icon matListAvatar fxLayout="row" fxLayoutAlign="center center" fontSet="fa"
+          fontIcon="fa-tachometer-alt-slowest" *ngIf="item.stateId == '004'">
+        </mat-icon>
+        <mat-icon matListAvatar fxLayout="row" fxLayoutAlign="center center" fontSet="fa" fontIcon="fa-pause"
+          *ngIf="item.stateId === '005'">
+        </mat-icon>
+        <h3 matLine>{{item.organizationalUnitName}} - {{ item.creationDate | date :'dd/MM/yyyy'}}</h3>
+        <p matLine>
+          <b> {{item.processTypeName}}</b>
+        </p>
+        <div class="floating-actions" fxlayout="row" fxlayoutgap="16px">
+          <button mat-icon-button (click)="openStateHistory(item)" title="Ver Historial">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-tasks"></mat-icon>
+          </button>
+        </div>
+      </mat-list-item>
+      <mat-list-item class="load-more" *ngIf="loaded && !disableAddLines"
+        (click)="getMoreResults(grupoState.EnProceso)">
+        <mat-icon matListAvatar fxLayout="row" fxLayoutAlign="center center" fontSet="fa" class="fa-lg" fontSet="fa"
+          fontIcon="fa-arrow-circle-down"></mat-icon>
+        <h3 matLine>Ver más resultados</h3>
+      </mat-list-item>
+    </mat-action-list>
+  </mat-expansion-panel>
+
+  <mat-expansion-panel (click)="changeExpander(grupoState.Terminado)"   #finalizado >
+    <mat-progress-bar mode="indeterminate"
+      [style.display]="loadingDeferedProcess && this.selectedState == grupoState.Terminado ? 'block' : 'none'">
+    </mat-progress-bar>
+    <mat-expansion-panel-header>
+      <mat-panel-title fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+        <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+          fontIcon="fa-hourglass-end"></mat-icon>
+        <span>Finalizados</span>
+      </mat-panel-title>
+      <mat-divider></mat-divider>
+    </mat-expansion-panel-header>
+
+    <mat-action-list *ngIf="loaded && !loadingDeferedProcess" >
+      <mat-list-item *ngIf="items?.length == 0 && loaded">
+        <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+          fontIcon="fa-info-circle"></mat-icon>
+        <span matLine>No tenés procesos terminados.</span>
+      </mat-list-item>
+    </mat-action-list>
+    <mat-action-list *ngIf="!loadingDeferedProcess" >
+      <mat-list-item *ngFor="let item of items"
+        [ngClass]="[activeRow == item.id ? 'active' : '', item.stateId === '008' ? 'limbo-process-inbox' : item.stateId === '007' || item.stateId === '009' ? 'erased-process-inbox' : !item.hasErrors ? 'finished-process-inbox' : 'error-process-inbox']"
+        (click)="openProcess(item)">
+        <mat-icon matListAvatar fxLayout="row" fxLayoutAlign="center center" fontSet="fa" fontIcon="fa-times"
+          *ngIf="item.stateId === '003' && item.hasErrors">
+        </mat-icon>
+        <mat-icon matListAvatar fxLayout="row" fxLayoutAlign="center center" fontSet="fa" fontIcon="fa-check"
+          *ngIf="item.stateId === '003' && !item.hasErrors">
+        </mat-icon>
+        <mat-icon matListAvatar fxLayout="row" fxLayoutAlign="center center" fontSet="fa" fontIcon="fa-trash-alt"
+          *ngIf="item.stateId === '007'">
+        </mat-icon>      
+        <mat-icon matListAvatar fxLayout="row" fxLayoutAlign="center center" fontSet="fa" fontIcon="fa-meh"
+          *ngIf="item.stateId === '008'">
+        </mat-icon>
+        <mat-icon matListAvatar fxLayout="row" fxLayoutAlign="center center" fontSet="fa" fontIcon="fa-clock"
+        *ngIf="item.stateId === '009'">
+      </mat-icon>
+        <h3 matLine>{{item.organizationalUnitName}} - {{ item.creationDate | date :'dd/MM/yyyy'}}</h3>
+        <p matLine>
+          <b>  {{item.stateId === '009' ? "Pendiente de Eliminación" : item.processTypeName}}</b>
+        </p>
+        <div class="floating-actions" fxlayout="row" fxlayoutgap="16px">
+          <button mat-icon-button (click)="openStateHistory(item)" title="Ver Historial">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-history"></mat-icon>
+          </button>
+        </div>
+      </mat-list-item>
+      <mat-list-item class="load-more" *ngIf="loaded && !disableAddLines"
+        (click)="getMoreResults(grupoState.Terminado)">
+        <mat-icon matListAvatar fxLayout="row" fxLayoutAlign="center center" fontSet="fa" class="fa-lg" fontSet="fa"
+          fontIcon="fa-arrow-circle-down"></mat-icon>
+        <h3 matLine>Ver más resultados</h3>
+      </mat-list-item>
+    </mat-action-list>
+  </mat-expansion-panel>
+
+</mat-accordion>

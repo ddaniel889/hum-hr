@@ -1,0 +1,44 @@
+@import 'img-management';
+
+
+.card-filter {
+  height: fit-content;
+  padding: 16px;
+  border-radius: 4px;
+  z-index: 20;
+  max-width: calc((1600px / 10) * 3) !important;
+  width: 30% !important;
+}
+
+.card-filter h4 {
+  margin: 0;
+  line-height: 40px;
+  padding-left: 20px;
+}
+
+.card-filter mat-form-field {
+  padding: 0 56px;
+}
+
+.card-filter .filter-footer {
+  padding: 0 56px;
+}
+
+app-formio-cardinal {
+  box-sizing: border-box;
+  min-width: 40vw;
+  place-content: stretch center;
+  align-items: stretch;
+  max-height: 100%;
+}
+
+.formio-content {
+  height: 100%;
+}
+
+
+@mixin cards($bg-card) {
+  .card-filter {
+    background: $bg-card;
+  }
+}

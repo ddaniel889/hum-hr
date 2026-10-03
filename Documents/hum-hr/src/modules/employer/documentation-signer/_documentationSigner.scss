@@ -1,0 +1,304 @@
+@import '../../../../assets/styles/img-management';
+
+
+.UI-V2 {
+  .inbox-container {
+    position: relative;
+
+    .load-window {
+      left: 0;
+      top: 112px;
+      height: calc(100% - 112px) !important;
+    }
+
+    h3 {
+      font-weight: 500;
+    }
+
+    h5 {
+      font-weight: 300;
+    }
+
+    .toolbar {
+      height: 80px;
+      margin: 16px;
+      border-radius: 8px;
+      padding: 0 16px;
+
+      mat-icon:not(.complex) {
+        width: 40px;
+        height: 40px;
+        font-size: 24px !important;
+      }
+
+      button.mat-icon-button {
+        mat-icon {
+          font-size: 20px !important;
+        }
+      }
+
+      h3,
+      h5 {
+        margin: 0
+      }
+    }
+
+    .container {
+      padding: 0 8px 16px 16px;
+      overflow-y: scroll;
+      max-height: calc(100% - 112px);
+      box-sizing: border-box;
+
+      mat-accordion {
+        background: none !important;
+
+        mat-expansion-panel {
+          border-radius: 8px !important;
+          overflow: hidden;
+
+          &:not(mat-expansion-panel:last-child) {
+            margin-bottom: 16px !important;
+          }
+
+          &.mat-expanded {
+            mat-expansion-panel-header {
+              height: 128px !important;
+              border-radius: 0 !important;
+              box-sizing: border-box;
+              padding-bottom: 56px !important;
+            }
+          }
+
+          mat-expansion-panel-header {
+            padding: 16px !important;
+            height: 128px !important;
+            box-sizing: border-box;
+            padding-bottom: 56px !important;
+            position: relative;
+
+            .signature-inbox-header {
+
+              .mat-icon,
+              b {
+                font-size: 1.17em;
+              }
+            }
+
+            .actions {
+              position: absolute;
+              bottom: 16px;
+              width: calc(100% - 32px);
+              left: 0;
+              padding: 0 16px;
+
+              button {
+                border-radius: 20px;
+                float: right;
+              }
+            }
+          }
+
+          .mat-expansion-panel-body {
+            padding: 0 16px 16px !important;
+
+            .item {
+              padding: 16px;
+              border-radius: 8px;
+              cursor: pointer;
+
+              button {
+                mat-icon {
+                  font-size: 20px !important;
+                }
+              }
+
+              h3 {
+                margin: 0;
+              }
+
+              &+.item {
+                margin-top: 16px;
+              }
+
+              &.active {
+                cursor: default;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .work-space {
+
+    h5,
+    h6 {
+      font-weight: 500;
+    }
+
+    .main {
+      position: relative;
+
+      .load-window {
+        left: 0;
+        top: 0;
+        height: 100%;
+      }
+
+      .container {
+        height: calc(100% - 112px - 96px);
+
+        .content-scroll {
+          display: flex;
+          flex-direction: row;
+          flex-wrap: wrap;
+          overflow-y: scroll;
+          max-height: calc(100% - 56px);
+          box-sizing: border-box;
+          padding: 8px 0 8px 8px;
+        }
+      }
+    }
+
+    .helper {
+      mat-hint {
+        h4 {
+          line-height: 1 !important;
+        }
+      }
+
+      mat-form-field {
+        width: 96px;
+
+        .mat-form-field-wrapper {
+          padding-bottom: 0;
+        }
+
+        .mat-form-field-underline {
+          display: none;
+        }
+      }
+
+      .actions {
+        .mat-button-wrapper {
+          justify-content: center;
+
+          mat-icon {
+            margin-right: 0;
+          }
+        }
+      }
+    }
+
+
+
+  }
+}
+
+
+@mixin documentationSigner($bg-card, $bg-background, $bg-toolbar-dark, $scroll-body, $scroll-thumb, $primary, $accent, $divider, $text-main, $text-side, $hover, $row-even) {
+
+  .UI-V2 {
+    .inbox-container {
+      background: $row-even;
+      border-right: 1px solid $divider;
+
+      *::-webkit-scrollbar-track {
+        background: $scroll-body;
+      }
+
+      *::-webkit-scrollbar-thumb {
+        background: $scroll-thumb;
+      }
+
+      *::-webkit-scrollbar-corner {
+        background: $scroll-body;
+      }
+
+      .load-window {
+        background: $row-even;
+      }
+
+      .toolbar {
+        background: $primary;
+        color: $text-main;
+
+        &.reverse {
+          background: $bg-card;
+          color: $text-side;
+          border: 1px solid $divider;
+        }
+      }
+
+      .container {
+        mat-accordion {
+          mat-expansion-panel {
+            background: $bg-toolbar-dark !important;
+            border: 1px solid $divider;
+
+            &.mat-expanded {
+              background: $bg-background !important;
+
+              mat-expansion-panel-header {
+                background: $bg-background !important;
+
+                &:hover {
+                  background:none!important;
+                }
+              }
+            }
+
+            mat-expansion-panel-header {
+              background: $bg-background !important;
+
+              &:hover {
+                background: $hover !important;
+              }
+
+              .signature-inbox-header {
+
+                .mat-icon,
+                b {
+                  color: $accent;
+                }
+              }
+            }
+
+            .mat-expansion-panel-body {
+              .item {
+                background: $row-even;
+                color: $text-side;
+                border: 1px solid $divider;
+
+                &:hover {
+                  background: $hover !important;
+                }
+
+                &.active {
+                  border-left: 6px solid $accent;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .work-space {
+      .main {
+        *::-webkit-scrollbar-track {
+          background: $scroll-body !important;
+        }
+
+        .load-window {
+          background: $bg-card !important;
+        }
+      }
+
+      .main-action {
+        border-top: 1px solid $divider;
+      }
+    }
+  }
+}

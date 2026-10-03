@@ -1,0 +1,104 @@
+<!-- toolbar -->
+<span class="view-container">
+  <mat-toolbar class="view-toolbar" *ngIf="!showWelcome">
+    <mat-toolbar-row>
+      <!-- document-selected-header-info -->
+      <div class="view-description" *ngIf="doc && showFileDocumentHeader">
+        <button fxLayout="row" fxLayoutAlign="center center" *ngIf="floatingMode" class="show-md" mat-icon-button
+          (click)='goBack()' title="Regresar al listado">
+          <mat-icon fxLayout="row" fxLayoutAlign="center center" class="fa-lg" fontSet="fa" fontIcon="fa-arrow-left">
+          </mat-icon>
+        </button>
+        <mat-icon fxLayout="row" fxLayoutAlign="center center" class="hide-md fa-lg" fontSet="fa" fontIcon="fa-file">
+        </mat-icon>
+        <div class="view-description-text" fxLayout="column" fxLayoutAlign="center start">
+          <h3 matLine [title]="doc.documentationTypeName"> {{ doc.documentationTypeName}}</h3>
+          <h5 matLine> Id: {{doc.id}} - Fecha Documento: {{ doc.documentDate | date: 'dd/MM/yyyy' }}</h5>
+        </div>
+      </div>
+      <!-- close-detail-mobile-only -->
+      <button id="closeDetail" mat-icon-button (click)="this.mobileClose()" title="Cerrar">
+        <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+      </button>
+      <div class="view-actions">
+        <div fxLayout="row" fxLayoutAlign="end center">
+          <!-- PDF-controls -->
+          <app-pdf-wrapper-controls *ngIf="!isZip" [pdfWrapper]="pdfWrapper" [showPrint]="showPrint"
+            [showSave]="showSave" [showZoomIn]="showZoomIn && filePdf" [showZoomOut]="showZoomOut && filePdf"
+            [(showRemove)]="showRemove" (OnRemoveFile)="removeFile()">
+          </app-pdf-wrapper-controls>
+          <!--cancel-document -->
+          <button mat-icon-button *ngIf="showCancel && canCancel && !doc.isCanceled()" (click)="cancelFileDocument()"
+            title="Rechazar documento">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-file-times"></mat-icon>
+          </button>
+          <!-- delete-document -->
+          <button *ngIf="canDelete && showDelete" mat-icon-button (click)="deleteFileDocument()"
+            title="Eliminar documento">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-trash"></mat-icon>
+          </button>
+          <!-- metadata-view -->
+          <button mat-icon-button (click)="this.showMetadatos()" title="Ver más Datos" *ngIf="showMetadatas">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-file-alt"></mat-icon>
+          </button>
+          <!-- view rejected motive -->
+          <button id="btnViewMotie" mat-icon-button (click)="canceledChapa = true" title="Ver Motivo de Rechazo"
+            *ngIf="doc.isCanceled() && !canceledChapa">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-eye"></mat-icon>
+          </button>
+        </div>
+      </div>
+    </mat-toolbar-row>
+  </mat-toolbar>
+  <!-- Todos los modulos -->
+  <span class="view-content">
+    <!-- LOADER -->
+    <div class="window-spinner" *ngIf="showSpinner">
+      <mat-progress-spinner mode="indeterminate" color="primary">
+      </mat-progress-spinner>
+    </div>
+    <!-- formio -->
+    <span class="formio-content"
+      *ngIf="(documentationType?.isExternalFormOnly || showFormio) && allowsFormio && !doc?.hasFiles">
+      <app-formio-cardinal [haveCloseAction]="false" (submitted)="submitFormio($event)"
+        [formName]="documentationType?.exteralForm" [fileDocument]="doc">
+      </app-formio-cardinal>
+      <div class="firmador">
+        <button mat-raised-button class="content-action-main" (click)="accion()" color="accent" fxLayout="row"
+          fxLayoutAlign="center center" [ngClass]="{'disabled' : saving}">
+          <mat-icon [ngClass]="saving ? 'fa-xs fa-spin' : 'fa-lg'" fontSet="fa"
+            [fontIcon]="saving ? 'fa-spinner-third' : 'fa-file-export'"></mat-icon>
+          <span>{{saving ? 'Cargando' : 'Enviar'}}</span>
+        </button>
+      </div>
+    </span>
+    <!-- PDF-viewer -->
+    <app-pdf-wrapper [showControls]="false" #pdfWrapper [doc]="doc" [file]="filePdf" [fileBlob]="fileBlob"
+      [fileName]="fileName" [autoView]="false" [showAll]="showAll"  [autoSize]="autoSizeDoc"
+      [hidden]=" showChapa || showSpinner || canceledChapa">
+    </app-pdf-wrapper>
+    <div class="actions-footer-wrapper">
+      <div class="actions-footer-container" [class.flow-active]="isQueryActive">
+        <app-file-document-query
+          *ngIf="doc && !showSpinner"
+          [doc]="doc"
+          [showQuery]="showQuery"
+          [organizationalUnitId]="doc?.organizationalUnitId"
+          (closedQuery)="closedQuery.emit($event)"
+          (activeChange)="isQueryActive = $event"
+          (queryChanged)="doc.hasMessage = $event">
+        </app-file-document-query>
+      </div>
+    </div>
+    <app-chapa [className]="'upload-bk'" [text]="'Documento pendiente de carga'"
+      *ngIf="doc?.isUploadPending() && !doc?.isCanceled()">
+    </app-chapa>
+    <app-chapa *ngIf="showWelcome" [className]="'info-empty'" [icon]="'fa-hand-sparkles'"
+      [text]="'Humanage te da la bienvenida'"
+      [subText]="'Decile adiós al papel, aquí podrás gestionar todo digitalmente y de la manera más fácil'">
+    </app-chapa>
+    <app-chapa [className]="'info-empty'" [icon]="'fa-file-times'" [text]="'El Documento ha sido Rechazado'"
+      [subText]="doc.rejectedMotive ? 'Motivo:' : ''" [infoExtra]="doc.rejectedMotive" [actionIcon]="'fa-eye'"
+      [actionText]="'Ver documento'" (actionClick)="hideChapa()" *ngIf="canceledChapa"></app-chapa>
+  </span>
+</span>

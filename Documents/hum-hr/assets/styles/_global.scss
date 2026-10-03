@@ -1,0 +1,478 @@
+///////////////////////////////
+@use '@angular/material' as mat;
+// Material theming
+///////////////////////////////
+@import '../../../node_modules/@angular/material/theming';
+///////////////////////////////
+// main core (shame)
+///////////////////////////////
+@import 'app';
+@import 'edge';
+
+///////////////////////////////
+// per component
+///////////////////////////////
+@import 'loader';
+@import 'animations';
+@import 'mediaQueries';
+@import 'home';
+@import 'inbox';
+@import 'welcome';
+@import 'table';
+@import 'search';
+@import 'sidenav';
+@import 'datepicker';
+@import 'snackbar';
+@import 'bottomSheet';
+@import 'list';
+@import 'cards';
+
+///////////////////////////////
+// per view
+///////////////////////////////
+@import '../../app/modules/login/login';
+@import '../../app/modules/login-browser/loginBrowser';
+@import '../../app/modules/profile/profile';
+@import '../../app/modules/employee/add-documentation/addDocumentation';
+@import '../../app/modules/employee/pendings/pending';
+@import '../../app/modules/employee/leaves/leave';
+@import '../../app/modules/employee/leave-detail/leaveDetail';
+@import '../../app/modules/employee/add-leave-dialog/addLeaveDialog';
+@import '../../app/modules/employee/home/employee2016Home';
+@import '../../app/modules/employer/employee-detail/employeeDetail';
+@import '../../app/modules/employer/leave-request-detail/leaveRequestDetail';
+@import '../../app/modules/employer/leave-config-employee/leaveConfigEmployee';
+@import '../../app/modules/employer/frame/frame';
+@import '../../app/modules/employer/deferred-processes/deferredProcesses';
+@import '../../app/modules/shared/custom-search-input/customSearchInput';
+@import '../../app/modules/employer/audit-find/audit';
+@import '../../app/modules/employer/documentation-signer/documentationSigner';
+@import '../../app/modules/employer/file-document-search/fileDocumentsSearch';
+@import '../../app/modules/employer/automatic-process-detail/automaticProcessDetail';
+@import '../../app/modules/employer/analytics/analytics-chart';
+@import '../../app/modules/employer/actor-find/actorFind';
+@import '../../app/modules/employer/analytics-document-set/analytics-sets';
+@import '../../app/modules/employer/add-menu-dialog/addMenuDialog';
+@import '../../app/modules/employer/document-configuration/documentConfiguration';
+@import '../../app/modules/employer/role-user-find/roleUserFind';
+@import '../../app/modules/shared/file-dnd/fileDnd';
+@import '../../app/modules/shared/file-document-inbox-block-ou/fileDocumentInboxBlockOu';
+@import '../../app/modules/shared/release-notes-dialog/release-notes';
+@import '../../app/modules/shared/file-document-sign/fileDocumentSign';
+@import '../../app/modules/shared/file-document-sign-massive-dialog/fileDocumentSignMassiveDialog';
+@import '../../app/modules/shared/file-document-state/fileDocumentState';
+@import '../../app/modules/shared/file-document-view/fileDocumentViewComponent';
+@import '../../app/modules/shared/file-document-view-modal/fileDocumentModal';
+@import '../../app/modules/shared/terms-and-conditions/tyc';
+@import '../../app/modules/shared/cs-grid-control/CS-Grid-style';
+@import '../../app/modules/shared/file-document-detail/fileDocumentDetail';
+@import '../../app/modules/shared/help-stepper/helpStepper';
+@import '../../app/modules/shared/help-index/helpIndex';
+@import '../../app/modules/shared/cs-upload-cropper-control/csUploadCropper';
+@import '../../app/modules/shared/file-document-upload/fileDocumentUpload';
+@import '../../app/modules/shared/autocomplete-chip/autocomplete';
+
+///////////////////////////////
+//NUEVO LSD
+///////////////////////////////
+@import '../../app/modules/employer/lsd/lsd';
+@import '../../app/modules/employer/upload-file-modal/uploadFileModal';
+
+///////////////////////////////
+//Color get function (primary, accent & warn)
+///////////////////////////////
+@function colorGet($theme, $selector) {
+  $type: map-get($theme, $selector);
+  $color: mat.get-color-from-palette($type);
+  @return $color;
+}
+
+///////////////////////////////
+//Deep Color get function (background & foreground)
+///////////////////////////////
+@function colorDeepGet($map, $keys...) {
+  @each $key in $keys {
+    $map: map-get($map, $key);
+  }
+
+  @return $map;
+}
+
+///////////////////////////////
+//custom theme mixer
+///////////////////////////////
+@mixin themeMixer ($color_pri, $varPri, $color_acc, $varAcc, $color_war, $varWarn, $scheme) {
+
+  ///////////////////////////////
+  //alternate schema (light-mode)
+  ///////////////////////////////
+  @if $scheme==light {
+    @include mat.core();
+    ///////////////////////////////
+    // Angular-material colors
+    ///////////////////////////////
+    $custom_primary: mat.define-palette($color_pri, $varPri);
+    $custom_accent: mat.define-palette($color_acc, $varAcc);
+    $custom_warn: mat.define-palette($color_war, $varWarn);
+    $custom_theme: mat.define-light-theme($custom_primary, $custom_accent, $custom_warn);
+    ///////////////////////////////
+    //angular generator
+    ///////////////////////////////
+    @include mat.all-component-themes($custom_theme);
+    ///////////////////////////////
+    //custom colors
+    ///////////////////////////////
+    $bg-card-app: #e0e0e0;
+    $bg-card: colorDeepGet($custom_theme, 'background', 'card');
+    $bg-card-side: colorDeepGet($custom_theme, 'background', 'disabled-button-toggle');
+    $bg-background: colorDeepGet($custom_theme, 'background', 'background');
+    $bg-button-selected: colorDeepGet($custom_theme, 'background', 'selected-button');
+    $bg-overlay: rgba(0, 0, 0, 0.32);
+    $bg-dark-blue: #607D8B;
+    $bg-toolbar-light: $bg-card-side;
+    $bg-toolbar-dark: $bg-card-side;
+    $bg-modal: rgba(0, 0, 0, 0.6);
+    $bg-filter: linear-gradient(45deg, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0.55) 16%, rgba(0, 0, 0, 0) 100%);
+    $bg-ripple-light: rgba(255, 255, 255, 0.1);
+    $bg-ripple-dark: rgba(0, 0, 0, 0.1);
+    $bg-glass: rgba(0, 0, 0, 0);
+    $btn-hover: colorDeepGet($custom_theme, 'background', 'hover');
+    ///////////////////////////////
+    ////base
+    ///////////////////////////////
+    $primary: colorGet($custom_theme, 'primary');
+    $primary-side: colorDeepGet($custom_theme, 'primary', 'darker');
+    $primary-light: colorDeepGet($custom_theme, 'primary', 'lighter');
+    $accent: colorGet($custom_theme, 'accent');
+    $accent-light: colorDeepGet($custom_theme, 'accent', 'lighter');
+    $warn: colorGet($custom_theme, 'warn');
+    $disabled: colorDeepGet($custom_theme, 'foreground', 'disabled');
+    $divider: colorDeepGet($custom_theme, 'foreground', 'divider');
+    ///////////////////////////////
+    ////text
+    ///////////////////////////////
+    $text-main: colorDeepGet($custom_theme, 'primary', 'default-contrast');
+    $text-main-solid: colorDeepGet($custom_theme, 'foreground', 'text');
+    $text-side: colorDeepGet($custom_theme, 'foreground', 'secondary-text');
+    $text-sub: colorDeepGet($custom_theme, 'foreground', 'hint-text');
+    $text-main-inverse-solid: $text-main;
+    $text-main-inverse: $text-main;
+    $text-side-inverse: $text-side;
+    $text-sub-inverse: $text-sub;
+    $text-disabled: $disabled;
+    $primary-text: $primary;
+    $bk-primary-text: colorDeepGet($custom_theme, 'primary', 'text');
+    ///////////////////////////////
+    ////scroll-bar
+    ///////////////////////////////
+    $scroll-body: $bg-glass;
+    $scroll-thumb: #9e9e9e;
+    ///////////////////////////////
+    ////status
+    ///////////////////////////////
+    $active: colorGet($custom_theme, 'primary');
+    $hover: $btn-hover;
+    ///////////////////////////////
+    /////badge
+    ///////////////////////////////
+    $badge: colorGet($custom_theme, 'warn');
+    ///////////////////////////////
+    /////chips
+    ///////////////////////////////
+    $seen: #2196F3;
+    $unseen: $bg-dark-blue;
+    $signed-ok: #009688;
+    $signed-not-ok: #673AB7;
+    $unsigned: #ff4081;
+    $filed: $bg-dark-blue;
+    $cancelled: #795548;
+    ///////////////////////////////
+    /////processes
+    ///////////////////////////////
+    $running: #FFD54F;
+    $finished-ok: #4DB6AC;
+    $finished-not-ok: #F48FB1;
+    $erased: #837C80;
+    $limbo: #FFD54F;
+    $bk-running: #ffecb3;
+    $bk-finished-ok: #b2dfdb;
+    $bk-finished-not-ok: #f8bbd0;
+    $bk-erased: #b2adb0;
+    ///////////////////////////////
+    /////status
+    ///////////////////////////////
+    $alert: #FFE082;
+    $success: #8BC34A;
+    ///////////////////////////////
+    /////leave status
+    ///////////////////////////////
+    $leave-pending: #FF9800;
+    $leave-bk-pending: #FFE0B2;
+    $leave-ok: #009688;
+    $leave-bk-ok: #b2dfdb;
+    $leave-not-ok: #9C27B0;
+    $leave-bk-not-ok: #e1bee7;
+    $leave-cancelled: #795548;
+    $leave-bk-cancelled:#BCAAA4;
+    $leave-draft: #dedede;
+    $leave-bk-draft:#f2f2f2;
+    ///////////////////////////////
+    ////table status
+    ///////////////////////////////
+    $row-header: $bg-card;
+    $row-divider: $divider;
+    $row-odd: $bg-background;
+    $row-even: $bg-card;
+    $row-active: $primary;
+    $row-selected: $primary;
+    $row-hover: $hover;
+    $row-disabled: $bg-dark-blue;
+    $multiple-row-odd: colorDeepGet($custom_theme, 'primary', 100);
+    $multiple-row-even: colorDeepGet($custom_theme, 'primary', 200);
+    ///////////////////////////////
+    //custom apps
+    ///////////////////////////////
+    @include app($bg-toolbar-dark, $btn-hover, $scroll-body, $scroll-thumb, $primary, $primary-side, $divider, $text-main, $text-main-inverse-solid);
+    @include loader($bg-card);
+    @include mediaQueries($bg-card, $bg-card-side, $bg-modal, $bg-filter, $bg-ripple-light, $bg-glass, $primary, $primary-side, $accent, $divider, $text-main, $text-main-inverse-solid, $text-main-inverse, $row-odd, $row-even);
+    @include home($bg-card-app, $bg-card);
+    @include inbox($bg-card, $primary, $divider, $primary-text, $hover, $badge, $running, $finished-ok, $finished-not-ok, $row-odd, $row-even, $erased, $limbo);
+    @include welcome($bg-card, $primary-side);
+    @include table($bg-card, $bg-glass, $primary, $divider, $text-main, $cancelled, $row-header, $row-divider, $row-odd, $row-even, $row-hover, $row-disabled, $multiple-row-odd, $multiple-row-even, $leave-pending, $leave-ok, $leave-not-ok,$leave-cancelled,$leave-draft);
+    @include search($bg-card, $bg-toolbar-light, $bg-glass, $divider, $text-main, $text-sub, $row-hover);
+    @include sidenav($bg-card, $bg-filter, $bg-glass, $primary, $divider, $text-main, $text-side, $text-main-inverse-solid, $hover);
+    @include datepicker($bg-card, $primary-side, $text-main-inverse);
+    @include snackbar($bg-ripple-light, $alert);
+    @include bottomSheet($primary, $accent, $divider, $text-main, $primary-text, $leave-cancelled);
+    @include list($bg-toolbar-light, $divider, $text-main-solid, $text-side, $primary-text, $hover, $row-odd, $row-even);
+    @include cards($bg-card);
+    @include login($bg-card, $accent);
+    @include loginBrowser($bg-card, $bg-overlay, $bg-dark-blue, $text-main, $text-side, $text-main-inverse);
+    @include profile($bg-card, $bg-toolbar-light, $divider);
+    @include addDocumentation($bg-card, $bg-background, $primary, $divider, $text-main-solid, $text-side, $primary-text);
+    @include pending($bg-background, $bg-dark-blue, $accent, $divider, $text-main-solid, $text-main, $text-side, $hover);
+    @include employee2016Home($text-main);
+    @include employeeDetail($bg-card, $bg-card-side, $bg-background, $bg-dark-blue, $bg-toolbar-dark, $primary, $warn, $success, $divider, $text-main, $text-main-inverse, $primary-text, $row-even);
+    @include frame($bg-card, $bg-card-side, $bg-background, $primary, $primary-light, $accent, $accent-light, $divider, $text-main-solid, $text-main, $text-side, $text-sub, $primary-text, $hover, $row-odd, $row-even,$leave-ok,$leave-not-ok);
+    @include deferredProcesses($bg-card, $bg-card-side, $bg-background, $primary, $primary-light, $accent, $accent-light, $divider, $text-main-solid, $text-main, $text-side, $text-sub, $primary-text, $hover, $row-odd, $row-even,$leave-ok,$leave-not-ok,$warn,$success);
+    @include customSearchInput($bg-background, $divider, $text-main-solid, $text-sub, $hover);
+    @include audit($bg-card-side, $bg-background, $primary, $divider, $text-main-solid, $text-main, $primary-text, $hover, $row-even);
+    @include documentationSigner($bg-card, $bg-background, $bg-toolbar-dark, $scroll-body, $scroll-thumb, $primary, $accent, $divider, $text-main, $text-side, $hover, $row-even);
+    @include fileDocumentsSearch($accent);
+    @include automaticProcessDetail($bg-toolbar-dark, $text-main, $running, $finished-ok, $finished-not-ok, $bk-running, $bk-finished-ok, $bk-finished-not-ok, $erased, $bk_erased);
+    @include analitycs-sets($bg-card, $bg-card-side, $divider, $primary-text, $signed-not-ok, $signed-ok);
+    @include addMenuDialog($bg-card, $bg-background, $bg-toolbar-dark, $bg-modal, $bg-glass, $primary, $warn, $disabled, $divider, $text-main-solid, $text-main, $text-side, $text-sub, $text-disabled, $primary-text, $hover);
+    @include documentConfiguration($bg-card, $bg-card-side, $bg-background, $bg-overlay, $bg-dark-blue, $bg-ripple-light, $bg-glass, $scroll-body, $scroll-thumb, $primary, $accent, $accent-light, $warn, $divider, $text-main-solid, $text-main, $text-side, $text-sub, $primary-text, $hover, $row-odd, $row-even);
+    @include roleUserFind($bg-card, $bg-card-side, $bg-background, $bg-overlay, $bg-dark-blue, $bg-ripple-light, $scroll-body, $scroll-thumb, $primary, $accent, $accent-light, $divider, $text-main-solid, $text-main, $text-side, $text-sub, $primary-text, $hover, $row-odd, $row-even);
+    @include actorFind($bg-card, $bg-card-side, $bg-background, $bg-overlay, $bg-dark-blue, $bg-ripple-light, $scroll-body, $scroll-thumb, $primary, $accent, $accent-light, $divider, $text-main-solid, $text-main, $text-side, $text-sub, $primary-text, $hover, $row-odd, $row-even);
+    @include fileDnd($bg-card, $bg-dark-blue, $bg-toolbar-dark, $text-disabled);
+    @include fileDocumentSign($bg-card, $bg-dark-blue, $accent, $scroll-thumb, $divider, $text-main, $text-side, $text-disabled, $primary-text, $signed-ok, $signed-not-ok);
+    @include fileDocumentSignMassiveDialog($bg-card, $bg-background, $accent, $primary-text);
+    @include fileDocumentState($bg-toolbar-light, $divider, $text-main-inverse, $seen, $unseen, $signed-ok, $signed-not-ok, $unsigned, $cancelled);
+    @include fileDocumentViewComponent($bg-card, $bg-background, $bg-dark-blue, $primary, $divider, $text-main);
+    @include fileDocumentModal($bg-card, $bg-card-side, $bg-background, $bg-dark-blue, $primary, $accent, $warn, $disabled, $divider, $text-main-solid, $text-main, $text-side, $text-sub, $text-disabled, $primary-text, $hover);
+    @include tyc($bg-card);
+    @include CS-Grid-style($bg-card, $bg-card-side, $bg-background, $bg-dark-blue, $bg-glass, $primary, $divider, $text-main-solid, $text-main, $text-side, $text-disabled, $hover);
+    @include fileDocumentDetail($divider);
+    @include helpStepper($bg-card, $divider, $text-side);
+    @include helpIndex($bg-card);
+    @include csUploadCropper($text-main, $text-side);
+    @include fileDocumentUpload($bg-card-side, $bg-dark-blue);
+    @include autocomplete($bg-card, $primary-text, $hover);
+    @include leave($bg-background, $accent, $divider, $text-main-solid, $text-side, $hover, $leave-pending, $leave-ok, $leave-not-ok, $leave-cancelled, $leave-bk-cancelled, $leave-draft, $leave-bk-draft);
+    @include leaveDetail($primary-text, $text-side, $leave-pending, $leave-bk-pending, $leave-ok, $leave-bk-ok, $leave-not-ok, $leave-bk-not-ok, $leave-cancelled, $leave-bk-cancelled, $leave-draft, $leave-bk-draft,$text-main, $bg-toolbar-light,$divider);
+    @include leaveRequestDetail($bg-card, $bg-background, $primary-text, $primary, $text-main, $row-even, $divider, $text-side, $leave-ok, $leave-not-ok, $leave-draft);
+    @include addLeaveDialog($accent, $text-main, $text-side, $text-disabled, $divider, $bg-background);
+    @include leaveConfigEmploye($bg-card, $bg-background, $primary-text, $primary, $text-main, $row-even, $divider, $text-side, $leave-ok, $leave-not-ok,$leave-draft, $text-sub, $row-odd);
+    //NUEVO LSD
+    @include lsd($bg-card, $bg-card-side, $bg-background, $bg-ripple-light, $scroll-body, $scroll-thumb, $primary, $accent, $divider, $text-main-solid, $text-main, $text-side, $text-sub, $text-main-inverse, $primary-text, $hover, $finished-ok, $row-odd, $row-even);
+    @include uploadFileModal($bg-card, $bg-background, $primary, $divider, $text-sub, $row-odd);
+
+  }
+
+  ///////////////////////////////
+  //alternate schema (dark-mode)
+  ///////////////////////////////
+  @else if $scheme==dark {
+    @include mat.core();
+    ///////////////////////////////
+    // Angular-material colors
+    ///////////////////////////////
+    $custom_primary: mat.define-palette($color_pri, $varPri);
+    $custom_accent: mat.define-palette($color_acc, $varAcc);
+    $custom_warn: mat.define-palette($color_war, $varWarn);
+    $custom_theme: mat.define-dark-theme($custom_primary, $custom_accent, $custom_warn);
+    ///////////////////////////////
+    //angular generator
+    ///////////////////////////////
+    @include mat.all-component-themes($custom_theme);
+    ///////////////////////////////
+    //custom colors
+    ///////////////////////////////
+    $bg-card-app: #212121;
+    $bg-card: colorDeepGet($custom_theme, 'background', 'card');
+    $bg-card-side: colorDeepGet($custom_theme, 'background', 'disabled-button-toggle');
+    $bg-background: colorDeepGet($custom_theme, 'background', 'background');
+    $bg-button-selected: colorDeepGet($custom_theme, 'background', 'selected-button');
+    $bg-overlay: rgba(0, 0, 0, 0.32);
+    $bg-dark-blue: #607D8B;
+    $bg-toolbar-light: $bg-card-side;
+    $bg-toolbar-dark: $bg-card-side;
+    $bg-modal: rgba(0, 0, 0, 0.6);
+    $bg-filter: linear-gradient(45deg, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0.55) 16%, rgba(0, 0, 0, 0) 100%);
+    $bg-ripple-light: rgba(255, 255, 255, 0.1);
+    $bg-ripple-dark: rgba(0, 0, 0, 0.1);
+    $bg-glass: rgba(0, 0, 0, 0);
+    $btn-hover: colorDeepGet($custom_theme, 'background', 'hover');
+    ///////////////////////////////
+    ////base
+    ///////////////////////////////
+    $primary: colorGet($custom_theme, 'primary');
+    $primary-side: colorDeepGet($custom_theme, 'primary', 'A700');
+    $primary-light: colorDeepGet($custom_theme, 'primary', 300);
+    $accent: colorGet($custom_theme, 'accent');
+    $accent-light: colorDeepGet($custom_theme, 'accent', 200);
+    $warn: colorGet($custom_theme, 'warn');
+    $disabled: colorDeepGet($custom_theme, 'foreground', 'disabled');
+    $divider: colorDeepGet($custom_theme, 'foreground', 'divider');
+    ///////////////////////////////
+    ////text
+    ///////////////////////////////
+    $text-main: colorDeepGet($custom_theme, 'primary', 'default-contrast');
+    $text-main-solid: colorDeepGet($custom_theme, 'foreground', 'text');
+    $text-side: colorDeepGet($custom_theme, 'foreground', 'secondary-text');
+    $text-sub: colorDeepGet($custom_theme, 'foreground', 'hint-text');
+    $text-main-inverse-solid: $text-main;
+    $text-main-inverse: $text-main;
+    $text-side-inverse: $text-main;
+    $text-sub-inverse: $text-main;
+    $text-disabled: $disabled;
+    $primary-text: $primary;
+    $bk-primary-text: colorDeepGet($custom_theme, 'primary', 'text');
+    ///////////////////////////////
+    ////scroll-bar
+    ///////////////////////////////
+    $scroll-body: $bg-glass;
+    $scroll-thumb: $text-disabled;
+    ///////////////////////////////
+    ////status
+    ///////////////////////////////
+    $active: colorGet($custom_theme, 'primary');
+    $hover: colorDeepGet($custom_theme, 'background', 'hover');
+    ///////////////////////////////
+    /////badge
+    ///////////////////////////////
+    $badge: colorGet($custom_theme, 'warn');
+    ///////////////////////////////
+    /////chips
+    ///////////////////////////////
+    $seen: #2196F3;
+    $unseen: $bg-dark-blue;
+    $signed-ok: #009688;
+    $signed-not-ok: #673AB7;
+    $unsigned: #ff4081;
+    $filed: $bg-dark-blue;
+    $cancelled: #795548;
+    ///////////////////////////////
+    /////processes
+    ///////////////////////////////
+    $running: #ffc107;
+    $finished-ok: #009688;
+    $finished-not-ok: #e91e63;
+    $erased: #837C80;
+    $limbo: #ffc107;
+    $bk-running: #ffecb3;
+    $bk-finished-ok: #b2dfdb;
+    $bk-finished-not-ok: #f8bbd0;
+    $bk-erased: #b2adb0;
+    ///////////////////////////////
+    /////status
+    ///////////////////////////////
+    $alert: #ff9800;
+    $success: #4caf50;
+    ///////////////////////////////
+    /////leave status
+    ///////////////////////////////
+    $leave-pending: #ffb74d;
+    $leave-bk-pending: #fff3e0;
+    $leave-ok: #4db6ac;
+    $leave-bk-ok: #e0f2f1;
+    $leave-not-ok: #ba68c8;
+    $leave-bk-not-ok: #f3e5f5;
+    $leave-cancelled : #795548;
+    $leave-bk-cancelled:#BCAAA4;
+    $leave-draft: #dedede;
+    $leave-bk-draft:#f2f2f2;
+
+    ///////////////////////////////
+    ////table status
+    ///////////////////////////////
+    $row-header: $bg-card;
+    $row-divider: $divider;
+    $row-odd: $bg-background;
+    $row-even: $bg-card;
+    $row-active: $primary;
+    $row-selected: $primary;
+    $row-hover: $hover;
+    $row-disabled: $bg-dark-blue;
+    $multiple-row-odd: colorDeepGet($custom_theme, 'primary', 100);
+    $multiple-row-even: colorDeepGet($custom_theme, 'primary', 200);
+    //custom apps
+    @include app($bg-toolbar-dark, $btn-hover, $scroll-body, $scroll-thumb, $primary, $primary-side, $divider, $text-main, $text-main-inverse-solid);
+    @include loader($bg-card);
+    @include mediaQueries($bg-card, $bg-card-side, $bg-modal, $bg-filter, $bg-ripple-light, $bg-glass, $primary, $primary-side, $accent, $divider, $text-main, $text-main-inverse-solid, $text-main-inverse, $row-odd, $row-even);
+    @include home($bg-card-app, $bg-card);
+    @include inbox($bg-card, $primary, $divider, $primary-text, $hover, $badge, $running, $finished-ok, $finished-not-ok, $row-odd, $row-even, $erased, $limbo);
+    @include welcome($bg-card, $primary-side);
+    @include table($bg-card, $bg-glass, $primary, $divider, $text-main, $cancelled, $row-header, $row-divider, $row-odd, $row-even, $row-hover, $row-disabled, $multiple-row-odd, $multiple-row-even, $leave-pending, $leave-ok, $leave-not-ok,$leave-cancelled,$leave-draft);
+    @include search($bg-card, $bg-toolbar-light, $bg-glass, $divider, $text-main, $text-sub, $row-hover);
+    @include sidenav($bg-card, $bg-filter, $bg-glass, $primary, $divider, $text-main, $text-side, $text-main-inverse-solid, $hover);
+    @include datepicker($bg-card, $primary-side, $text-main-inverse);
+    @include snackbar($bg-ripple-light, $alert);
+    @include bottomSheet($primary, $accent, $divider, $text-main, $primary-text, $leave-cancelled);
+    @include list($bg-toolbar-light, $divider, $text-main-solid, $text-side, $primary-text, $hover, $row-odd, $row-even);
+    @include cards($bg-card);
+    @include login($bg-card, $accent);
+    @include loginBrowser($bg-card, $bg-overlay, $bg-dark-blue, $text-main, $text-side, $text-main-inverse);
+    @include profile($bg-card, $bg-toolbar-light, $divider);
+    @include addDocumentation($bg-card, $bg-background, $primary, $divider, $text-main-solid, $text-side, $primary-text);
+    @include pending($bg-background, $bg-dark-blue, $accent, $divider, $text-main-solid, $text-main, $text-side, $hover);
+    @include employee2016Home($text-main);
+    @include employeeDetail($bg-card, $bg-card-side, $bg-background, $bg-dark-blue, $bg-toolbar-dark, $primary, $warn, $success, $divider, $text-main, $text-main-inverse, $primary-text, $row-even);
+    @include frame($bg-card, $bg-card-side, $bg-background, $primary, $primary-light, $accent, $accent-light, $divider, $text-main-solid, $text-main, $text-side, $text-sub, $primary-text, $hover, $row-odd, $row-even,$leave-ok,$leave-not-ok);
+    @include deferredProcesses($bg-card, $bg-card-side, $bg-background, $primary, $primary-light, $accent, $accent-light, $divider, $text-main-solid, $text-main, $text-side, $text-sub, $primary-text, $hover, $row-odd, $row-even,$leave-ok,$leave-not-ok,$warn,$success);
+    @include customSearchInput($bg-background, $divider, $text-main-solid, $text-sub, $hover);
+    @include audit($bg-card-side, $bg-background, $primary, $divider, $text-main-solid, $text-main, $primary-text, $hover, $row-even);
+    @include documentationSigner($bg-card, $bg-background, $bg-toolbar-dark, $scroll-body, $scroll-thumb, $primary, $accent, $divider, $text-main, $text-side, $hover, $row-even);
+    @include fileDocumentsSearch($accent);
+    @include automaticProcessDetail($bg-toolbar-dark, $text-main, $running, $finished-ok, $finished-not-ok, $bk-running, $bk-finished-ok, $bk-finished-not-ok, $erased, $bk_erased);
+    @include analitycs-sets($bg-card, $bg-card-side, $divider, $primary-text, $signed-not-ok, $signed-ok);
+    @include addMenuDialog($bg-card, $bg-background, $bg-toolbar-dark, $bg-modal, $bg-glass, $primary, $warn, $disabled, $divider, $text-main-solid, $text-main, $text-side, $text-sub, $text-disabled, $primary-text, $hover);
+    @include documentConfiguration($bg-card, $bg-card-side, $bg-background, $bg-overlay, $bg-dark-blue, $bg-ripple-light, $bg-glass, $scroll-body, $scroll-thumb, $primary, $accent, $accent-light, $warn, $divider, $text-main-solid, $text-main, $text-side, $text-sub, $primary-text, $hover, $row-odd, $row-even);
+    @include roleUserFind($bg-card, $bg-card-side, $bg-background, $bg-overlay, $bg-dark-blue, $bg-ripple-light, $scroll-body, $scroll-thumb, $primary, $accent, $accent-light, $divider, $text-main-solid, $text-main, $text-side, $text-sub, $primary-text, $hover, $row-odd, $row-even);
+    @include actorFind($bg-card, $bg-card-side, $bg-background, $bg-overlay, $bg-dark-blue, $bg-ripple-light, $scroll-body, $scroll-thumb, $primary, $accent, $accent-light, $divider, $text-main-solid, $text-main, $text-side, $text-sub, $primary-text, $hover, $row-odd, $row-even);
+    @include fileDnd($bg-card, $bg-dark-blue, $bg-toolbar-dark, $text-disabled);
+    @include fileDocumentSign($bg-card, $bg-dark-blue, $accent, $scroll-thumb, $divider, $text-main, $text-side, $text-disabled, $primary-text, $signed-ok, $signed-not-ok);
+    @include fileDocumentSignMassiveDialog($bg-card, $bg-background, $accent, $primary-text);
+    @include fileDocumentState($bg-toolbar-light, $divider, $text-main-inverse, $seen, $unseen, $signed-ok, $signed-not-ok, $unsigned, $cancelled);
+    @include fileDocumentViewComponent($bg-card, $bg-background, $bg-dark-blue, $primary, $divider, $text-main);
+    @include fileDocumentModal($bg-card, $bg-card-side, $bg-background, $bg-dark-blue, $primary, $accent, $warn, $disabled, $divider, $text-main-solid, $text-main, $text-side, $text-sub, $text-disabled, $primary-text, $hover);
+    @include tyc($bg-card);
+    @include CS-Grid-style($bg-card, $bg-card-side, $bg-background, $bg-dark-blue, $bg-glass, $primary, $divider, $text-main-solid, $text-main, $text-side, $text-disabled, $hover);
+    @include fileDocumentDetail($divider);
+    @include helpStepper($bg-card, $divider, $text-side);
+    @include helpIndex($bg-card);
+    @include csUploadCropper($text-main, $text-side);
+    @include fileDocumentUpload($bg-card-side, $bg-dark-blue);
+    @include autocomplete($bg-card, $primary-text, $hover);
+    @include leave($bg-background, $accent, $divider, $text-main-solid, $text-side, $hover, $leave-pending, $leave-ok, $leave-not-ok, $leave-cancelled, $leave-bk-cancelled,$leave-draft, $leave-bk-draft);
+    @include leaveDetail($primary-text, $text-side, $leave-pending, $leave-bk-pending, $leave-ok, $leave-bk-ok, $leave-not-ok, $leave-bk-not-ok, $leave-cancelled, $leave-bk-cancelled,$leave-draft, $leave-bk-draft,$text-main,$bg-toolbar-light,$divider);
+    @include leaveRequestDetail($bg-card, $bg-background, $primary-text, $primary, $text-main, $row-even, $divider, $text-side, $leave-ok, $leave-not-ok,$leave-draft);
+    @include addLeaveDialog($accent, $text-main, $text-side, $text-disabled, $divider, $bg-background);
+    @include leaveConfigEmploye($bg-card, $bg-background, $primary-text, $primary, $text-main, $row-even, $divider, $text-side, $leave-ok, $leave-not-ok,$leave-draft, $text-sub, $row-odd);
+    //NUEVO LSD
+    @include lsd($bg-card, $bg-card-side, $bg-background, $bg-ripple-light, $scroll-body, $scroll-thumb, $primary, $accent, $divider, $text-main-solid, $text-main, $text-side, $text-sub, $text-main-inverse, $primary-text, $hover, $finished-ok, $row-odd, $row-even);
+    @include uploadFileModal($bg-card, $bg-background, $primary, $divider, $text-sub, $row-odd);
+
+  }
+}

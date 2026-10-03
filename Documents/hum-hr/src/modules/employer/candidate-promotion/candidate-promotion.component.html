@@ -1,0 +1,43 @@
+<div class="load-window message" *ngIf="clickOnce">
+    <mat-progress-spinner style="z-index: 1" mode="indeterminate" color="primary">
+    </mat-progress-spinner>
+    <h3 class="primary-text">Estamos preparando todo para promover a tu nuevo empleado.</h3>
+    <span>No cierres esta pantalla, esto podría demorar unos instantes.</span>
+</div>
+<span class="promote-container" [style.height]="clickOnce ? '0px':'auto'" *ngIf="!clickOnce">
+  <mat-toolbar color="grey">
+    <mat-toolbar-row>
+      <div class="toolbar-line" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+        <div class="title" fxLayout="column" fxLayoutAlign="center start">
+          <h3>Promover candidato</h3>
+        </div>
+        <button mat-icon-button (click)="cancel()" title="Cerrar">
+          <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+        </button>
+      </div>
+    </mat-toolbar-row>
+  </mat-toolbar>
+  <mat-divider></mat-divider>
+  <form [formGroup]="promotionForm" style="position: relative;">
+    <mat-progress-bar mode="indeterminate" [style.display]="loading ? 'block' : 'none'">
+    </mat-progress-bar>
+    <div class="add-menu-form-body" fxLayout="column" fxLayoutGap="16px">
+      <ng-container *ngIf="metadatasToFill.length > 0 ">
+        <div *ngFor="let meta of metadatasToFill">
+          <app-custom-control [metadata]="meta" [aditionalsmetadatas]="metadatasToFill"
+            (valueSet)="setMetadatasValuesCustomContro($event)">
+          </app-custom-control>
+        </div>
+        <div class="asisted-input" fxLayout="row-reverse" fxLayoutAlign="start center" *ngIf="useSaml">
+          <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+            <input matInput placeholder="Identificación Delegada" formControlName="nickNameFrmCtrl">
+          </mat-form-field>
+        </div>
+      </ng-container>
+    </div>
+    <div class="add-menu-form-actions">
+      <button mat-raised-button (click)="save()" [disabled]="clickOnce" color="primary" class="btn"> Finalizar </button>
+      <button mat-button [disabled]="clickOnce" (click)="cancel()">Cancelar</button>
+    </div>
+  </form>
+</span>

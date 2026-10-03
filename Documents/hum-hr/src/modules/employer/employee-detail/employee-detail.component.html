@@ -1,0 +1,376 @@
+<form [formGroup]="editPersonForm" (keydown.enter)="save()" (keydown.escape)="cancel()" style="height: 100%"
+    [hidden]="isImageUploadOpened">
+    <div class="load-window" [style.display]="loading ? 'flex' : 'none'">
+        <mat-progress-spinner style="z-index: 1" mode="indeterminate" color="primary"></mat-progress-spinner>
+    </div>
+    <div (keydown.enter)="$event.preventDefault()" class="employee_detail-container"
+        [ngClass]="{'is-editing': selectedEditingControl}">
+        <div class="employee_detail-toolbar">
+            <button mat-icon-button [title]="isCandidate ? 'Eliminar candidato' : 'Eliminar empleado'"
+                (click)="hardDeleteEmployee()"
+                *ngIf="employee && userResult?.lastLoginDate == null && canDeleteEmployee && !isValidator">
+                <mat-icon class="fa-xs" fontSet="fa" fontIcon="fa-trash-alt"></mat-icon>
+            </button>
+            <button mat-icon-button title="Compartir empleado" (click)="showSharePerson()"
+                *ngIf="employee && employee.isActive && isAdministrator && hasOuToShare && !isCandidate && !isValidator">
+                <mat-icon class="fa-xs" fontSet="fa" fontIcon="fa-share-alt"></mat-icon>
+            </button>
+            <button mat-icon-button (click)="refresh()" title="Actualizar">
+                <mat-icon class="fa-xs" fontSet="fa" fontIcon="fa-redo"></mat-icon>
+            </button>
+            <button mat-icon-button (click)="employeeDetailClose()" title="Cerrar">
+                <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+            </button>
+        </div>
+        <div class="employee_detail-head">
+            <div class="detail_head-body">
+                <div class="head_body-avatar">
+                    <button mat-icon-button title="Cambiar Imagen" (click)="isImageUploadOpened = !isImageUploadOpened"
+                        *ngIf="(isAdministrator || isCandidateAdmin || isCandidateAdminBasic) && !isValidator">
+                        <mat-icon class="fa-xs" fontSet="fa" fontIcon="fa-camera"></mat-icon>
+                    </button>
+                    <ngx-avatar *ngIf="updateAvatar" [name]="initials" [src]="selectedEmployee?.preview" size="100"
+                        [round]="true"></ngx-avatar>
+                </div>
+
+                <div class="head_body-status" *ngIf="userResult?.lastLoginDate == null && userResult?.welcomeSent">
+                    <mat-icon matBadge="!" matBadgeSize="small" matBadgePosition="after" matBadgeColor="warn"
+                        class="fa-xs" fontSet="fa" fontIcon="fa-user-slash" *ngIf="!employee?.isActive"></mat-icon>
+                    <span class="icon-stacked" *ngIf="!employee?.hasActiveCertificate">
+                        <mat-icon matBadge="!" matBadgeSize="small" matBadgePosition="after" matBadgeColor="warn"
+                            class="fa-xs" fontSet="fa" fontIcon="fa-fingerprint"></mat-icon>
+                        <mat-icon class="fa-xs" fontSet="fa" fontIcon="fa-slash"></mat-icon>
+                    </span>
+                    <mat-icon matBadge="!" matBadgeSize="small" matBadgePosition="after" matBadgeColor="warn"
+                        class="fa-xs" fontSet="fa" fontIcon="fa-lock" *ngIf="userResult?.locked"></mat-icon>
+                </div>
+
+                <div class="head_body-status"
+                    *ngIf="userResult?.lastLoginDate == null && !userResult?.welcomeSent && canSendWelcome && !isValidator">
+                    <mat-chip-list>
+                        <mat-chip color="warn" (click)="sendPendingWelcome()" [title]="'Enviar Mail'"
+                            selected="selected" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="8px">
+                            <mat-icon fontSet="fa" fontIcon="fa-bell-slash"></mat-icon>
+                            <span>Sin Mail de Bienvenida</span>
+                        </mat-chip>
+                    </mat-chip-list>
+                </div>
+
+                <div class="head_body-title">
+                    <div class="body_title-name" *ngIf="selectedEditingControl !== 'fullName'"
+                        (dblclick)="editControl('fullName')" title="Doble click para editar">
+                        <div class="input-like">
+                            <span>Nombre</span>
+                            <b> {{employee?.lastName}}, {{employee?.name}}</b>
+                        </div>
+                        <button mat-icon-button title="Editar" *ngIf="canEdit" (click)="editControl('fullName')">
+                            <mat-icon class="fa-xs" fontSet="fa" fontIcon="fa-pen"
+                                *ngIf="isContainerTypeLoaded"></mat-icon>
+                            <mat-icon class="fa-xs fa-spin" fontSet="fad" fontIcon="fa-spinner-third"
+                                *ngIf="!isContainerTypeLoaded">
+                            </mat-icon>
+                        </button>
+                    </div>
+                    <div class="edition-line" *ngIf="selectedEditingControl === 'fullName'">
+                        <mat-form-field>
+                            <input matInput="matInput"
+                                [placeholder]="editPersonForm.controls['lastName'].hasError('required') ? 'Es un dato requerido' : 'Ingresa el nuevo apellido'"
+                                formControlName="lastName" required [readOnly]="saving" />
+                        </mat-form-field>
+                        <mat-form-field>
+                            <input matInput="matInput"
+                                [placeholder]="editPersonForm.controls['firstName'].hasError('required') ? 'Es un dato requerido' : 'Ingresa el nuevo nombre'"
+                                formControlName="firstName" required [readOnly]="saving" />
+                        </mat-form-field>
+                        <div class="actions">
+                            <button mat-stroked-button (click)="cancel()" [disabled]="saving">
+                                Cancelar
+                            </button>
+                            <button mat-raised-button color="accent" (click)="save()" [disabled]="saving">
+                                Guardar
+                            </button>
+                        </div>
+                        <mat-progress-bar mode="indeterminate" *ngIf="saving"> </mat-progress-bar>
+                    </div>
+                    <div class="body_title-user"
+                        *ngIf="(employee?.email != employee?.nickName && !saving) && !oldUserHide">
+                        <div class="input-like">
+                            <span>Usuario</span>
+                            <b>{{employee?.nickName}}</b>
+                        </div>
+                    </div>
+                    <div class="body_title-user"
+                        *ngIf="selectedEditingControl !== 'nickName' && useSaml && !isCandidate">
+                        <div class="input-like">
+                            <span>Identificación Delegada</span>
+                            <b>{{employee?.delegatedSystemId}}</b>
+                        </div>
+                        <button mat-icon-button title="Editar" *ngIf="canEdit && useSaml && !isCandidate"
+                            (click)="editControl('nickName')">
+                            <mat-icon class="fa-xs" fontSet="fa" fontIcon="fa-pen"
+                                *ngIf="isContainerTypeLoaded"></mat-icon>
+                            <mat-icon class="fa-xs fa-spin" fontSet="fad" fontIcon="fa-spinner-third"
+                                *ngIf="!isContainerTypeLoaded">
+                            </mat-icon>
+                        </button>
+                    </div>
+                    <div class="edition-line" *ngIf="selectedEditingControl === 'nickName' && useSaml">
+                        <mat-form-field>
+                            <input matInput="matInput"
+                                [placeholder]="editPersonForm.controls['nickName'].hasError('required') ? 'Es un dato requerido' : 'Ingresa la nueva identificación delegada'"
+                                formControlName="nickName" required [readOnly]="saving" />
+                        </mat-form-field>
+                        <div class="actions">
+                            <button mat-stroked-button (click)="cancel()" [disabled]="saving">
+                                Cancelar
+                            </button>
+                            <button mat-raised-button color="accent" (click)="save()" [disabled]="saving">
+                                Guardar
+                            </button>
+                        </div>
+                        <mat-progress-bar mode="indeterminate" *ngIf="saving"> </mat-progress-bar>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="employee_detail-scrollable">
+            <div class="detail_head-body">
+                <div class="head_body data">
+                    <ng-container *ngIf="!isCandidate && !onlyisLeaveApprove()">
+                        <div class="data-line clickable" *ngIf="selectedEditingControl !== 'nroLeg' && !isValidator">
+                            <div class="data_line-text">
+                                <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-book-user"></mat-icon>
+                                <div class="line_text-container">
+                                    <div class="line_text-side">Legajo</div>
+                                    <div class="line_text-main">{{employee?.nroLeg}}</div>
+                                </div>
+                            </div>
+                            <button mat-icon-button title="Editar" *ngIf="canEdit" (click)="editControl('nroLeg')">
+                                <mat-icon class="fa-xs" fontSet="fa" fontIcon="fa-pen"
+                                    *ngIf="isContainerTypeLoaded && !isValidator"></mat-icon>
+                                <mat-icon class="fa-xs fa-spin" fontSet="fad" fontIcon="fa-spinner-third"
+                                    *ngIf="!isContainerTypeLoaded">
+                                </mat-icon>
+                            </button>
+                            <button *ngIf="isRRHH || isCandidateAdmin || isCandidateAdminBasic" mat-icon-button
+                                (click)="gotoEmployeeDocumentView(employee)" title="Ver Documentación">
+                                <mat-icon class="fa-xs" fontSet="fa" fontIcon="fa-folder">
+                                </mat-icon>
+                            </button>
+                        </div>
+
+                        <div class="edition-line" *ngIf="selectedEditingControl === 'nroLeg'">
+                            <mat-form-field>
+                                <input matInput="matInput"
+                                    [placeholder]="editPersonForm.controls['nroLeg'].hasError('required') ? 'Es un dato requerido' : 'Ingresa el nuevo número de legajo'"
+                                    formControlName="nroLeg" required [readOnly]="saving" />
+                            </mat-form-field>
+                            <div class="actions">
+                                <button mat-stroked-button (click)="cancel()" [disabled]="saving">
+                                    Cancelar
+                                </button>
+                                <button mat-raised-button color="accent" (click)="save()" [disabled]="saving">
+                                    Guardar
+                                </button>
+                            </div>
+                            <mat-progress-bar mode="indeterminate" *ngIf="saving"> </mat-progress-bar>
+                        </div>
+                    </ng-container>
+                    <div class="data-line clickable" *ngIf="selectedEditingControl !== 'fiscalId' && !onlyisLeaveApprove() && !isValidator">
+                        <div class="data_line-text">
+                            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-passport"></mat-icon>
+                            <div class="line_text-container" *ngIf="containerType">
+                                <div class="line_text-side">{{containerType?.label}}</div>
+                                <div class="line_text-main">
+                                    {{containerType?.mask ? (employee?.cuil | mask: maskFiscalId) : employee?.cuil}}
+                                </div>
+                            </div>
+                        </div>
+                        <button mat-icon-button title="Editar" *ngIf="canEdit" (click)="editControl('fiscalId')">
+                            <mat-icon class="fa-xs" fontSet="fa" fontIcon="fa-pen"
+                                *ngIf="isContainerTypeLoaded"></mat-icon>
+                            <mat-icon class="fa-xs fa-spin" fontSet="fad" fontIcon="fa-spinner-third"
+                                *ngIf="!isContainerTypeLoaded">
+                            </mat-icon>
+                        </button>
+                    </div>
+                    <div class="edition-line" *ngIf="selectedEditingControl === 'fiscalId'">
+                        <mat-form-field>
+                            <input matInput="matInput"
+                                [placeholder]="editPersonForm.controls['fiscalId'].hasError('required') ? 'Es un dato requerido' : 'Ingresa el nuevo Identificador fiscal'"
+                                formControlName="fiscalId" required [readOnly]="saving" [mask]="maskFiscalIdInput" />
+                        </mat-form-field>
+                        <div class="actions">
+                            <button mat-stroked-button (click)="cancel()" [disabled]="saving">
+                                Cancelar
+                            </button>
+                            <button mat-raised-button color="accent" (click)="save()" [disabled]="saving">
+                                Guardar
+                            </button>
+                        </div>
+                        <mat-progress-bar mode="indeterminate" *ngIf="saving"> </mat-progress-bar>
+                    </div>
+                    <div class="data-line" (dblclick)="editControl('email')" [ngClass]="{'clickable':canEdit}"
+                        *ngIf="selectedEditingControl !== 'email'" title="Doble click para editar">
+                        <div class="data_line-text">
+                            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-envelope"></mat-icon>
+                            <div class="line_text-container">
+                                <div class="line_text-side">Correo electrónico</div>
+                                <div class="line_text-main">{{employee?.email}}</div>
+                            </div>
+                        </div>
+                        <button mat-icon-button title="Editar"
+                            *ngIf="canEdit && (enableHumanageHrEmailChange || isCandidate)"
+                            (click)="editControl('email')">
+                            <mat-icon class="fa-xs" fontSet="fa" fontIcon="fa-pen"
+                                *ngIf="isContainerTypeLoaded"></mat-icon>
+                            <mat-icon class="fa-xs fa-spin" fontSet="fad" fontIcon="fa-spinner-third"
+                                *ngIf="!isContainerTypeLoaded">
+                            </mat-icon>
+                        </button>
+                        <ng-container *ngIf="!enableHumanageHrEmailChange && !isCandidate && !isValidator">
+                            <mat-icon class="fa-lg"
+                                title="Este campo tiene la edición deshabilitada para reforzar la seguridad de la firma electrónica. Cualquier duda comunícate con Mesa de Ayuda"
+                                fontSet="fa" fontIcon="fa-question-circle"></mat-icon>
+                        </ng-container>
+                    </div>
+                    <div class="edition-line" *ngIf="selectedEditingControl === 'email'">
+                        <mat-form-field>
+                            <input matInput="matInput"
+                                [placeholder]="editPersonForm.controls['email'].hasError('required') ? 'Es un dato requerido' : 'Ingresa el nuevo mail'"
+                                formControlName="email" required [readOnly]="saving" />
+                        </mat-form-field>
+                        <div class="actions">
+                            <button mat-stroked-button (click)="cancel()" [disabled]="saving">
+                                Cancelar
+                            </button>
+                            <button mat-raised-button color="accent" (click)="save()" [disabled]="saving">
+                                Guardar
+                            </button>
+                        </div>
+                        <mat-progress-bar mode="indeterminate" *ngIf="saving"> </mat-progress-bar>
+                    </div>
+                    <ng-container *ngFor="let m of adittionalsMetadatas">
+                        <div class="data-line" [ngClass]="{'clickable':canEdit}" [ngSwitch]="m.metadataType"
+                            *ngIf="selectedEditingControl !== m.metadataSystemName && !onlyisLeaveApprove() && !isValidator">
+                            <div class="data_line-text" *ngSwitchDefault>
+                                <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-asterisk"></mat-icon>
+                                <div class="line_text-container">
+                                    <div class="line_text-side">{{m.metadataLabel}}</div>
+                                    <div class="line_text-main">{{m.metadataValue}}</div>
+                                </div>
+                            </div>
+                            <div class="data_line-text" *ngSwitchCase="'comboKV'">
+                                <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-users"></mat-icon>
+                                <div class="line_text-container">
+                                    <div class="line_text-side">{{m.metadataLabel}}</div>
+                                    <div class="line_text-main">{{m.descriptionValue}}</div>
+                                </div>
+                            </div>
+                            <div class="data_line-text" *ngSwitchCase="'combo'">
+                                <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-users"></mat-icon>
+                                <div class="line_text-container">
+                                    <div class="line_text-side">{{m.metadataLabel}}</div>
+                                    <div class="line_text-main">{{m.metadataValue}}</div>
+                                </div>
+                            </div>
+                            <div class="data_line-text" *ngSwitchCase="'number'">
+                                <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-list-ol"></mat-icon>
+                                <div class="line_text-container">
+                                    <div class="line_text-side">{{m.metadataLabel}}</div>
+                                    <div class="line_text-main">{{m.metadataValue}}</div>
+                                </div>
+                            </div>
+                            <div class="data_line-text" *ngSwitchCase="'text'">
+                                <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-list"></mat-icon>
+                                <div class="line_text-container">
+                                    <div class="line_text-side">{{m.metadataLabel}}</div>
+                                    <div class="line_text-main">{{m.metadataValue}}</div>
+                                </div>
+                            </div>
+                            <div class="data_line-text" *ngSwitchCase="'email'">
+                                <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-envelope"></mat-icon>
+                                <div class="line_text-container">
+                                    <div class="line_text-side">{{m.metadataLabel}}</div>
+                                    <div class="line_text-main">{{m.metadataValue}}</div>
+                                </div>
+                            </div>
+                            <div class="data_line-text" *ngSwitchCase="'phoneNumber'">
+                                <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-mobile-android-alt"></mat-icon>
+                                <div class="line_text-container">
+                                    <div class="line_text-side">{{m.metadataLabel}}</div>
+                                    <div class="line_text-main">{{m.metadataValue}}</div>
+                                </div>
+                            </div>
+                            <div class="data_line-text" *ngSwitchCase="'date'">
+                                <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-calendar-alt"></mat-icon>
+                                <div class="line_text-container">
+                                    <div class="line_text-side">{{m.metadataLabel}}</div>
+                                    <div class="line_text-main">
+                                        {{m.metadataValue | date: 'dd/MM/yyyy'}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="data_line-text" *ngSwitchCase="'period'">
+                                <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-calendar-week"></mat-icon>
+                                <div class="line_text-container">
+                                    <div class="line_text-side">{{m.metadataLabel}}</div>
+                                    <div class="line_text-main">{{m.metadataValue}}</div>
+                                </div>
+                            </div>
+                            <button mat-icon-button title="Editar" *ngIf="canEdit"
+                                (click)="editControl(m.metadataSystemName)">
+                                <mat-icon class="fa-xs" fontSet="fa" fontIcon="fa-pen"
+                                    *ngIf="isContainerTypeLoaded"></mat-icon>
+                                <mat-icon class="fa-xs fa-spin" fontSet="fad" fontIcon="fa-spinner-third"
+                                    *ngIf="!isContainerTypeLoaded">
+                                </mat-icon>
+                            </button>
+                        </div>
+                        <div class="edition-line" *ngIf="selectedEditingControl === m.metadataSystemName && !isValidator">
+                            <app-custom-control [metadata]="m" [showAdd]="true"
+                                [aditionalsmetadatas]="editedEmployee.metadatas" [containerType]="containerType"
+                                (valueSet)="setMetadataValue($event)" [isDisabled]="saving"
+                                (newValueAdded)="updateOptionValues()" (comboEdited)="updateOptionValues()">
+                            </app-custom-control>
+                            <div class="actions">
+                                <button mat-stroked-button (click)="cancel()" [disabled]="saving">
+                                    Cancelar
+                                </button>
+                                <button mat-raised-button color="accent" (click)="save()" [disabled]="saving">
+                                    Guardar
+                                </button>
+                            </div>
+                            <mat-progress-bar mode="indeterminate" *ngIf="saving"> </mat-progress-bar>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+            <app-certificates
+                *ngIf="employee != null && ( isRRHH || isCandidateAdmin || isAdministrator || isCandidateAdminBasic) && !isValidator"
+                [userId]="employee.userId" [isRRHH]="false" [enableAdd]="true"
+                [employeeId]="employee.id"></app-certificates>
+            <app-user-security-detail
+                *ngIf="userResult && ( isAdministrator || isCandidateAdmin || isCandidateAdminBasic || employeeManagement) && !isValidator"
+                [onlyEmployeeManagement]="onlyEmployeeManagement" [isRRHH]="false" [user]="userResult"
+                [isCandidate]="isCandidate" (reSendEmail)="sendPendingWelcome()">
+            </app-user-security-detail>
+            <app-leave-config-employee [isCandidate]="isCandidate" *ngIf="userResult && (isLeaveAprov || isLeaveConfig || isValidator) && hasConfigLeave" [user]="userResult" [isValidator]="isValidator" [userId]="employee.userId"
+            [isActiveEmployee]="employee.isActive" [isLeaveConfig]="isLeaveConfig" [organizationalUnitId]="organizationalUnitId">
+            </app-leave-config-employee>
+        </div>
+    </div>
+</form>
+<div class="employee_detail-container cropper" *ngIf="isImageUploadOpened">
+    <div class="employee-title">
+        <div class="title-text">
+            <mat-icon class="fa-xs" fontSet="fa" fontIcon="fa-camera"></mat-icon>
+            <div class="title_text-main">Cambiar Imagen de Perfil</div>
+        </div>
+        <button mat-icon-button (click)="isImageUploadOpened = !isImageUploadOpened" title="Volver">
+            <mat-icon class="fa-xs" fontSet="fa" fontIcon="fa-times"></mat-icon>
+        </button>
+    </div>
+    <app-cs-upload-cropper-control [uploadedImage]="selectedEmployee?.preview" (uploadImage)="uploadAvatar($event)">
+    </app-cs-upload-cropper-control>
+</div>

@@ -1,0 +1,61 @@
+@import '../../../../assets/styles/img-management';
+
+
+.cropper {
+  .employee-title {
+    margin-top: 0 !important;
+    padding: 0 16px;
+  }
+
+  app-cs-upload-cropper-control {
+    height: calc(100% - 65px);
+    margin-top: 1px;
+
+    .preview {
+      padding: 16px;
+
+
+      img {
+        width: 50%;
+        border-radius: 50%;
+        box-sizing: border-box;
+        margin: 0 auto;
+      }
+
+      h5 {
+        margin-bottom: 0 !important;
+      }
+
+      .actions {
+        padding: 16px;
+        width: 100%;
+      }
+    }
+
+    .cropper-area {
+      padding: 16px;
+
+      .actions {
+        padding: 16px;
+      }
+    }
+  }
+}
+
+@mixin csUploadCropper($text-main, $text-side) {
+  .cropper {
+    .employee-title {
+      .title-text {
+        color: $text-main !important;
+      }
+    }
+
+    app-cs-upload-cropper-control {
+      .preview {
+        h5 {
+          color: $text-side;
+        }
+      }
+    }
+  }
+}

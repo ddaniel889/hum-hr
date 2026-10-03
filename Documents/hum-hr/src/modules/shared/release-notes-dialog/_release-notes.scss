@@ -1,0 +1,12 @@
+.mat-badge-medium.mat-badge-overlap.mat-badge-before .mat-badge-content {
+  left: unset !important;
+  right: 1px;
+  top: 5px !important;
+}
+
+app-release-notes-dialog {
+  .dialog-footer {
+    padding: 16px;
+  }
+}
+

@@ -1,0 +1,350 @@
+@import '../../../../assets/styles/img-management';
+
+.firmador {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 96px;
+  @include display(f, u, u, c, c, u);
+  z-index: 1;
+  pointer-events: none;
+
+  button {
+    min-width: 180px;
+    height: 48px;
+    border-radius: 24px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+
+  .content-action-main {
+    height: 64px;
+    border-radius: 40px !important;
+    padding: 0 16px 0 32px !important;
+    min-width: unset !important;
+    pointer-events: all;
+
+    &.disabled {
+      cursor: default !important;
+      box-shadow: none !important;
+    }
+
+    .mat-button-wrapper {
+      display: flex;
+      align-items: center;
+
+      span {
+        padding: 0 20px;
+        font-size: 20px;
+      }
+    }
+  }
+}
+
+.sign-cycle {
+  padding: 0;
+  box-sizing: content-box;
+  position: relative;
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: auto;
+  flex: 1;
+
+  .mat-divider-horizontal {
+    z-index: 0 !important;
+  }
+
+  mat-icon {
+    padding: 8px;
+  }
+
+  button mat-icon {
+    padding: 0
+  }
+
+  mat-progress-bar {
+    top: 0;
+    left: 0;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  span {
+    margin: 0
+  }
+
+  mat-horizontal-stepper {
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+
+    .mat-horizontal-content-container {
+      padding: 0;
+      height: 100%;
+      overflow: visible !important;
+
+      .mat-horizontal-stepper-content {
+
+        &>div {
+          height: 100%
+        }
+
+        .sign-cycle-content {
+          margin: 0 auto;
+          justify-content: center;
+          align-items: center;
+          flex-wrap: wrap;
+          padding: 16px;
+
+          .cycle-content-title-container {
+            margin: 16px 32px;
+            justify-content: center !important;
+            max-width: fit-content !important;
+          }
+
+          .cycle-content-action {
+            mat-form-field {
+              padding-bottom: 8px;
+
+              .mat-form-field-wrapper {
+                margin-bottom: -1.25rem;
+                min-width: 250px;
+              }
+            }
+
+            .content-action-main {
+              height: 64px;
+              border-radius: 40px !important;
+              padding: 0 16px 0 32px !important;
+              min-width: unset !important;
+
+              .mat-button-wrapper {
+                display: flex;
+                align-items: center;
+
+                span {
+                  padding: 0 20px;
+                  font-size: 20px;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.resume-status {
+  height: 96px;
+  padding: 0;
+  box-sizing: content-box;
+  position: relative;
+
+  .title {
+    width: max-content;
+    justify-content: center;
+  }
+
+}
+
+mat-toolbar-row {
+  mat-icon {
+    padding: 8px;
+  }
+
+  button mat-icon {
+    padding: 0
+  }
+}
+
+#closeDetail {
+  display: none;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+app-sign-document {
+  .mat-avatar {
+    .title {
+      width: unset;
+
+      h3,
+      h5 {
+        width: unset;
+        overflow: visible;
+      }
+    }
+  }
+}
+
+.sign-cycle.employer {
+  height: unset;
+  padding: 16px 0;
+
+  .sign-cycle-content {
+    flex-wrap: wrap;
+    padding: 0 32px;
+    justify-content: space-around;
+    align-items: center;
+
+    .cycle-content-title-container {
+      padding-bottom: 16px;
+      justify-content: center !important;
+      text-align: center;
+
+      *:not(button) {
+        width: 100%;
+        text-align: center !important;
+        justify-content: center !important;
+      }
+    }
+  }
+}
+
+app-home-file-documents app-file-document-sign,
+app-pending app-file-document-sign {
+  display: block;
+  position: relative;
+}
+
+.help-hoverable {
+  position: relative;
+  width: 30px;
+  display: flex;
+  justify-content: center;
+
+  &:hover {
+    mat-hint {
+      visibility: visible!important;
+      display: block!important;
+    }
+  }
+
+  &.wide {
+    mat-hint {
+      left: calc(50% - 230px);
+      width: 460px;
+    }
+  }
+
+  mat-hint {
+    position: absolute;
+    padding: 16px;
+    bottom: 100%;
+    left: calc(50% - 160px);
+    margin: 0 auto;
+    width: 320px;
+    border-radius: 4px;
+    z-index: 1;
+    white-space: normal;
+    box-sizing: border-box;
+    max-height: 400px;
+    overflow-y: auto;
+
+    &:hover {
+      visibility: visible;
+    }
+
+    button {
+      float: right;
+    }
+
+    .close-mobile{
+      display: none;
+    }
+  }
+}
+
+
+@mixin fileDocumentSign($bg-card, $bg-dark-blue, $accent, $scroll-thumb, $divider, $text-main, $text-side, $text-disabled, $primary-text, $signed-ok, $signed-not-ok) {
+
+  .firmador {
+    .content-action-main {
+      color: $text-main !important;
+
+      &.disabled {
+        color: $text-disabled !important;
+        background: $divider;
+      }
+    }
+  }
+
+
+  .sign-cycle {
+    background: $bg-card;
+
+    button {
+      &.success {
+        background-color: $signed-ok;
+      }
+
+      &.warning {
+        background-color: $signed-not-ok;
+      }
+    }
+
+    mat-horizontal-stepper {
+      .mat-horizontal-content-container {
+        .mat-horizontal-stepper-content {
+          .sign-cycle-content {
+            .cycle-content-title-container {
+              .cycle-content-title {
+                h4 {
+                  color: $bg-dark-blue;
+                }
+              }
+            }
+
+            .cycle-content-action {
+              .content-action-main {
+                color: $text-main !important;
+
+                &.mat-stroked-button{
+                  &:disabled{
+                    color:$scroll-thumb!important;
+                  }
+                  &:not(:disabled){
+                    color:$accent!important;
+                  }
+                }
+              }
+
+              .content-action-side {
+                u {
+                  color: $scroll-thumb;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .resume-status {
+    background: $bg-card;
+  }
+
+  .help-hoverable {
+    mat-icon {
+      color: $text-side;
+    }
+
+    mat-hint {
+
+      background: $bg-card;
+      box-shadow: 0px 3px 5px -1px rgba(0, 0, 0, 0.2), 0px 6px 10px 0px rgba(0, 0, 0, 0.14), 0px 1px 18px 0px $divider;
+
+      b {
+        color: $primary-text !important;
+      }
+    }
+  }
+}

@@ -1,0 +1,78 @@
+<mat-horizontal-stepper #stepper class="help-stepper">
+    <mat-step>
+        <mat-card fxLayout="column" class="help-card">
+            <mat-card-header>
+
+            </mat-card-header>
+            <mat-card-content>
+                <span class="help-header" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px"
+                    fxFlex="grow">
+                    <span fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                        <mat-icon color="accent" fxLayout="row" fxLayoutAlign="center center" class="fa-lg" fontSet="fa"
+                            fontIcon="fa-question-circle">
+                        </mat-icon>
+                        <h3>{{ model?.title }}</h3>
+                    </span>
+                </span>
+                <span class="help-content" fxLayout="column" fxLayoutGap="16px"
+                    *ngIf="model?.description || model?.itemListDescription" fxFlex="grow">
+                    <h4 [innerHTML]="model?.description">
+                    </h4>
+                    <img *ngIf="model?.image" [src]="model.image">
+                    <ul *ngIf="model?.itemListDescription">
+                        <li *ngFor="let li of model?.itemListDescription" [innerHTML]="li">
+                        </li>
+                    </ul>
+                </span>
+                <mat-action-list *ngIf="model?.children">
+                    <button mat-list-item class="option-btn" (click)="move(i)"
+                        *ngFor="let item of model?.children; let i=index;">
+                        <div class="help-options" fxLayout="row" fxLayoutAlign="start center" fxFlex="grow"
+                            fxLayoutGap="16px">
+                            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-arrow-right"></mat-icon>
+                            <span>{{ item?.title }}</span>
+                        </div>
+                    </button>
+                </mat-action-list>
+            </mat-card-content>
+            <mat-card-footer fxLayout="row-reverse" fxLayoutGap="12px">
+                <button mat-raised-button color="accent" (click)="close()">Cerrar ayuda</button>
+            </mat-card-footer>
+        </mat-card>
+    </mat-step>
+    <mat-step *ngFor="let item of model.children">
+        <mat-card fxLayout="column" class="help-card">
+            <mat-card-content>
+                <span class="help-header" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px"
+                    fxFlex="grow">
+                    <span fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                        <mat-icon color="accent" fxLayout="row" fxLayoutAlign="center center" class="fa-lg" fontSet="fa"
+                            fontIcon="fa-question-circle">
+                        </mat-icon>
+                        <h3>{{ item?.title }}</h3>
+                    </span>
+                </span>
+                <span class="help-content" fxLayout="column" fxLayoutGap="16px"
+                    *ngIf="item?.description || item?.itemListDescription" fxFlex="grow">
+                    <span *ngIf="item?.image" [innerHTML]="item.image"></span>
+                    <h4 [innerHTML]="item?.description">
+                    </h4>
+                    <ul *ngIf="item?.itemListDescription">
+                        <li *ngFor="let li of item?.itemListDescription" [innerHTML]="li">
+                        </li>
+                    </ul>
+                    <ul *ngIf="item?.itemList">
+                        <li *ngFor="let li of item?.itemList">
+                            {{li.description}}
+                            <a *ngIf="li.actionDescription" href="javascript:;" (click)="action(li)">{{li.actionDescription}}</a>
+                        </li>
+                    </ul>
+                </span>
+            </mat-card-content>
+            <mat-card-footer fxLayout="row-reverse" fxLayoutGap="12px">
+                <button mat-raised-button color="accent" (click)="close()">Cerrar ayuda</button>
+                <button mat-button (click)="reset()">Volver al Inicio</button>
+            </mat-card-footer>
+        </mat-card>
+    </mat-step>
+</mat-horizontal-stepper>

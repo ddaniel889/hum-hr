@@ -1,0 +1,160 @@
+<span class="view-container"
+  [ngClass]="{'my-docs-signed' : !ShowEmployeeSignature() && showDocumentStateBottom && !uploadEnabled}"
+  *ngIf="(ShowPdf() || showUploader) && !showWelcome">
+  <mat-toolbar class="side-bar" color="grey">
+    <mat-toolbar-row>
+      <!-- document-selected-header-info -->
+      <div class="mat-avatar four-icons" fxLayout="row" fxLayoutAlign="space-between center"
+        *ngIf="this.showFileDocumentHeader">
+        <div class="toolbar-line" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+          <mat-icon  class="fa-lg" fontSet="fa" fontIcon="fa-file">
+          </mat-icon>
+          <div class="title" fxLayout="column" fxLayoutAlign="center start">
+            <h3 matLine> {{ doc.documentationTypeName}}</h3>
+            <h5 matLine> Id: {{doc.id}} - Fecha Documento: {{ doc.documentDate | date :'dd/MM/yyyy' }}</h5>
+          </div>
+        </div>
+      </div>
+      <!-- close-detail-mobile-only -->
+      <button id="closeDetail" mat-icon-button (click)="this.mobileClose()" title="Cerrar">
+        <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+      </button>
+      <div class="toolbar-actions" fxLayout="row" fxLayoutAlign="start center"
+        *ngIf="ShowPdf() && !doc.isUploadPending() || (ShowPdf() && (doc.isUploadPending() && togglePreview))">
+        <!-- PDF-controls -->
+        <app-pdf-wrapper-controls [pdfWrapper]="pdfWrapper" [showPrint]="showPrint" [showSave]="showSave"
+          [showZoomIn]="showZoomIn && filePdf" [showZoomOut]="showZoomOut && filePdf">
+        </app-pdf-wrapper-controls>
+        <!-- view rejected motive -->
+        <button id="btnViewMotie" mat-icon-button (click)="canceledChapa = true" title="Ver Motivo de Rechazo"
+          *ngIf="isCanceled() && !canceledChapa">
+          <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-eye"></mat-icon>
+        </button>
+      </div>
+    </mat-toolbar-row>
+  </mat-toolbar>
+  <!-- toggle upload/formio -->
+  <span class="view-content"
+    [ngClass]="(!doc?.hasFiles && !documentationType?.isExternalFormOnly && allowsFormio) ? 'toggle-container' : ''">
+    <!-- toggle-buttons -->
+    <div class="toggle-buttons-container" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px"
+      *ngIf="!doc?.hasFiles && !documentationType?.isExternalFormOnly && allowsFormio">
+      <button mat-button [color]="showFormio ? 'accent':''" (click)="toggleFormio(true)" fxLayout="row"
+        fxLayoutAlign="center center">
+        <span fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="24px">
+          <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-keyboard" fxLayout="row" fxLayoutAlign="center center">
+          </mat-icon>
+          <span>Completar Formulario</span>
+        </span>
+      </button>
+      <button mat-button [color]="!showFormio ? 'accent':''" (click)="toggleFormio(false)" fxLayout="row"
+        fxLayoutAlign="center center">
+        <span fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="24px">
+          <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-paperclip" fxLayout="row" fxLayoutAlign="center center">
+          </mat-icon>
+          <span>Adjuntar Documentación</span>
+        </span>
+      </button>
+    </div>
+    <!-- LOADER -->
+    <div class="window-spinner" *ngIf="showSpinner">
+      <mat-progress-spinner mode="indeterminate" color="primary">
+      </mat-progress-spinner>
+    </div>
+    <!-- formio -->
+    <span class="formio-content"
+      *ngIf="(documentationType?.isExternalFormOnly || showFormio) && allowsFormio && !doc?.hasFiles && !canceledChapa">
+      <app-formio-cardinal [haveCloseAction]="false" (submitted)="submitFormio($event)"
+        [formName]="documentationType?.exteralForm" [fileDocument]="doc">
+      </app-formio-cardinal>
+      <div class="firmador formio-send-fixed">
+        <span class="formio-hint" *ngIf="saving">Aguarda unos instantes mientras enviamos el Formulario</span>
+        <button mat-raised-button id="btn-enviar" class="content-action-main" (click)="accion()" color="accent" fxLayout="row"
+          fxLayoutAlign="center center" [disabled]="saving">
+          <mat-icon [ngClass]="saving ? 'fa-xs fa-spin' : 'fa-lg'" fontSet="fa"
+            [fontIcon]="saving ? 'fa-spinner-third' : 'fa-file-export'"></mat-icon>
+          <span>{{saving ? 'Cargando' : 'Enviar'}}</span>
+        </button>
+      </div>
+    </span>
+    <div class="new-container" fxLayout="row" fxLayoutAlign="start center">
+      <!-- upload-form -->
+      <app-file-document-upload [doc]="doc" [isNewDocument]="isNewDocument" [documentationType]="documentationType"
+        [allowMultipleFiles]="allowMultipleUploadFiles"
+        *ngIf="doc && showUploader && uploadEnabled && !showFormio && !documentationType?.isExternalFormOnly && !doc.isCanceled()"
+        [filePdf]="filePdf" (OnFileSelected)="fileSelect($event)" (OnSeeFileDefaultSelected)="fileSelect($event, true)"
+        (OnUpload)="fileUploaded($event)" (cleanFile)="cleanFiles()" [ngClass]="{'on': togglePreview}">
+      </app-file-document-upload>
+
+      <!-- Preview de imagenes -->
+      <div class="preview-content" *ngIf="fileType && !fileType?.isPdf && !canceledChapa"
+        [ngClass]="{'on': togglePreview}">
+        <div class="preview-container" *ngIf="fileType?.isValidPreview else elseBlock">
+          <img [src]="fileType.base64" />
+        </div>
+        <ng-template #elseBlock>
+          <h4>El formato del archivo seleccionado no puede ser previsualizado, pero se cargará correctamente</h4>
+        </ng-template>
+      </div>
+
+      <!-- PDF-viewer -->
+      <app-pdf-wrapper [showControls]="false" #pdfWrapper [doc]="doc" [file]="filePdf" [fileBlob]="fileBlob"
+        [fileName]="fileName" [autoView]="this.autoView" [ngClass]="{'floating':showUploader,'on': togglePreview}"
+        [showAll]="showAll" [hidden]="showChapa || showSpinner || !ShowPdf() || canceledChapa">
+      </app-pdf-wrapper>
+
+      <!--indicador de subida -->
+      <div class="upload-indications" [ngClass]="{'on': togglePreview}" fxLayout="row" fxLayoutAlign="start center"
+        fxLayoutGap="16px" *ngIf="showUploader">
+        <button mat-icon-button title="volver" (click)="closePreview()">
+          <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-arrow-left"></mat-icon>
+        </button>
+        <h3 matLine>{{fileType?.fileName}}</h3>
+      </div>
+    </div>
+    <div class="actions-footer-wrapper">
+      <div class="actions-footer-container" [class.flow-active]="isSignActive || isQueryActive">
+        <!-- signer -->
+        <app-file-document-sign [organizationalUnitId]="doc.organizationalUnitId" [showMotiveDisagreement]=false
+          *ngIf="ShowEmployeeSignature() && !doc.isCanceled() && !isQueryActive"
+          [doc]="doc"
+          [employerSign]="m"
+          (signingChanged)="signingChanged($event)"
+          (signingFinish)="afterSigning($event)"
+          [filterDocumentationTypes]="filterDocumentationTypes">
+        </app-file-document-sign>
+        <!-- query -->
+        <app-file-document-query
+          *ngIf="!doc.isCanceled() && !showSpinner && !isSignActive"
+          [doc]="doc"
+          [organizationalUnitId]="doc.organizationalUnitId"
+          [showQuery]="showQueries"
+          [hideCloseQuery]="true"
+          (activeChange)="isQueryActive = $event"
+          (queryChanged)="queryChanged.emit($event)">
+        </app-file-document-query>
+
+      </div>
+    </div>
+    <!-- employee-pending-upload -->
+    <app-chapa [className]="'upload-bk'" [text]="'Documento pendiente de carga'"
+      *ngIf="doc && doc.isUploadPending() && !uploadEnabled">
+    </app-chapa>
+    <!-- sign-status-bottom -->
+    <app-file-document-state [ngClass]="{'bottom-container' : this.showDocumentStateBottom}" [item]="this.doc"
+      [showSmallChips]=false *ngIf="doc?.wasSignedByEmployee() || (doc.isCanceled() && !doc.isUploadPending())">
+    </app-file-document-state>
+    <!-- rejected motive -->
+    <app-chapa [className]="'info-empty'" [icon]="'fa-file-times'" [text]="'El Documento ha sido Rechazado'"
+    [subText]="doc.rejectedMotive ? 'Motivo:' : ''"
+        [infoExtra]="doc.rejectedMotive"
+      [actionIcon]="'fa-eye'" [actionText]="'Ver documento'" (actionClick)="canceledChapa = false;"
+      *ngIf="canceledChapa"></app-chapa>
+  </span>
+</span>
+<!-- welcome -->
+<app-chapa *ngIf="showWelcome" [className]="'info-empty'" [icon]="'fa-hand-sparkles'"
+  [text]="'Humanage te da la bienvenida'"
+  [subText]="'Decile adiós al papel, aquí podrás gestionar todo digitalmente y de la manera más fácil'">
+</app-chapa>
+

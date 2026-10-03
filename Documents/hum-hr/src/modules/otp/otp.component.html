@@ -1,0 +1,135 @@
+<div class="login" fxLayout="row" fxLayoutAlign="center center" fxFill>
+  <img class="login-bg" [src]="backgroundSrc" alt="/">
+    <mat-card class="login-card" fxLayout="column" fxFlex.xl="20" fxFlex.lg="30" fxFlex.md="40" fxFlex.sm="70"
+        fxFlex.xs="90">
+        <mat-card-header>
+            <mat-card-title fxLayout="column" fxLayoutGap="12px">
+              <div class="brand" fxLayout="column" fxLayoutAlign="center center" style="min-height: 150px;">
+                <img *ngIf="logoSrc" [src]="logoSrc" alt="/">
+                </div>
+            </mat-card-title>
+        </mat-card-header>
+        <div class="otp-qr" *ngIf="QRBase64?.length > 0 && !isLoadingQR">
+            <mat-horizontal-stepper #stepper>
+                <mat-step>
+                    <mat-card-content>
+                        <div fxLayout="column" >
+                            <h3 fxFlex="grow" class="text-center">
+                                Código para configurar OTP en un dispositivo
+                            </h3>
+                            <h5 fxFlex="grow" class="text-center">
+                                <b>¡Al cerrar esta ventana no podras volver a visualizar el codigo!</b>
+                                <br> Escanea el código con un autenticador y quedará configurado automaticamente. <br>
+                                <a (click)="stepper.next()" *ngIf="!isOtpKeyAcquired">
+                                    Si no tenés instalado un
+                                    autenticador, seguí éstos pasos.
+                                </a>
+                            </h5>
+
+                            <img src="{{QRBase64}}" />
+
+                            <mat-card-footer fxLayout="column" fxLayoutAlign="center stretch">
+
+                                <mat-checkbox *ngIf="!isOtpKeyAcquired" (click)="acquireOtp()">
+                                    Ya tengo OTP para Humanage configurado
+                                </mat-checkbox>
+
+                                <button *ngIf="isOtpKeyAcquired" mat-raised-button (click)="toLogin()" color="primary"
+                                    class="btn">
+                                    Finalizar y volver al Login
+                                </button>
+
+                            </mat-card-footer>
+                        </div>
+                    </mat-card-content>
+                </mat-step>
+                <mat-step>
+                    <mat-card-content>
+                        <div class="otp-help" fxLayout="column">
+
+                            <h3 fxFlex="grow" class="text-center">
+                                Vamos a utilizar el Autenticador de Google
+                            </h3>
+
+                            <h5 fxFlex="grow" class="text-center">
+                                <b>Necesitás un celular o tablet con lector QR*</b>
+                                <br> Seleccioná el OS de tu dispositivo
+                            </h5>
+                            <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="16px">
+                                <button mat-raised-button (click)="installAndroid()" [disabled]="appIphoneInstall">
+                                    Android
+                                </button>
+                                <button mat-raised-button (click)="installIphone()" [disabled]="appAndroidInstall">
+                                    iOS
+                                </button>
+                            </div>
+                            <div fxLayout="row" fxLayoutAlign="center center" *ngIf="appAndroidInstall">
+                                <img src="../../../assets/img/qr_OTP_app-android.png">
+                            </div>
+                            <div fxLayout="row" fxLayoutAlign="center center" *ngIf="appIphoneInstall">
+                                <img src="../../../assets/img/qr_OTP_app-ios.png">
+                            </div>
+
+                            <h5 fxFlex="grow" class="text-center" *ngIf="appIphoneInstall || appAndroidInstall">
+                                *Usa tu lector de QR aquí para instalar la app
+                            </h5>
+
+                            <mat-card-footer fxLayout="row-reverse" fxLayoutAlign="start center" fxLayoutGap="12px">
+                                <button mat-raised-button color="primary" matStepperNext (click)="cancelInstall()">
+                                    Ya la instalé
+                                </button>
+                                <button mat-button matStepperPrevious (click)="cancelInstall()">
+                                    Cerrar ayuda
+                                </button>
+                            </mat-card-footer>
+                        </div>
+                    </mat-card-content>
+                </mat-step>
+
+                <mat-step>
+                    <mat-card-content>
+                        <div class="otp-help" fxLayout="column">
+                            <h3 fxFlex="grow" class="text-center">
+                                Sigue los pasos iniciales de la App
+                            </h3>
+
+                            <h5 fxFlex="grow" class="text-center">
+                                Avanza hasta el menú indicado y seleccioná la opción de <b>escanear código de
+                                    barras</b>. Luego tendrás que otorgar permiso a la aplicación para poder acceder a
+                                la cámara.
+                            </h5>
+
+                            <div fxLayout="row" fxLayoutAlign="center center">
+                                <img class="x2" src="../../../assets/img/help-app.png">
+                            </div>
+                            <h2 class="text-center">Listo :)</h2>
+                            <h5 class="text-center"><b>Ya podés obtener tu clave OTP escaneando el QR inicial</b></h5>
+
+                            <mat-card-footer fxLayout="column">
+                                <button mat-raised-button color="accent" (click)="move(0)">
+                                    ¡Vamos allá!
+                                </button>
+                            </mat-card-footer>
+                        </div>
+                    </mat-card-content>
+                </mat-step>
+            </mat-horizontal-stepper>
+        </div>
+        <mat-card-content class="qr-not-loaded" *ngIf="!QRBase64 && !isLoadingQR">
+            <div fxLayout="column">
+                <h3 fxFlex="grow" class="text-center">
+                    Este link ya no está disponible :(
+                </h3>
+                <h5 fxFlex="grow" class="text-center">
+                    Tenés que volver a generar tu código de verificación de OTP para Humanage.
+                </h5>
+                <mat-card-footer fxLayout="column">
+                    <button mat-raised-button (click)="toLogin()" color="primary" class="btn">
+                        Volver al Login y generar nuevo OTP
+                    </button>
+                </mat-card-footer>
+            </div>
+        </mat-card-content>
+    </mat-card>
+    <img *ngIf="logoSrc && subdomain" class="humanage-icon" [src]="humanageSrc" alt="/">
+</div>

@@ -1,0 +1,201 @@
+<mat-progress-bar mode="indeterminate" [style.display]="loaded ? 'none' : 'block'"></mat-progress-bar>
+<mat-accordion>
+    <mat-expansion-panel (click)="changeExpander(grupoPeriodo.Actual)"
+        [expanded]="selectedPeriod == grupoPeriodo.Actual">
+        <mat-progress-bar mode="indeterminate"
+            [style.display]="loadingPeriod && this.selectedPeriod== grupoPeriodo.Actual ? 'block' : 'none'">
+        </mat-progress-bar>
+        <mat-expansion-panel-header>
+            <mat-panel-title fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+                    fontIcon="fa-calendar-alt"></mat-icon>
+                <span>Actualmente</span>
+            </mat-panel-title>
+            <mat-divider></mat-divider>
+        </mat-expansion-panel-header>
+        <mat-action-list *ngIf="loaded && !loadingPeriod">
+            <mat-list-item *ngIf="items?.length == 0 && loaded">
+                <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+                    fontIcon="fa-info-circle"></mat-icon>
+                <span matLine>No tenés recibos para este período.</span>
+            </mat-list-item>
+        </mat-action-list>
+        <mat-action-list *ngIf="!loadingPeriod">
+            <mat-list-item *ngFor="let item of items" [ngClass]="[activeRow == item.id ? 'active' : '']"
+                (click)="openDocument(item)">
+                <mat-icon matListAvatar fxLayout="row" fxLayoutAlign="center center" fontSet="fa" fontIcon="fa-file">
+                </mat-icon>
+                <h3 matLine> {{item.period | date :'MMMM yyyy' | titlecase }} </h3>
+                <p matLine>
+                    {{item.type}}
+                </p>
+                <div matLine fxLayout="row wrap" fxLayoutAlign="start center" fxLayoutGap="16px">
+                    <mat-basic-chip disabled class="unseen" fxLayout="row" fxLayoutAlign="center center"
+                        fxLayoutGap="4px" *ngIf="!item.viewedDate">
+                        <mat-icon  fontSet="fa" fontIcon="fa-eye-slash">
+                        </mat-icon>
+                        <span>No visto</span>
+                    </mat-basic-chip>
+                    <mat-basic-chip disabled class="seen" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px"
+                        *ngIf="item.viewedDate" matTooltip="{{item.ViewedDate | date: 'dd/MM/yyyy'}}">
+                        <mat-icon  fontSet="fa" fontIcon="fa-eye">
+                        </mat-icon>
+                        <span>Visto</span>
+                    </mat-basic-chip>
+                    <mat-basic-chip disabled class="signed-ok" fxLayout="row" fxLayoutAlign="center center"
+                        fxLayoutGap="4px" *ngIf="item.stateClass === 'firmado-conforme'"
+                        matTooltip="{{item.stateDate | date :'dd/MM/yyyy'}}">
+                        <mat-icon  fontSet="fa" fontIcon="fa-check">
+                        </mat-icon>
+                        <span>Conforme</span>
+                    </mat-basic-chip>
+                    <mat-basic-chip disabled class="signed-not-ok" fxLayout="row" fxLayoutAlign="center center"
+                        fxLayoutGap="4px" *ngIf="item.stateClass === 'firmado-no-conforme'"
+                        matTooltip="{{item.stateDate | date :'dd/MM/yyyy'}}">
+                        <mat-icon  fontSet="fa" fontIcon="fa-times">
+                        </mat-icon>
+                        <span>No conforme</span>
+                    </mat-basic-chip>
+                    <mat-basic-chip disabled class="not-signed" fxLayout="row" fxLayoutAlign="center center"
+                        fxLayoutGap="4px" *ngIf="item.stateClass === 'no-firmado' && item.stateOwnerEdit">
+                        <mat-icon  fontSet="fa" fontIcon="fa-signature">
+                        </mat-icon>
+                        <span>No firmado</span>
+                    </mat-basic-chip>
+                </div>
+            </mat-list-item>
+        </mat-action-list>
+    </mat-expansion-panel>
+    <mat-expansion-panel (click)="changeExpander(grupoPeriodo.Pasado)"
+        [expanded]="selectedPeriod == grupoPeriodo.Pasado">
+        <mat-progress-bar mode="indeterminate"
+            [style.display]="loadingPeriod && this.selectedPeriod== grupoPeriodo.Pasado ? 'block' : 'none'">
+        </mat-progress-bar>
+        <mat-expansion-panel-header>
+            <mat-panel-title fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+                    fontIcon="fa-calendar-alt"></mat-icon>
+                <span>El año pasado</span>
+            </mat-panel-title>
+            <mat-divider></mat-divider>
+        </mat-expansion-panel-header>
+        <mat-action-list *ngIf="loaded && !loadingPeriod">
+            <mat-list-item *ngIf="items?.length == 0 && loaded">
+                <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+                    fontIcon="fa-info-circle"></mat-icon>
+                <span matLine>No tenés recibos para este período.</span>
+            </mat-list-item>
+        </mat-action-list>
+        <mat-action-list *ngIf="!loadingPeriod">
+            <mat-list-item *ngFor="let item of items" [ngClass]="[activeRow == item.id ? 'active' : '']"
+                (click)="openDocument(item)">
+                <mat-icon matListAvatar fxLayout="row" fxLayoutAlign="center center" fontSet="fa" fontIcon="fa-file">
+                </mat-icon>
+                <h3 matLine> {{item.period | date :'MMMM yyyy' | titlecase }} </h3>
+                <p matLine>
+                    {{item.type}}
+                </p>
+                <div matLine fxLayout="row wrap" fxLayoutAlign="start center" fxLayoutGap="16px">
+                    <mat-basic-chip disabled class="unseen" fxLayout="row" fxLayoutAlign="center center"
+                        fxLayoutGap="4px" *ngIf="!item.viewedDate">
+                        <mat-icon  fontSet="fa" fontIcon="fa-eye-slash">
+                        </mat-icon>
+                        <span>No visto</span>
+                    </mat-basic-chip>
+                    <mat-basic-chip disabled class="seen" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px"
+                        *ngIf="item.viewedDate" matTooltip="{{item.ViewedDate | date :'dd/MM/yyyy'}}">
+                        <mat-icon  fontSet="fa" fontIcon="fa-eye">
+                        </mat-icon>
+                        <span>Visto</span>
+                    </mat-basic-chip>
+                    <mat-basic-chip disabled class="signed-ok" fxLayout="row" fxLayoutAlign="center center"
+                        fxLayoutGap="4px" *ngIf="item.stateClass === 'firmado-conforme'"
+                        matTooltip="{{item.stateDate | date :'dd/MM/yyyy'}}">
+                        <mat-icon  fontSet="fa" fontIcon="fa-check">
+                        </mat-icon>
+                        <span>Conforme</span>
+                    </mat-basic-chip>
+                    <mat-basic-chip disabled class="signed-not-ok" fxLayout="row" fxLayoutAlign="center center"
+                        fxLayoutGap="4px" *ngIf="item.stateClass === 'firmado-no-conforme'"
+                        matTooltip="{{item.stateDate | date :'dd/MM/yyyy'}}">
+                        <mat-icon  fontSet="fa" fontIcon="fa-times">
+                        </mat-icon>
+                        <span>No conforme</span>
+                    </mat-basic-chip>
+                    <mat-basic-chip disabled class="not-signed" fxLayout="row" fxLayoutAlign="center center"
+                        fxLayoutGap="4px" *ngIf="item.stateClass === 'no-firmado' && item.stateOwnerEdit">
+                        <mat-icon  fontSet="fa" fontIcon="fa-signature">
+                        </mat-icon>
+                        <span>No firmado</span>
+                    </mat-basic-chip>
+                </div>
+            </mat-list-item>
+        </mat-action-list>
+    </mat-expansion-panel>
+    <mat-expansion-panel (click)="changeExpander(grupoPeriodo.Anterior)"
+        [expanded]="selectedPeriod == grupoPeriodo.Anterior">
+        <mat-progress-bar mode="indeterminate"
+            [style.display]="loadingPeriod && this.selectedPeriod== grupoPeriodo.Anterior ? 'block' : 'none'">
+        </mat-progress-bar>
+        <mat-expansion-panel-header>
+            <mat-panel-title fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+                <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+                    fontIcon="fa-calendar-alt"></mat-icon>
+                <span>Anteriormente</span>
+            </mat-panel-title>
+            <mat-divider></mat-divider>
+        </mat-expansion-panel-header>
+        <mat-action-list *ngIf="loaded && !loadingPeriod">
+            <mat-list-item *ngIf="items?.length == 0 && loaded">
+                <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+                    fontIcon="fa-info-circle"></mat-icon>
+                <span matLine>No tenés recibos para este período.</span>
+            </mat-list-item>
+        </mat-action-list>
+        <mat-action-list *ngIf="!loadingPeriod">
+            <mat-list-item *ngFor="let item of items" [ngClass]="[activeRow == item.id ? 'active' : '']"
+                (click)="openDocument(item)">
+                <mat-icon matListAvatar fxLayout="row" fxLayoutAlign="center center" fontSet="fa" fontIcon="fa-file">
+                </mat-icon>
+                <h3 matLine> {{item.period | date :'MMMM yyyy' | titlecase }} </h3>
+                <p matLine>
+                    {{item.type}}
+                </p>
+                <div matLine fxLayout="row wrap" fxLayoutAlign="start center" fxLayoutGap="16px">
+                    <mat-basic-chip disabled class="unseen" fxLayout="row" fxLayoutAlign="center center"
+                        fxLayoutGap="4px" *ngIf="!item.viewedDate">
+                        <mat-icon  fontSet="fa" fontIcon="fa-eye-slash">
+                        </mat-icon>
+                        <span>No visto</span>
+                    </mat-basic-chip>
+                    <mat-basic-chip disabled class="seen" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px"
+                        *ngIf="item.viewedDate" matTooltip="{{item.ViewedDate | date :'dd/MM/yyyy'}}">
+                        <mat-icon  fontSet="fa" fontIcon="fa-eye">
+                        </mat-icon>
+                        <span>Visto</span>
+                    </mat-basic-chip>
+                    <mat-basic-chip disabled class="signed-ok" fxLayout="row" fxLayoutAlign="center center"
+                        fxLayoutGap="4px" *ngIf="item.stateClass === 'firmado-conforme'"
+                        matTooltip="{{item.stateDate | date :'dd/MM/yyyy'}}">
+                        <mat-icon  fontSet="fa" fontIcon="fa-check">
+                        </mat-icon>
+                        <span>Conforme</span>
+                    </mat-basic-chip>
+                    <mat-basic-chip disabled class="signed-not-ok" fxLayout="row" fxLayoutAlign="center center"
+                        fxLayoutGap="4px" *ngIf="item.stateClass === 'firmado-no-conforme'"
+                        matTooltip="{{item.stateDate | date :'dd/MM/yyyy'}}">
+                        <mat-icon  fontSet="fa" fontIcon="fa-times">
+                        </mat-icon>
+                        <span>No conforme</span>
+                    </mat-basic-chip>
+                    <mat-basic-chip disabled class="not-signed" fxLayout="row" fxLayoutAlign="center center"
+                        fxLayoutGap="4px" *ngIf="item.stateClass === 'no-firmado' && item.stateOwnerEdit">
+                        <mat-icon  fontSet="fa" fontIcon="fa-signature">
+                        </mat-icon>
+                        <span>No firmado</span>
+                    </mat-basic-chip>
+                </div>
+            </mat-list-item>
+        </mat-action-list>
+    </mat-expansion-panel>
+</mat-accordion>

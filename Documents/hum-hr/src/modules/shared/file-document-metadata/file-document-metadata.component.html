@@ -1,0 +1,77 @@
+<mat-toolbar color="grey">
+  <mat-toolbar-row>
+    <div class="toolbar-line" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+      <div class="mat-avatar" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+        <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-file-alt">
+        </mat-icon>
+        <div class="title" fxLayout="column" fxLayoutAlign="center start">
+          <h3 matLine> {{data.doc.documentationTypeName}} </h3>
+          <h5 matLine>Fecha Documento: {{data.doc.documentDate | date :'dd/MM/yyyy' }}
+            {{headerCreatedByMessageInfo}}</h5>
+        </div>
+      </div>
+      <div mat-line class="chip-line">
+        <app-file-document-state [item]="data.doc" [showSmallChips]="false"></app-file-document-state>
+      </div>
+      <button mat-icon-button (click)="cancel()" title="Cerrar">
+        <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+      </button>
+    </div>
+  </mat-toolbar-row>
+</mat-toolbar>
+<div class="add-menu-form-body w-table" fxLayout="column" fxLayoutGap="16px" fxLayoutAlign="center stretch "
+  style="padding:16px">
+  <mat-list>
+    <h3 mat-subheader>General</h3>
+    <mat-list-item>
+      <mat-icon matListAvatar fxLayout="row" fxLayoutAlign="center center" fontSet="fas" fontIcon="fa-file-alt">
+      </mat-icon>
+      <p matLine>Id Documento</p>
+      <h3 matLine>{{data.doc.id}}</h3>
+      <button mat-icon-button ngxClipboard [cbContent]="'Id: ' + data.doc.id">
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-link"></mat-icon>
+      </button>
+    </mat-list-item>
+    <mat-list-item>
+      <mat-icon matListAvatar fxLayout="row" fxLayoutAlign="center center" fontSet="fas" fontIcon="fa-id-badge">
+      </mat-icon>
+      <p matLine>Legajo</p>
+      <h3 matLine>{{data.doc.EmployeeCompleteName}}</h3>
+      <button mat-icon-button ngxClipboard [cbContent]="'Legajo: ' + data.doc.EmployeeCompleteName">
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-link"></mat-icon>
+      </button>
+    </mat-list-item>
+    <mat-list-item>
+      <mat-icon matListAvatar fxLayout="row" fxLayoutAlign="center center" fontSet="fa" fontIcon="fa-book-user">
+      </mat-icon>
+      <p matLine>Legajo Nro</p>
+      <h3 matLine>{{data.doc.nroLegajo}}</h3>
+      <button mat-icon-button ngxClipboard [cbContent]="'Legajo Nro: ' + data.doc.nroLegajo">
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-link"></mat-icon>
+      </button>
+    </mat-list-item>
+    <mat-list-item>
+      <mat-icon matListAvatar fxLayout="row" fxLayoutAlign="center center" fontSet="fa" fontIcon="fa-passport">
+      </mat-icon>
+      <p matLine>Identificador Fiscal</p>
+      <h3 matLine>{{data.doc.employeeLegalId}}</h3>
+      <button mat-icon-button ngxClipboard [cbContent]="'Identificador Fiscal: ' + data.doc.employeeLegalId">
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-link"></mat-icon>
+      </button>
+    </mat-list-item>
+    <ng-container *ngIf="otrosMetadatos">
+      <h3 mat-subheader>Otros</h3>
+      <mat-list-item *ngFor="let item of data.doc.metadataAditional">
+        <mat-icon matListAvatar fxLayout="row" fxLayoutAlign="center center" fontSet="fa"
+          [fontIcon]="metadataIcon(item)">
+        </mat-icon>
+        <p matLine>{{item.metadataLabel}} </p>
+        <h3 matLine *ngIf="item.metadataType ==='date'">{{item.metadataValue | date :'dd/MM/yyyy'}}</h3>
+        <h3 matLine *ngIf="item.metadataType ==='period'">{{item.formatMetadata() | date :'MMMM yyyy'}}</h3>
+        <h3 matLine *ngIf="item.metadataType !=='date' && item.metadataType !== 'period'">
+          {{item.formatMetadata()}}
+        </h3>
+      </mat-list-item>
+    </ng-container>
+  </mat-list>
+</div>

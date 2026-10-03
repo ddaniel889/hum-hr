@@ -1,0 +1,155 @@
+<!-- EMPLOYEE-SEARCH -->
+<div class="main" fxLayout="column" fxFill>
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <!-- info -->
+    <div class="header">
+      <div class="content" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px" fxFlex="100">
+        <!-- Ou selector -->
+        <div class="ou-select" (click)='selectOU.open()' matRipple fxLayout="row" fxLayoutAlign="start center"
+          title="Cambiar de Empresa" *ngIf="organizationalUnits?.length > 1">
+          <div class="info" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-industry-alt">
+            </mat-icon>
+            <div fxLayout="column">
+              <h5>Empresa</h5>
+              <h3>{{loading && !selectedOrganizationalUnit ? 'Cargando...': selectedOrganizationalUnit?.name}}</h3>
+            </div>
+          </div>
+          <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-caret-down">
+          </mat-icon>
+          <mat-select class="invisible-item" #selectOU (click)="$event.stopPropagation()"
+            [(ngModel)]="selectedOrganizationalUnit">
+            <mat-option *ngFor="let organizationalUnit of organizationalUnits" [value]="organizationalUnit"
+              (click)="filteredSearch()">
+              {{organizationalUnit?.name}}
+            </mat-option>
+          </mat-select>
+        </div>
+         <!--analitics title  -->
+         <div class="module-title" *ngIf="views?.length == 1" fxLayout="row" fxLayoutAlign="start center">
+         <div class="info" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+           <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-line-chart">
+           </mat-icon>
+           <div class="info-text" fxLayout="column">
+             <h3>Analíticas{{ organizationalUnits?.length > 1 ? '' : ' - Recibos de Sueldo' }}</h3>
+             <h5>
+               {{organizationalUnits?.length == 1 ? selectedOrganizationalUnit?.name : 'Recibos de Sueldo'}}
+             </h5>
+           </div>
+         </div>
+       </div>
+        <!-- app selector  -->
+        <div class="module-title selectable"  *ngIf="views?.length > 1" (click)='selectView.open()' matRipple
+          fxLayout="row" fxLayoutAlign="start center" title="Cambiar Analíticas">
+          <div class="info" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-line-chart">
+            </mat-icon>
+            <div class="info-text" fxLayout="column">
+              <h3>Analíticas{{ organizationalUnits?.length > 1 ? '' : ' - Recibos de Sueldo' }}</h3>
+              <h5>
+                {{organizationalUnits?.length == 1 ? selectedOrganizationalUnit?.name : 'Recibos de Sueldo'}}
+              </h5>
+            </div>
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-caret-down">
+            </mat-icon>
+            <mat-select class="invisible-item" #selectView (click)="$event.stopPropagation()"
+              [(ngModel)]="selectedView">
+              <mat-option *ngFor="let view of views" [value]="view" (click)="changeView(view)"
+                [disabled]="view.key === selectedView.key">
+                {{view.key}}
+              </mat-option>
+            </mat-select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="search-container">
+      <div class="search" fxLayout="row" fxLayoutAlign="start center" fxFlex="100">
+        <div class="content" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px" fxFlex="100">
+          <mat-icon class="fa" fontSet="fal" fontIcon="fa-search">
+          </mat-icon>
+          <div fxLayout="column" fxFlex="100">
+            <label *ngIf="!loading">*Sólo números, formato aaaa/mm (Año/Mes)</label>
+            <input #analitycsSearchInput type="search" mask="0000/00" pattern="([12]\d{3}(0[1-9]|1[0-2]))"
+              [placeholder]="'Ingresa un Período *'" [(ngModel)]="period" (keydown.enter)="search()"
+              [disabled]="loading" />
+          </div>
+          <button *ngIf="segmentList?.length > 0" mat-button color="primary" [matMenuTriggerFor]="menu"
+            [disabled]="loading">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-filter">
+            </mat-icon>
+            Filtros
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- LOADER -->
+  <div class="load-window new" *ngIf="loading && !analytics?.total">
+    <mat-progress-spinner style="z-index: 1" mode="indeterminate" color="primary">
+    </mat-progress-spinner>
+  </div>
+  <!-- helper -->
+  <div class="helper" fxLayout="row" fxLayoutAlign="space-between center" *ngIf="analytics?.total">
+    <!-- hint -->
+    <mat-hint fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="space-between center">
+      <!-- ACTUALIZAR -->
+      <button mat-icon-button (click)='search(true)' title="Actualizar Listado" [disabled]="loading">
+        <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-redo"></mat-icon>
+      </button>
+      <h4>Documentos del período {{analyticsFind.period | mask: '9999/99'}}</h4>
+    </mat-hint>
+    <!-- actions -->
+    <div class="actions" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+      <button mat-stroked-button *ngIf="!analytics.isAllSigned" (click)="notifToEmployee()" [disabled]="clickOnce"
+        color="primary">
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-envelope">
+        </mat-icon>
+        Notificar Pendientes
+      </button>
+    </div>
+    <mat-progress-bar mode="indeterminate" *ngIf="loading"></mat-progress-bar>
+  </div>
+  <div class="dash-container" fxLayout="row" *ngIf="!loading">
+    <!-- Empty (app chapa) -->
+    <ng-container *ngIf="!analytics?.total">
+      <app-chapa [className]="'info-empty'" [icon]="'fa-file-times'"
+        [text]="'¡Ups! No hay Datos de Documentación aquí...'" [subText]="'Intenta ingresar otro Período'">
+      </app-chapa>
+    </ng-container>
+    <!-- CONTENT-CHART -->
+    <div class="content-chart" *ngIf="analytics?.total">
+      <app-cs-charts-control [data]="analytics"></app-cs-charts-control>
+    </div>
+  </div>
+</div>
+
+<!-- APP SEARCH MENU -->
+<mat-menu #menu="matMenu" xPosition="before" yPosition="below" class="menu-options mat-card">
+  <div class="container" (click)="$event.stopPropagation()" fxLayout="column" fxLayoutAlign="start stretch">
+    <div class="slide-group" fxLayout="column" fxLayoutAlign="start stretch">
+      <div class="title" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+        <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+          <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-folder">
+          </mat-icon>
+          <mat-icon class="fa-lg complex" fontSet="fas" fontIcon="fa-filter">
+          </mat-icon>
+        </div>
+        <div fxLayout="column">
+          <h4>Filtros de Carpeta</h4>
+          <h6>Elige alguna de los siguientes opciones</h6>
+        </div>
+      </div>
+      <app-autocomplete-chip [showIcons]="true" [iconName]="'fa-filter'" [listView]="true" [originalList]="segmentList"
+        title="{{placeHolderDescription}}" [placeHolderText]="placeHolderDescription"
+        [selectedItemsList]="selectedEmployeeFind" [disabledAutocomplete]="loading"
+        (OnItemSelected)="selectEmployeeFind($event)" fxFlex="grow" fxLayout="row" fxLayoutAlign="start center">
+      </app-autocomplete-chip>
+    </div>
+  </div>
+  <div class="footer" fxLayout="row-reverse" fxLayoutAlign="start center" fxLayoutGap="16px">
+    <button mat-raised-button color="primary" (click)="filteredSearch()">Filtrar Resultados</button>
+    <button mat-button>Cerrar</button>
+  </div>
+</mat-menu>

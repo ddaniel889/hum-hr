@@ -1,0 +1,105 @@
+<div class="dialog-content" fxLayout="column" fxLayoutAlign="space-between start">
+  <mat-toolbar>
+    <mat-toolbar-row>
+      <div class="mat-avatar" fxLayout="row" fxLayoutAlign="space-between center">
+        <div class="toolbar-line" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px" fxFlex="grow">
+          <mat-icon  class="fa-lg" fontSet="fa" fontIcon="fa-signature">
+          </mat-icon>
+          <div class="title" fxLayout="column" fxLayoutAlign="center start">
+            <h3>{{this.data.organizationalUnitName}}</h3>
+            <h5>Firma de Documentos</h5>
+          </div>
+        </div>
+      </div>
+      <button class="close-massive" mat-icon-button (click)="closeDialog()" *ngIf="this.showCloseDialog" title="Cerrar">
+        <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+      </button>
+    </mat-toolbar-row>
+  </mat-toolbar>
+  <div class="dialog-body" fxLayout="column">
+    <!-- tipo de documentacion de la OU -->
+    <span *ngIf="this.data.showDocumentation() && !this.showSigning">
+      <p>
+        Documentación pendiente tipo<br>
+        <b>{{this.data.documentationName}}</b><br>
+        con fecha {{this.data.documentationDate | date: 'dd/MM/yyyy'}}
+      </p>
+    </span>
+    <!-- todos los documentos del la OU-->
+    <span *ngIf="this.data.showOu() && !this.showSigning">
+      <p><b>Toda</b><br>
+        la Documentación pendiente<br>
+        del período
+      </p>
+    </span>
+    <!-- tabla listado documentos -->
+    <div *ngIf="this.data.showDetails() && !this.showSigning" class="dialog-table">
+      <table mat-table [dataSource]="this.data.documents">
+        <ng-container matColumnDef="organizationalUnitName">
+          <th mat-header-cell *matHeaderCellDef> Unidad Organizacional </th>
+          <td mat-cell *matCellDef="let element"> {{this.data.organizationalUnitName}} </td>
+        </ng-container>
+        <ng-container matColumnDef="documentationName">
+          <th mat-header-cell *matHeaderCellDef> Documentación </th>
+          <td mat-cell *matCellDef="let element"> {{element.documentationTypeName}} </td>
+        </ng-container>
+        <ng-container matColumnDef="employeeFirstName">
+          <th mat-header-cell *matHeaderCellDef> Nombre </th>
+          <td mat-cell *matCellDef="let element"> {{element.employeeFirstName}} </td>
+        </ng-container>
+        <ng-container matColumnDef="employeeLastName">
+          <th mat-header-cell *matHeaderCellDef> Apellido </th>
+          <td mat-cell *matCellDef="let element"> {{element.employeeLastName}} </td>
+        </ng-container>
+        <ng-container matColumnDef="employeeFile">
+          <th mat-header-cell *matHeaderCellDef> Nro Legajo </th>
+          <td mat-cell *matCellDef="let element"> {{element.nroLegajo}} </td>
+        </ng-container>
+        <ng-container matColumnDef="employeeLegalId">
+          <th mat-header-cell *matHeaderCellDef> {{containerType?.label}} </th>
+          <td mat-cell *matCellDef="let element">
+            {{element ? element.employeeLegalId : '' | mask: containerType?.mask}}
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </div>
+    <!--token firmador externo help vieja-->
+    <div *ngIf="this.showTokenInfo" fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="16px">
+      <div class="img-container">
+        <img alt="" src="../../../../assets/img/cardinal_signtoken.ico">
+      </div>
+      <div fxLayout="column" fxLayoutAlign="center center">
+        <span>
+          <b>Por favor, continuá con tu firmador</b>
+        </span>
+      </div>
+      <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px"
+        style="background: rgb(232, 234, 246);padding: 16px;color: #3F51B5">
+        <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-engine-warning" fxLayout="row" fxLayoutAlign="center center">
+        </mat-icon>
+        <div fxLayout="column" fxLayoutAlign="center start">
+          <span>
+            <b>No cierres ni actualices el navegador</b>
+          </span>
+          <span>
+            Este proceso puede demorar unos instantes y se cerrará automáticamente una vez finalizado
+          </span>
+          <span>
+            Encontrarás la aplicación de firma en la barra de tareas con el mismo ícono que se encuentra en
+            esta ventana.
+          </span>
+        </div>
+        <mat-progress-bar style="bottom:0" mode="indeterminate" *ngIf="this.showTokenInfo"></mat-progress-bar>
+      </div>
+    </div>
+  </div>
+  <!-- firmador masivo -->
+  <app-file-document-sign [organizationalUnitId]="this.data.organizationalUnitId" [showMotiveDisagreement]=false
+    [documentationTypeId]="this.data.documentationId" [creationDate]="this.data.documentationDate"
+    [docs]="this.data.documents" [employerSign]="true" [hidden]="this.showSigning"
+    (signingFinish)="finishSigning($event)" (signingStart)="signingStart($event)">
+  </app-file-document-sign>
+
+</div>

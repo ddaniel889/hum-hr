@@ -1,0 +1,150 @@
+@import '../../../../src/assets/styles/img-management';
+
+
+.ux-modal {
+  height: 100vh;
+  width: 100vw;
+  min-width: 100vw;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  @include display(f, r, u, c, c, u);
+  z-index: 20;
+}
+
+.ux-modal .card {
+  width: 100%;
+  max-width: 350px;
+  border-radius: .3rem;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+  border: none !important
+}
+
+.main-title {
+  font-size: 1.8rem;
+  font-weight: 300;
+  text-align: center;
+  margin-bottom: 1rem;
+  line-height: 2rem;
+  padding: 1rem;
+}
+
+.sub-title {
+  font-size: 1.1rem;
+  font-weight: 300;
+  text-align: center;
+  margin-bottom: 1rem;
+  padding: 0 1rem;
+}
+
+.cad-row {
+  @include display(f, r, u, c, u, u);
+  margin-bottom: 1rem;
+}
+
+.icon {
+  height: 4rem;
+  width: 4rem;
+  border-radius: 4rem;
+  opacity: .8;
+  transition: opacity ease .2s;
+}
+
+.icon:hover {
+  opacity: 1 !important;
+}
+
+.icon.big {
+  height: 8rem;
+  width: 8rem;
+  border-radius: 4rem;
+}
+
+.icon.chr {
+  @include bkimg(u, 'chrome.png', nrcc, ct);
+}
+
+.icon.fir {
+  @include bkimg(u, 'firefox.png', nrcc, ct);
+}
+
+.icon.ope {
+  @include bkimg(u, 'opera.png', nrcc, ct);
+}
+
+.icon.edg {
+  @include bkimg(u, 'edge.png', nrcc, ct);
+}
+
+.icon.saf {
+  @include bkimg(u, 'safari.png', nrcc, ct);
+}
+
+.divider {
+  width: 1rem;
+}
+
+.card-footer {
+  padding: 1rem;
+  border-top: 1px solid rgba(0, 0, 0, .2);
+  @include display(f, r, u, fe, u, u);
+}
+
+.card-footer a {
+  @include display(f, r, u, u, c, u);
+  font-size: .9rem;
+  opacity: .7;
+  transition: opacity ease .2s;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.card-footer a:hover {
+  opacity: 1;
+}
+
+.card-footer a>.chevron {
+  height: 1rem;
+  width: 1rem;
+  @include bkimg(u, 'chevron-down.png', nrcc, ct);
+  margin-left: .5rem;
+}
+
+.card-footer a.hide {
+  @include display(n, u, u, u, u, u);
+}
+
+.card-footer a.show {
+  @include display(f, u, u, u, u, u);
+}
+
+.toggle {
+  @include display(ni, u, u, u, u, u);
+}
+
+
+@mixin loginBrowser($bg-card, $bg-overlay, $bg-dark-blue, $text-main, $text-side, $text-main-inverse) {
+  .ux-modal {
+    background: $bg-overlay;
+  }
+
+  .ux-modal .card {
+    background: $bg-card;
+  }
+
+  .main-title {
+    background: $bg-dark-blue;
+    color: $text-main-inverse;
+  }
+
+  .sub-title {
+    color: $text-side;
+  }
+
+  .card-footer a {
+    color: $text-main;
+  }
+}

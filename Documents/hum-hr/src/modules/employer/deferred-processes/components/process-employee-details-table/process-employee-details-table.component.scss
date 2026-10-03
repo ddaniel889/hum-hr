@@ -1,0 +1,34 @@
+.state-col-container {
+  display: inline-flex;
+  align-items: center;
+}
+
+.state-chips-list {
+  display: flex;
+  gap: 8px;
+}
+
+.action-col-container {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 24px;
+  row-gap: 4px;
+}
+
+.action-link {
+  display: flex;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 16.94px;
+  cursor: pointer;
+
+  mat-icon {
+    font-size: 12px;
+    min-width: unset;
+  }
+}
+
+mat-progress-spinner.loading-document {
+  margin:8px;
+}

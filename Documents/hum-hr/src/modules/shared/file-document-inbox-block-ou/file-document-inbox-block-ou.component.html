@@ -1,0 +1,30 @@
+<mat-expansion-panel [expanded]="this.expanded">
+  <mat-progress-bar mode="indeterminate" [style.display]="progressBarDisplay ? 'block' : 'none'">
+  </mat-progress-bar>
+  <mat-expansion-panel-header>
+    <mat-panel-title fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+      <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+        fontIcon="fa-industry-alt"></mat-icon>
+      <span>{{organizationalUnit?.name}}</span>
+    </mat-panel-title>
+    <div class="floating-actions" fxlayout="row" fxLayoutAlign="start center" fxlayoutgap="16px"
+      *ngIf="this.showSignAll">
+      <button mat-flat-button color="primary" (click)="signAllDocuments($event)"  *ngIf="items && items.length > 0">
+        Firmar Todos
+      </button>
+    </div>
+    <mat-divider></mat-divider>
+  </mat-expansion-panel-header>
+  <mat-action-list *ngIf="!progressBarDisplay && items?.length == 0 ">
+    <mat-list-item>
+      <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+        fontIcon="fa-info-circle"></mat-icon>
+      <span matLine>No hay documentos.</span>
+    </mat-list-item>
+  </mat-action-list>
+  <mat-action-list *ngIf="!progressBarDisplay && items?.length > 0">
+    <app-file-document-inbox-item-documentation *ngFor="let item of items" [item]="item"
+      (signingFinished)="updateList()" (click)="onOpenProcess(item)" [showSignAll]="this.showSignAll">
+    </app-file-document-inbox-item-documentation>
+  </mat-action-list>
+</mat-expansion-panel>

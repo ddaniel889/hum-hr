@@ -1,0 +1,7 @@
+<div class="dialog-content" fxLayout="column" fxFill>
+    <div class="document-template-container">
+        <div class="document-selection">
+            <app-add-person (cancelAddPerson)="closeAddPerson()" (backAddPerson)="closeAddPerson()" (actionFinished)="closeAddPerson(true)" [showOuSelection]="false" [person]="data" [toolbartitle]="tittle" [newPerson]="true" [isCandidate]="isCandidate"></app-add-person>
+        </div>
+    </div>
+</div>

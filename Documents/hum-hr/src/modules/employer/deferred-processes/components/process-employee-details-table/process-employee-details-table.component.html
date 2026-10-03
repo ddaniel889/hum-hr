@@ -1,0 +1,131 @@
+<div class="table-paginator-container">
+  <table mat-table [dataSource]="dataSource" class="mat-elevation-z0">
+    <!-- Page Column -->
+    <ng-container matColumnDef="page">
+      <th mat-header-cell *matHeaderCellDef>Página</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.pages?.[0] }}
+        <ng-container *ngIf="element.pages?.length > 1">
+          {{ " - " + element.pages[element.pages.length - 1] }}
+        </ng-container>
+      </td>
+    </ng-container>
+
+    <!-- Identifier Column -->
+    <ng-container matColumnDef="identifier">
+      <th mat-header-cell *matHeaderCellDef>Identificador reconocido</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.identifier }}
+      </td>
+    </ng-container>
+
+    <!-- NroLegajo Column -->
+    <ng-container matColumnDef="nroLegajo">
+      <th mat-header-cell *matHeaderCellDef>Nro Legajo</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.employeeFileId }}
+      </td>
+    </ng-container>
+
+    <!-- Name Column -->
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef>Nombre</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.firstName }} {{ element.lastName }}
+      </td>
+    </ng-container>
+
+    <!-- State Column -->
+    <ng-container matColumnDef="state">
+      <th mat-header-cell *matHeaderCellDef>Estado</th>
+      <td mat-cell *matCellDef="let element">
+        <div class="state-chips-list">
+          <app-custom-chip
+            *ngIf="element.employeeFound"
+            [customTheme]="'green'"
+            [text]="'RECONOCIDO'"
+          ></app-custom-chip>
+          <app-custom-chip
+            *ngIf="element.isDeleted"
+            [customTheme]="'brown'"
+            [text]="'BORRADO'"
+          ></app-custom-chip>
+          <app-custom-chip
+            *ngIf="element.hasError"
+            [customTheme]="'red'"
+            [text]="'CON ERROR'"
+          ></app-custom-chip>
+          <app-custom-chip
+            *ngIf="element.hasWarning"
+            [customTheme]="'orange'"
+            [text]="getStatusMessage(element)"
+          ></app-custom-chip>
+        </div>
+      </td>
+    </ng-container>
+
+    <!-- Action Column -->
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let element">
+        <ng-container
+          *ngIf="
+            element.documentId !== null &&
+            !element.hasError &&
+            !element.hasWarning &&
+            !element.isDeleted
+          "
+        >
+          <button
+            mat-icon-button
+            [matTooltip]="'Ver documento nro ' + element.documentId"
+            [matTooltipPosition]="'right'"
+            (click)="viewDocument(element.documentId)"
+            *ngIf="
+              element.documentId !== loadingDocumentId;
+              else loadingTemplate
+            "
+            [disabled]="element.documentId === loadingDocumentId"
+            color="primary"
+          >
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-eye"></mat-icon>
+          </button>
+        </ng-container>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+
+  <ng-template #loadingTemplate>
+    <mat-progress-spinner
+      class="loading-document"
+      diameter="24"
+      mode="indeterminate"
+      strokeWidth="3"
+    >
+    </mat-progress-spinner>
+  </ng-template>
+
+  <div class="progress-bar-container">
+    <mat-progress-bar
+      mode="indeterminate"
+      *ngIf="isLoading$ | async"
+    ></mat-progress-bar>
+  </div>
+
+  <!-- Paginator -->
+  <div class="paginator-container">
+    <mat-paginator
+      *ngIf="paginationInfo$ | async as paginationInfo"
+      class="bg-transparent"
+      [length]="paginationInfo.totalCount"
+      [pageSize]="paginationInfo.pageSize"
+      [pageSizeOptions]="[10, 25, 100]"
+      [pageIndex]="paginationInfo.currentPage - 1"
+      showFirstLastButtons
+      (page)="handlePageEvent($event)"
+    ></mat-paginator>
+  </div>
+</div>

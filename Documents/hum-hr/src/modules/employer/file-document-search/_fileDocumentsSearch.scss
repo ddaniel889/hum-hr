@@ -1,0 +1,37 @@
+@import '../../../../assets/styles/img-management';
+
+
+app-chapa {
+  height: 100%;
+  width: 100%;
+  display: block;
+}
+
+.upload-warning {
+  height: calc(100% - 64px);
+}
+
+.adv-menu-content.input-content {
+  padding: 16px 46px;
+}
+
+.scroller {
+  max-height: calc(100vh - 32px - 64px - 68px);
+  overflow: auto !important;
+  overflow: overlay !important;
+  padding: 16px 24px 16px 16px;
+  box-sizing: border-box;
+}
+
+mat-radio-button.disabled {
+  cursor: pointer;
+  pointer-events: none;
+}
+
+@mixin fileDocumentsSearch($accent) {
+  mat-radio-button.disabled {
+    .mat-radio-label-content {
+      color: $accent;
+    }
+  }
+}

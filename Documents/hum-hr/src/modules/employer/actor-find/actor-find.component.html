@@ -1,0 +1,355 @@
+<!-- catcher nuevo actor -->
+<div class="main-overlay" *ngIf="isEditing" [ngClass]="{'enabled' : isEditing}"></div>
+<!-- navegacion OU -->
+<div class="navigation" [ngClass]="{'detail-open' : showDetail || isEditing, 'float-in' : showOus }"
+  [fxFlex]="showDetail || isEditing ? '0' : 30" fxFill *ngIf="parentOu">
+  <!-- estado OU -->
+  <div class="toolbar" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px"
+    *ngIf="parentOu?.selected">
+    <div class="header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+      <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-layer-group">
+      </mat-icon>
+      <div class="info" fxLayout="column">
+        <h3>{{parentOu?.name}}</h3>
+        <h5>Empresas del Grupo</h5>
+      </div>
+    </div>
+    <!-- accion cerrar ous tablet -->
+    <button class="show-md" mat-icon-button fxLayout="row" fxLayoutAlign="center center" (click)="closeOus()">
+      <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-times">
+      </mat-icon>
+    </button>
+  </div>
+  <!-- volver -->
+  <div class="toolbar reverse" fxLayout="row" fxLayoutAlign="space-between center"
+    *ngIf="parentOu && !parentOu?.selected">
+    <div class="header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+      <mat-icon class="fa-lg hide-md" fontSet="fas" fontIcon="fa-layer-group">
+      </mat-icon>
+      <!-- accion volver ous tablet -->
+      <button class="show-md" mat-icon-button fxLayout="row" fxLayoutAlign="center center"
+        (click)="selectRootOu(); isEditing = false ; showDetail = false">
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-arrow-left">
+        </mat-icon>
+      </button>
+      <div class="info" fxLayout="column">
+        <h5>Regresar</h5>
+        <h3>{{ parentOu?.name }}</h3>
+      </div>
+    </div>
+    <!-- accion cerrar ous tablet -->
+    <button class="show-md" mat-icon-button fxLayout="row" fxLayoutAlign="center center" (click)="closeOus()">
+      <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-times">
+      </mat-icon>
+    </button>
+    <!-- accion volver -->
+    <button class="hide-md" mat-icon-button fxLayout="row" fxLayoutAlign="center center"
+      (click)="selectRootOu(); isEditing = false ; showDetail = false">
+      <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-arrow-left">
+      </mat-icon>
+    </button>
+  </div>
+  <!-- listado de empresas -->
+  <div class="container">
+    <!-- ayuda -->
+    <div class="helper" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px" *ngIf="parentOu?.selected">
+      <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-exclamation-circle">
+      </mat-icon>
+      <h5>Elije una empresa</h5>
+    </div>
+    <!-- foreach empresas del grupo -->
+    <ng-container *ngIf="!selectedOrganizationalUnit || selectedOrganizationalUnit?.isRoot">
+      <div *ngFor="let ou of organizationalUnits" class="item" [ngClass]="{'active' : ou?.selected}" matRipple
+        fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px"
+        (click)="selectChildOu(ou) ; isEditing = false ; showDetail = false">
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-industry-alt">
+        </mat-icon>
+        <h3>{{ou?.name}}</h3>
+      </div>
+    </ng-container>
+    <div class="item active" matRipple *ngIf="selectedOrganizationalUnit && !selectedOrganizationalUnit?.isRoot"
+      fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px"
+      (click)="selectChildOu(selectedOrganizationalUnit)">
+      <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-industry-alt">
+      </mat-icon>
+      <h3>{{selectedOrganizationalUnit?.name}}</h3>
+    </div>
+  </div>
+</div>
+<!-- actores -->
+<div class="work-space" [fxFlex]="showDetail || isEditing ? '100' : (parentOu ? '70': '100')" fxFill>
+  <!-- vista ppal -->
+  <div class="main" [fxFlex]="showDetail || isEditing ? '70' : '100'" [ngClass]="{'side-open': showDetail || isEditing}"
+    fxFill fxLayout="column" fxLayoutAlign="space-between">
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+      <!-- info -->
+      <div class="header">
+        <div class="content" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px" fxFlex="100">
+          <!-- Ou selector -->
+          <div class="ou-select" (click)='toggleOus()' matRipple fxLayout="row" fxLayoutAlign="start center"
+            title="Cambiar de Empresa" *ngIf="parentOu" [hidden]="!showDetail && !isEditing">
+            <div class="info" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+              <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-industry-alt">
+              </mat-icon>
+              <div fxLayout="column">
+                <h5>Ver Sección</h5>
+                <h3>
+                  Empresas
+                </h3>
+              </div>
+            </div>
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-caret-down">
+            </mat-icon>
+          </div>
+          <!-- app selector -->
+          <div class="module-title" fxLayout="row" fxLayoutAlign="start center">
+            <div class="info" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+              <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-users-crown">
+              </mat-icon>
+              <div fxLayout="column">
+                <h3>Actores</h3>
+                <h5>{{selectedOrganizationalUnit?.name}}</h5>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Busqueda  -->
+      <div class="search-container">
+        <div #roleUserSearchInput class="search" fxLayout="row" fxLayoutAlign="start center" fxFlex="100"
+          *ngIf="showSearchBar">
+          <div class="content" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px" fxFlex="100">
+            <mat-icon class="fa" fontSet="fal" fontIcon="fa-search">
+            </mat-icon>
+            <input type="search" [(ngModel)]="filterName" placeholder="Buscar Actores" (keydown.enter)="search()" />
+            <!-- <button mat-button color="primary" [matMenuTriggerFor]="menu" [disabled]="!ouLoaded">
+              <mat-icon  class="fa-lg" fontSet="fa"
+              fontIcon="fa-caret-down"></mat-icon>
+              Búsqueda Avanzada
+              </button> -->
+            <button mat-icon-button title="Ver Guía de Búsqueda" [matMenuTriggerFor]="menuHelp" [disabled]="loading">
+              <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-question-circle"></mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- listado de actores -->
+    <div class="container" fxLayout="column">
+      <!-- ayuda de actores c/filtro -->
+      <!-- helper -->
+      <div class="helper" fxLayout="row" fxLayoutAlign="space-between center">
+        <!-- hint -->
+        <mat-hint fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="space-between center">
+          <!-- ACTUALIZAR -->
+          <button mat-icon-button (click)='filteredSearch()' title="Actualizar Listado">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-redo"></mat-icon>
+          </button>
+          <h4 *ngIf="!loading">
+            {{selectedOrganizationalUnit?.isRoot ?
+            (actors?.length < 1 ? 'Sin Actores en el Grupo' : (actors?.length> 1 ? actors?.length +'
+              Actores del Grupo encontrados' : '1 Actor del Grupo encontrado')) :
+              (actors?.length < 1 ? 'Sin Actores en la Empresa' : (actors?.length> 1 ? actors?.length +'
+                Actores de la Empresa encontrados' : '1 Actor de la Empresa encontrado'))
+                }}
+          </h4>
+          <h4 *ngIf="loading">Cargando...</h4>
+        </mat-hint>
+        <!-- filtro -->
+        <div class="actions" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+          <button mat-stroked-button color="primary" [matMenuTriggerFor]="menuFilter" [disabled]="loading">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-eye">
+            </mat-icon>
+            {{filterLabel}}
+          </button>
+        </div>
+        <mat-progress-bar mode="indeterminate" *ngIf="loading && actors?.length"></mat-progress-bar>
+      </div>
+      <!-- Chapas -->
+      <ng-container *ngIf="!loading && noContainerType">
+        <app-chapa [className]="'info-empty'" [icon]="'fa-tired'" [text]="'¡Ups! Tenemos un problema'"
+          [subText]="'Avisale a tu administrador que no hay Configuración de Legajo disponible'"></app-chapa>
+      </ng-container>
+      <ng-container *ngIf="!noContainerType && (!loading && !actors?.length)">
+        <app-chapa [className]="'info-empty'" [icon]="'fa-theater-masks'" [text]="'No hay Actores en esta sección'"
+          [subText]="'Usa el botón Nuevo Actor para crear uno'"></app-chapa>
+      </ng-container>
+      <!-- loader -->
+      <div class="load-window new" *ngIf="loading && !actors?.length">
+        <mat-progress-spinner mode="indeterminate" color="primary">
+        </mat-progress-spinner>
+      </div>
+      <!-- foreach actores -->
+      <ng-container *ngIf="!noContainerType && actors?.length > 0">
+        <div class="content-scroll">
+          <div [id]="'actorCard'+i" *ngFor="let act of actors; let i=index" class="item"
+            [ngClass]="{'selected scrollTo' : act?.selected, 'full-page': !parentOu, 'disabled' : !act?.enabled}"
+            matRipple fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px" (click)="selectActor(act)">
+            <!-- icono del rol -->
+            <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center" *ngIf="act?.locked">
+              <mat-icon class="fa-lg" fontSet="fas" [fontIcon]="act?.icon">
+              </mat-icon>
+              <mat-icon class="fa-lg complex" fontSet="fas" fontIcon="fa-lock">
+              </mat-icon>
+            </div>
+            
+            <mat-icon class="fa-lg" fontSet="fas" [fontIcon]="act?.icon" *ngIf="!act?.locked">
+            </mat-icon>
+            <!-- info del rol -->
+            <div class="info" fxLayout="column">
+              <h3>
+                {{act?.firstName}} {{act?.lastName}}
+              </h3>
+              <h5>
+                {{act?.mail}}
+              </h5>
+              <span class="subtitle" [matTooltip]="getRolToolTip(act?.roles)" matTooltipPosition="above">
+                {{getRolDescription(act?.roles)}}
+              </span>
+              <h5>
+                {{act?.organizationalUnitName}}
+              </h5>
+              <h5 *ngIf="act?.filtersAvaliable">
+                Filtros aplicados
+              </h5>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+
+    <!-- crear actor -->
+    <div class="main-action" fxLayout="row" fxLayoutAlign="center center">
+      <button mat-raised-button class="main-btn" color="accent" (click)="isEditing = true ;showDetail = false"
+        [disabled]="noContainerType">
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-plus">
+        </mat-icon>
+        Nuevo Actor
+      </button>
+    </div>
+  </div>
+  <!-- vista detalles -->
+    <app-actor-detail class="side" *ngIf="showDetail && !isEditing" [ngClass]="{'disabled' : !selectedActor?.enabled}"
+    [fxFlex]="showDetail ? '30' : '0'" (closeDetail)="closeDetail($event)" (saved)="refreshItem($event)" (changeState)="changeCardState($event)"
+    [actor]="selectedActor" [isAdjetiveSigner] = "selectActor.filtersAvaliable" [selectedOu]="selectedOrganizationalUnit" [organizationalUnits]="organizationalUnits"></app-actor-detail>
+
+  <!-- vista crear actor -->
+  <div class="side edition" [fxFlex]="isEditing ? '30' : '0'" *ngIf="isEditing">
+    <div class="toolbar" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+      <div class="header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-user-edit">
+        </mat-icon>
+        <h3>Nuevo Actor</h3>
+      </div>
+      <!-- cerrar crear actor -->
+      <button mat-icon-button fxLayout="row" fxLayoutAlign="center center" (click)="isEditing=false">
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-times">
+        </mat-icon>
+      </button>
+    </div>
+    <!-- stepper crear Actor -->
+    <div class="container">
+      <app-role-user-add [selectedOu]="selectedOrganizationalUnit" (closeCreate)="OnAddClosed($event)">
+      </app-role-user-add>
+    </div>
+  </div>
+</div>
+
+<!-- user filter -->
+<mat-menu #menuFilter="matMenu" xPosition="before" yPosition="below" class="menu-options mat-card">
+  <div class="container" (click)="$event.stopPropagation()" fxLayout="column" fxLayoutAlign="start stretch">
+    <div class="slide-group" fxLayout="column" fxLayoutAlign="start stretch">
+      <div class="title" [ngClass]="{'mat-error':!enabledFilter && !disabledFilter}" fxLayout="row"
+        fxLayoutAlign="start center" fxLayoutGap="16px">
+        <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+          <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-users-crown">
+          </mat-icon>
+          <mat-icon class="fa-lg complex" fontSet="fas" fontIcon="fa-eye">
+          </mat-icon>
+        </div>
+        <div fxLayout="column">
+          <h4>Visualización de Actores</h4>
+          <h6 *ngIf="enabledFilter || disabledFilter">
+            {{enabledFilter && disabledFilter ? 'Ver Todos' :
+            (!enabledFilter ? 'Ver sólo los Deshabilitados' :
+            'Habilitados')
+            }}
+          </h6>
+          <h6 *ngIf="!enabledFilter && !disabledFilter">
+            {{!enabledFilter && !disabledFilter ?'Selecciona una opción': ''}}
+          </h6>
+        </div>
+      </div>
+      <mat-slide-toggle [(ngModel)]="enabledFilter">
+        Habilitados
+      </mat-slide-toggle>
+      <mat-slide-toggle [(ngModel)]="disabledFilter">
+        Deshabilitados
+      </mat-slide-toggle>
+    </div>
+  </div>
+  <div class="footer" fxLayout="row-reverse" fxLayoutAlign="start center" fxLayoutGap="16px">
+    <button [disabled]="!enabledFilter && !disabledFilter" mat-raised-button color="primary"
+      (click)="filteredSearch()">Actualizar Vista</button>
+    <button mat-button>Cerrar</button>
+  </div>
+</mat-menu>
+
+<!-- APP SEARCH HELP -->
+<mat-menu #menuHelp="matMenu" yPosition="below" class="menu-options help mat-card">
+  <div class="container">
+    <div class="title" fxLayout="row" fxLayoutAlign="space-between center">
+      <span fxLayout="column">
+        <h6>Guía y Ejemplos de Uso</h6>
+        <h4 class="primary">Cómo funciona la búsqueda: Buscar Actores</h4>
+      </span>
+      <button mat-icon-button title="Ocultar Guía">
+        <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times">
+        </mat-icon>
+      </button>
+    </div>
+    <div class="slide-group">
+      <mat-accordion (click)="$event.stopPropagation()">
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <h4>Podés buscar por apellido y/o nombre.</h4>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <ul style="margin-top:16px">
+            <li>
+              <i>Si ingresas <b>José</b> encontrarás a las personas <b>con este apellido o nombre</b>.</i>
+            </li>
+            <li>
+              <i>Si ingresas <b>José Ignacio Salinas</b> encontrarás a las personas cuyo <b>apellido y/o
+                  nombre
+                  contengan alguna de las palabras</b> ingresadas.</i>
+            </li>
+          </ul>
+        </mat-expansion-panel>
+        <mat-expansion-panel hideToggle="true">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <h4>Podés buscar por correo electrónico ingresando el dominio completo (persona@organizacion.com)
+              </h4>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+        </mat-expansion-panel>
+        <mat-expansion-panel hideToggle="true">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <h4>Podés buscar por el Identificador Fiscal ingresando una cifra a partir de 7 dígitos.</h4>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+        </mat-expansion-panel>
+      </mat-accordion>
+      <div class="title" fxLayout="row" fxLayoutAlign="space-between center">
+        <span fxLayout="column">
+          <h6>Nota:</h6>
+          <h4 class="accent">¡Todos los casos de Búsqueda anteriormente mencionados son combinables!</h4>
+        </span>
+      </div>
+    </div>
+  </div>
+</mat-menu>

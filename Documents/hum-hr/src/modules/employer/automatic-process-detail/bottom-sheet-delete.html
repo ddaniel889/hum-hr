@@ -1,0 +1,9 @@
+<div fxLayout="column" fxLayoutGap="16px" fxLayoutAlign="center stretch" style="padding:16px">
+    <h3>¿Deseas eliminar los documentos?</h3>
+    <p>Recuerda que aquellos que hubieran sido compartidos a los empleados no podrán ser eliminados y permaneceran listados como procesados correctamente. </p>
+    <br>
+    <div fxLayout="row-reverse " fxLayoutGap="12px">
+        <button mat-raised-button (click)="onClose()" color="accent" class="btn">Eliminar</button>
+        <button mat-button (click)="cancel()">Cancelar</button>
+    </div>
+</div>

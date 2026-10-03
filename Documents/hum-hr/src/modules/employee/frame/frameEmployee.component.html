@@ -1,0 +1,373 @@
+<mat-drawer-container autosize>
+
+  <!-- Perfil -->
+  <mat-drawer class="profile-menu" #sidenav [disableClose]="true">
+
+    <!-- Perfil toolbar -->
+    <mat-toolbar class="profile-toolbar" color="grey">
+      <mat-toolbar-row>
+        <div class="mat-avatar" fxLayout="row" fxLayoutAlign="space-between center">
+          <div class="toolbar-line" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+
+            <!-- Cerrar Perfil Btn -->
+            <button mat-icon-button (click)="sidenav.toggle()" title="Cerrar">
+              <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+            </button>
+            <div id="employeeFrame_profileBtn" class="title" fxLayout="column" fxLayoutAlign="center start">
+              <h3>Menú</h3>
+              <h5>Opciones personales</h5>
+            </div>
+          </div>
+        </div>
+
+        <!-- Editar Perfil Btn -->
+        <button id="employeeFrame_profileEditBtn" mat-icon-button *ngIf="ouAccessConfig?.canEditPersonalInformation"
+          (click)="editingMode()" title="Editar">
+          <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-pen"></mat-icon>
+        </button>
+      </mat-toolbar-row>
+    </mat-toolbar>
+    <!-- Perfil Content -->
+    <app-profile *ngIf="sidenav.opened" [isEditable]="editMode && ouAccessConfig?.canEditProfile"
+      [isEmployeeFrame]="true" [isEmployerFrame]="false" (editingMode)="editingMode($event)"
+      (updatePreview)="updatePreview($event)" [preview]="profilePreview">
+    </app-profile>
+  </mat-drawer>
+  <mat-drawer-content class="app-container">
+    <mat-drawer-container autosize>
+      <mat-drawer class="side-nav mat-elevation-z6" #sidenavOut mode="side" opened="true" [disableClose]="true"
+        [ngClass]="{'open': isExpanded, 'enter': menuFocus}">
+
+        <!-- Cabecera -->
+        <div class="side-header">
+          <!-- Logo -->
+          <img class="logo" [src]="urlIcon" *ngIf="urlIcon" alt="logo"/>
+
+          <!-- Perfil Btn -->
+          <button class="menu-trigger" mat-mini-fab (click)="sidenav.toggle()"
+            matTooltip="Abrir Menú de Opciones Personales" matTooltipPosition="after">
+            <ngx-avatar [name]="initials" [src]="preview" size="50" [round]="true">
+            </ngx-avatar>
+          </button>
+
+          <!-- Menu Btn -->
+          <button class="side-trigger" mat-mini-fab color="white" (click)="isExpanded = !isExpanded"
+            [matTooltip]="!isExpanded ? 'Expandir' : 'Contraer'" matTooltipPosition="after">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-bars"></mat-icon>
+          </button>
+
+          <!-- Cerrar Menu Mobile Btn -->
+          <button mat-mini-fab class="side-close-mobile" color="" (click)="menuFocus = !menuFocus"
+            [matTooltip]="!isExpanded ? 'Expandir' : 'Contraer'" matTooltipPosition="after">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+          </button>
+        </div>
+
+        <!-- Herramientas -->
+        <div id="side-container" class="side-nav-container">
+          <div class="content" fxLayout="column" fxLayoutAlign="space-between">
+            <div class="tools">
+              <mat-nav-list>
+                <h3 mat-subheader>Mis Herramientas</h3>
+
+                <!-- Pendientes -->
+                <mat-list-item *ngIf="hasLD" (click)="gotoPendings()" [routerLink]="['welcome']"
+                  [ngClass]="{active: router.isActive(router.parseUrl('employee/pendings'), false)}"
+                  matTooltip="Mis pendientes" matTooltipPosition="after">
+                  <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fas"
+                    fontIcon="fa-file-exclamation" matBadge="{{badgeLDTotal > 0 ? badgeLDTotal : ''}}"
+                    matBadgePosition="before" matBadgeColor="warn"></mat-icon>
+                  <span matLine>Mis pendientes</span>
+                </mat-list-item>
+
+                <!-- Recibos -->
+                <mat-list-item *ngIf="hasRSD && !hasLD" (click)="gotoHome()" [routerLink]="['welcome']"
+                  [ngClass]="{active: router.isActive(router.parseUrl('employee/home'), false)}"
+                  matTooltip="Mis Recibos de Sueldo" matTooltipPosition="after">
+                  <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+                    fontIcon="fa-file"></mat-icon>
+                  <span matLine>Mis Recibos de Sueldo</span>
+                </mat-list-item>
+
+                <!-- Historicoss -->
+                <mat-list-item *ngIf="hasRSD && hasLD" (click)="gotoHome()" [routerLink]="['welcome']"
+                  [ngClass]="{active: router.isActive(router.parseUrl('employee/home'), false)}"
+                  matTooltip="Recibos de Sueldo Históricos" matTooltipPosition="after">
+                  <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+                    fontIcon="fa-file"></mat-icon>
+                  <span matLine>Recibos de Sueldo Históricos</span>
+                </mat-list-item>
+
+                <!-- Documentos -->
+                <mat-list-item *ngIf="hasLD" (click)="gotoFileDocumentsHome()" [routerLink]="['welcome']"
+                  [ngClass]="{active: router.isActive(router.parseUrl('employee/home-file-documents'), false)}"
+                  matTooltip="Mis Documentos" matTooltipPosition="after">
+                  <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+                    fontIcon="fa-folder-open"></mat-icon>
+                  <span matLine>Mis Documentos</span>
+                </mat-list-item>
+
+                <!-- Licencias -->
+                <mat-list-item *ngIf="configLeaveOu && ConfigLeaveEmployee && !isCandidate && !isApprover" (click)="gotoMyLeaves()" [routerLink]="['welcome']"
+                  [ngClass]="{active: router.isActive(router.parseUrl('employee/leaves'), false)}"
+                  matTooltip="Mis licencias" matTooltipPosition="after" (keydown)="gotoMyLeaves()" (keypress)="gotoMyLeaves()" (keyup)="gotoMyLeaves()">
+                  <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+                    fontIcon="fa-calendar-plus"></mat-icon>
+                  <span matLine>Mis licencias</span>
+                </mat-list-item>
+                <mat-list-item *ngIf="configLeaveOu && !isCandidate && isApprover" (click)="gotoMyLeaves()" [routerLink]="['welcome']"
+                [ngClass]="{active: router.isActive(router.parseUrl('employee/leaves'), false)}"
+                matTooltip="Licencias" matTooltipPosition="after" (keydown)="gotoMyLeaves()" (keypress)="gotoMyLeaves()" (keyup)="gotoMyLeaves()">
+                <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+                  fontIcon="fa-calendar-plus"></mat-icon>
+                <span matLine>Licencias</span>
+              </mat-list-item>
+                <!-- Team -->
+                <mat-list-item *ngIf="configLeaveOu && useWorkflowApprove && isValidator && !isCandidate" (click)="goToTeam()" [ngClass]="{active: router.isActive(router.parseUrl('employee/team'), false)}" [routerLink]="['welcome']" matTooltip="Mi Equipo" matTooltipPosition="after" (keydown)="goToTeam()" (keypress)="goToTeam()" (keyup)="goToTeam()">
+                  <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa" fontIcon="fa-users"></mat-icon>
+                  <span matLine>Mi Equipo</span>
+                </mat-list-item>
+
+                <!-- Agregar -->
+                <mat-list-item *ngIf="hasLD && hasDocumentationTypesForEmployee && !quickFoodMetadataValue" (click)="goToAddDocumentation()" [routerLink]="['welcome']"
+                  [ngClass]="{active: router.isActive(router.parseUrl('employee/add-documentation'), false)}"
+                  matTooltip="Nuevo Documento" matTooltipPosition="after">
+                  <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+                    fontIcon="fa-file-plus"></mat-icon>
+                  <span matLine>Nuevo Documento</span>
+                </mat-list-item>
+
+                <!-- HUMANAGE CONNECT  -->
+                <mat-list-item name="mli_MenuHumanageConnect" routerLink="/employee/humanage-connect"
+                  class="fa-bg-beta"
+                  routerLinkActive="active"
+                  *ngIf="useConnect" matTooltip="Humanage Connect" matTooltipPosition="after">
+                  <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+                    fontIcon="fa-messages">
+                  </mat-icon>
+                  <span matLine>Humanage Connect</span>
+                </mat-list-item>
+              </mat-nav-list>
+            </div>
+
+            <!-- Navegacion -->
+            <div class="links">
+              <mat-nav-list>
+                <h3 mat-subheader>Navegación</h3>
+
+                <!-- notificaiones -->
+                <mat-list-item *ngIf="!hasFiltersMetadatos()" [matMenuTriggerFor]="goMenuNotif"
+                  (click)="refreshNotificacion()" [matTooltip]="totalNotifications > 0 ?
+                                                                    (totalNotifications > 1 ?
+                                                                    totalNotifications + ' nuevas Notificaciones' :
+                                                                    '1 nueva Notificación' ) :
+                                                                    'Mis Notificaciones' " matTooltipPosition="after">
+                  <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+                    fontIcon="fa-bell" matBadge="{{totalNotifications > 0  ? totalNotifications : ''}}"
+                    matBadgePosition="before" matBadgeColor="warn"></mat-icon>
+                  <span matLine>Mis Notificaciones</span>
+                </mat-list-item>
+
+                <!-- Accesos -->
+                <mat-list-item *ngIf="appLinks && appLinks.length > 0" [matMenuTriggerFor]="goMenu"
+                  matTooltip="Mis Accesos" matTooltipPosition="after">
+                  <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+                    fontIcon="fa-th"></mat-icon>
+                  <span matLine>Mis Accesos</span>
+                </mat-list-item>
+
+                <!-- Ayuda -->
+                <mat-list-item [matMenuTriggerFor]="goMenuAyuda" matTooltip="Ayuda" matTooltipPosition="after">
+                  <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+                    fontIcon="fa-info"></mat-icon>
+                  <span matLine>Ayuda</span>
+                </mat-list-item>
+
+                <!-- Cerrar Humanage -->
+                <mat-list-item (click)="logOut()" class="logout-btn"
+                  [matTooltip]="!isSamlActive ? 'Salir del sistema' : 'Salir y volver'" matTooltipPosition="after">
+                  <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+                    fontIcon="fa-sign-out"></mat-icon>
+                  <span matLine>{{!isSamlActive ? 'Salir del sistema' : 'Salir y volver'}}</span>
+                </mat-list-item>
+              </mat-nav-list>
+            </div>
+          </div>
+
+          <!-- Version N° -->
+          <div class="version">
+            <mat-nav-list>
+              <h3 mat-subheader>{{releaseName}}</h3>
+            </mat-nav-list>
+          </div>
+        </div>
+      </mat-drawer>
+      <mat-drawer-content class="app-container">
+
+        <!-- loading -->
+        <div *ngIf="loading" class="mat-loading-window">
+          <mat-progress-spinner style="z-index: 1" mode="indeterminate" color="primary">
+          </mat-progress-spinner>
+        </div>
+
+        <!-- ///////////////// -->
+        <!-- MAIN APP -->
+        <!-- ///////////////// -->
+        <router-outlet></router-outlet>
+
+        <!-- Abrir Menu Mobile Btn -->
+        <button mat-icon-button class="side-open-mobile" color="" (click)="menuFocus = !menuFocus"
+          [title]="!isExpanded ? 'Expandir' : 'Contraer'">
+          <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-bars"></mat-icon>
+        </button>
+      </mat-drawer-content>
+    </mat-drawer-container>
+  </mat-drawer-content>
+</mat-drawer-container>
+
+<!-- NOTIFICATIONS MENU -->
+<mat-menu #goMenuNotif="matMenu" xPosition="before" yPosition="above" overlapTrigger="true"
+  class="notifications-panel mat-card">
+
+  <!-- NOTIFICATIONS TOP -->
+  <div class="notification top" fxLayout="row" fxLayoutAlign="space-between center" (click)="$event.stopPropagation()">
+    <span class="header">
+      <h3>Notificaciones</h3>
+    </span>
+    <button mat-icon-button title="Actualizar" (click)="refreshNotificacion()">
+      <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-redo"></mat-icon>
+    </button>
+  </div>
+  <div class="notifications-body">
+    <div class="window-spinner" *ngIf="loadNotifications">
+      <mat-progress-spinner mode="indeterminate" color="primary">
+      </mat-progress-spinner>
+    </div>
+
+    <!-- notification none -->
+    <div class="notification no-notif" *ngIf="totalNotifications < 1  && !loadNotifications">
+      <div class="primary" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+        <mat-icon class="fa-lg" fxLayoutAlign="center center" fontSet="fas" fontIcon="fa-cloud-moon">
+        </mat-icon>
+        <div fxLayout="column">
+          <h3>Sin novedades por aquí...</h3>
+        </div>
+      </div>
+    </div>
+    <ng-container *ngIf="!loadNotifications">
+
+      <!-- NOTIFICATIONS PERSISTENT SIGNATURE STATUS -->
+      <div class="notification selectable" *ngFor="let proc of processToNotif">
+        <div fxLayout="row" fxLayoutAlign="space-between center" fxFlex="grow">
+          <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px" *ngIf="proc.results" fxFlex="grow">
+            <mat-icon class="fa-lg" fxLayoutAlign="center center" fontSet="fas" fontIcon="fa-comment-alt">
+            </mat-icon>
+            <div class="notification-on-signature" fxLayout="column">
+              <h3>
+                Se están firmando {{ proc.results.totalItems }} {{proc.results.totalItems == 1 ?
+                'Documento':'Documentos'}}
+              </h3>
+              <mat-progress-bar class="signature-bar" mode="determinate" [value]="proc.results.advancePercentage">
+              </mat-progress-bar>
+              <span class="signature-count">
+                {{proc.results.pagesProcessed }} de
+                {{proc.results.totalPages}}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOTIFICATIONS POP MODEL -->
+      <div class="notification selectable" (click)="notifAction(notif);" *ngFor="let notif of notifications">
+        <div fxLayout="row" fxLayoutAlign="space-between center">
+          <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+            <mat-icon class="fa-lg" fxLayoutAlign="center center" fontSet="fas" [fontIcon]="notif.icon">
+            </mat-icon>
+            <div fxLayout="column">
+              <h3> {{ notif.description}} </h3>
+              <h5 *ngIf="notif.subtitle">{{ notif.subtitle }}</h5>
+            </div>
+          </div>
+          <div *ngIf="notif.actionName" class="subtitle" fxLayout="column">
+            <h5 *ngIf="notif.actionName" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+              <mat-icon class="fa-lg" fxLayoutAlign="center center" fontSet="fas" [fontIcon]="notif.actionIcon">
+              </mat-icon>
+              <span>
+                {{ notif.actionName }}
+              </span>
+            </h5>
+          </div>
+          <button mat-icon-button class="notif-hide-button" (click)="deleteNotifButton(notif.id)" title="Ocultar">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-times" fxLayout="row" fxLayoutAlign="center center">
+            </mat-icon>
+          </button>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+
+  <!-- NOTIFICATIONS bottom -->
+  <div class="notification bottom" *ngIf="totalNotifications > 1" fxLayout="row-reverse"
+    fxLayoutAlign="space-between center" (click)="$event.stopPropagation()">
+    <button mat-button (click)="deleteAllNotif()">
+      Ocultar Todas
+    </button>
+  </div>
+</mat-menu>
+
+<!-- NAVEGACION MENU -->
+<mat-menu #goMenu="matMenu" xPosition="before" yPosition="above" overlapTrigger="true">
+  <mat-nav-list class="navigation-list mat-card" *ngIf="appLinks.length <= minAccessValue">
+    <mat-list-item *ngFor="let app of appLinks" (click)="switchTo(app)">
+      <mat-icon *ngIf="app.module === 'employer' || app.module === 'candidateadmin' || app.module === 'jefe' || app.module === 'leaveaprov'"
+        class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+        fontIcon="fa-industry-alt">
+      </mat-icon>
+      <mat-icon *ngIf="app.module === 'lsd'"
+      class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+      fontIcon="fa-book">
+      </mat-icon>
+      <mat-icon *ngIf="app.module === 'employee'" class="fa-lg" fxLayout="row" fxLayoutAlign="center center"
+        mat-list-icon fontSet="fas" fontIcon="fa-id-badge">
+      </mat-icon>
+      <mat-icon *ngIf="app.module === 'signer'" class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon
+        fontSet="fas" fontIcon="fa-signature">
+      </mat-icon>
+      <mat-icon *ngIf="app.module === 'overseer'" class="fa-lg" fxLayout="row" fxLayoutAlign="center center"
+        mat-list-icon fontSet="fas" fontIcon="fa-eye">
+      </mat-icon>
+      <mat-icon *ngIf="app.link" class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+        fontIcon="fa-exchange">
+      </mat-icon>
+      <span matLine>{{app.roleName }}</span>
+      <span matLine><b>{{app.ouName }}</b></span>
+    </mat-list-item>
+  </mat-nav-list>
+  <div class="container" (click)="$event.stopPropagation()" fxLayout="column" *ngIf="appLinks.length > minAccessValue">
+    <div class="slide-group" fxLayout="column" *ngIf="appLinks">
+      <div class="title" fxLayout="row" fxLayoutGap="12px">
+        <div class="icon-complex" fxLayout="row">
+        </div>
+        <div fxLayout="column">
+          <h4>Buscar Accesos</h4>
+        </div>
+      </div>
+      <app-autocomplete-chip [showIcons]="true" [iconName]="'fa-filter'" [AccessList]="appLinks"
+        title="Ingrese la Empresa" [placeHolderText]="'Ingrese la Empresa'" [AccessView]="true"
+        (OnAccessClick)="switchTo($event)" fxFlex="grow" fxLayout="row">
+      </app-autocomplete-chip>
+    </div>
+  </div>
+</mat-menu>
+
+<!-- AYUDA MENU -->
+<mat-menu #goMenuAyuda="matMenu" xPosition="before" yPosition="above" overlapTrigger="true">
+  <mat-nav-list class="navigation-list mat-card">
+    <mat-list-item (click)="help()" matTooltip="Ayuda online" matTooltipPosition="after">
+      <mat-icon class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+        fontIcon="fa-question-circle"></mat-icon>
+      <span matLine>Ayuda online</span>
+    </mat-list-item>
+  </mat-nav-list>
+</mat-menu>

@@ -1,0 +1,161 @@
+<form fxFill fxFlex="100">
+  <!-- cabecera detalles -->
+  <div class="leave_detail-container" [style.display]="loading ? 'none' : ''">
+    <div class="toolbar" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+      <div class="header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+        <mat-icon class="fa-lg" fontSet="fas" [fontIcon]=getLeaveTypeIcon(leaveRequest)>
+        </mat-icon>
+        <div class="text" fxLayout="column">
+          <h3>{{getLeaveTypeName(leaveRequest)}}</h3>
+          <h5>Detalles del pedido</h5>
+        </div>
+      </div>
+      <!-- cerrar detalles -->
+      <button mat-icon-button fxLayout="row" fxLayoutAlign="center center" (click)="close()">
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-times">
+        </mat-icon>
+      </button>
+    </div>
+    <!-- datos -->
+    <div class="leave_detail-container-content" fxLayout="column" fxLayoutGap="16px">
+      <!-- body detalle del solicitante-->
+      <div class="leave_resume" fxLayout="column">
+        <!-- cabecera detalle del solicitante-->
+        <h3 class="leave_resume-title primary">Datos del solicitante</h3>
+        <!-- name -->
+        <div class="line" fxLayout="column">
+          <h6>Apellido y Nombre</h6>
+          <h3>{{leaveRequest?.userName}}</h3>
+        </div>
+        <!-- employee id -->
+        <div class="line" fxLayout="column" *ngIf="leaveRequest?.legajo">
+          <h6>Legajo</h6>
+          <h3>{{leaveRequest?.legajo}}</h3>
+        </div>
+        <!-- mail -->
+        <div class="line" fxLayout="column">
+          <h6>Correo Electrónico</h6>
+          <h3>{{leaveRequest?.userEmail}}</h3>
+        </div>
+        <!-- phone -->
+        <div class="line" fxLayout="column" *ngIf="leaveRequest?.userTelephone">
+          <h6>Teléfono</h6>
+          <h3>{{leaveRequest?.userTelephone}}</h3>
+        </div>
+
+        <mat-divider></mat-divider>
+        <!-- total days available -->
+        <div class="line" fxLayout="column" *ngIf="leaveRequest.totalDays > 0">
+          <h6> Días de Vacaciones totales </h6>
+          <h3>
+            {{leaveRequest.totalDays + ' días'}}
+
+            <span class="line-side">
+              (Año: {{ leaveRequest?.configLeaveOu?.year}})
+            </span>
+          </h3>
+        </div>
+        <!-- days left -->
+        <div class="line" fxLayout="column" *ngIf="leaveRequest.availableDays > 0">
+          <h6> Días de Vacaciones disponibles para solicitar </h6>
+          <h3>
+            {{leaveRequest.availableDays}} {{leaveRequest.availableDays > 1 ? 'días' : 'dia'}}
+          </h3>
+        </div>
+        <div class="line" fxLayout="column" *ngIf="leaveRequest.totalDays == 0">
+          <h6> Días de Vacaciones totales </h6>
+          <h3>
+            Sin Días Disponibles
+          </h3>
+        </div>
+        <!-- days left -->
+        <div class="line" fxLayout="column" *ngIf="leaveRequest.availableDays == 0">
+          <h6> Días de Vacaciones disponibles para solicitar </h6>
+          <h3>
+             Sin Días Disponibles
+          </h3>
+        </div>
+      </div>
+      <!-- body de la solicitud -->
+      <div class="leave_resume" fxLayout="column">
+        <!-- cabecera detalle de la solicitud-->
+        <h3 class="leave_resume-title accent">Datos de la solicitud</h3>
+        <!-- solicitados -->
+        <div class="line" fxLayout="column" *ngIf="leaveRequest.state.key !== '0'">
+          <h6>Año</h6>
+          <h3>{{leaveRequest.configLeaveOu.year}}</h3>
+        </div>
+        <div class="line" fxLayout="column" *ngIf="leaveRequest.state.key !== '0'">
+          <h6>Días Solicitados</h6>
+          <h3>{{leaveRequest.daysConsumed}} {{leaveRequest.daysConsumed > 1 ? 'días' : 'día'}}</h3>
+        </div>
+        <div class="line" fxLayout="column" #draftText *ngIf="leaveRequest.state.key == '0'">
+          <h6>Días Propuestos</h6>
+          <h3>{{leaveRequest.daysConsumed}} {{leaveRequest.daysConsumed > 1 ? 'días' : 'día'}}</h3>
+        </div>
+        <div class="line" fxLayout="column" *ngIf="leaveRequest.state.key == '3'">
+          <h6>Motivo de rechazo</h6>
+          <h3>{{leaveRequest.state.note}}</h3>
+        </div>
+        <div class="line" fxLayout="column" *ngIf="leaveRequest.state.key == '4'">
+          <h6>Motivo de cancelación</h6>
+          <h3>{{leaveRequest.state.note}}</h3>
+        </div>
+        <div class="line" fxLayout="column" *ngIf="leaveRequest.state.key == '0'">
+          <h6>Fecha de la solicitud </h6>
+          <h3>{{leaveRequest.state.stateDate | date: 'd/M/yyyy HH:mm'}} </h3>
+        </div>
+        <div class="line" fxLayout="column" *ngIf="leaveRequest.state.key == '0'">
+          <h6>Propuestos por </h6>
+          <h3>{{ leaveRequest.createdBy.firstName + ' ' + leaveRequest.createdBy.lastName }} </h3>
+        </div>
+        <div class="line" fxLayout="column" *ngIf="leaveRequest.state.key == '2' || leaveRequest.state.key == '3'">
+          <h6>Fecha en la que se {{getAccionName(leaveRequest.state.key)}} </h6>
+          <h3>{{leaveRequest.state.stateDate | date: 'd/M/yyyy HH:mm'}} </h3>
+        </div>
+        <div class="line" fxLayout="column" *ngIf="leaveRequest.state.key == '2' || leaveRequest.state.key == '3'">
+          <h6>Solicitud {{getName(leaveRequest.state.key)}} por </h6>
+          <h3>{{leaveRequest.state.userName}}</h3>
+        </div>
+      </div>
+      <div *ngIf="getOtherApprovers(configLeaveOu.leaveTypeOu.workflowApprove?.id,leaveRequest.actionApprovers,leaveRequest.state)" class="leave_resume" fxLayout="column">
+        <h3 class="leave_resume-title accent">Otros Aprobadores</h3>
+        <div *ngFor="let approvers of leaveRequest.actionApprovers" class="line" fxLayout="column">
+          <h6>{{ getLabelOtherApprovers(configLeaveOu.leaveTypeOu.workflowApprove?.id,approvers.action) }}</h6>
+            <h3>{{approvers.firstName}} {{approvers.lastName}}</h3>
+            <div *ngIf="getDateOtherApprovers(leaveRequest.state.key,approvers.action)">
+              <h6>Fecha de validación</h6>
+              <h3>{{approvers.fecha | date: 'd/M/yyyy HH:mm'}}</h3>
+            </div>
+        </div>
+      </div>
+    </div>
+    <!-- acciones -->
+    <div class="actions" fxLayout="row" fxLayoutAlign="space-between center"
+      *ngIf="(selectedLeaveRequest.stateId == '1' || selectedLeaveRequest.stateId == '2') && canApprove">
+      <button name="btn_RechazarSolicitud" mat-stroked-button class="not-ok"
+        (click)="approveReject(false, selectedLeaveRequest)" fxFlex="50"
+        *ngIf="showRejectBtn()">
+        <span fxLayout="row" fxLayoutGap="12px" fxLayoutAlign="center center">
+          <mat-icon fontSet="fas" fontIcon="fa-thumbs-down">
+          </mat-icon>
+          <span>
+            Rechazar Solicitud
+          </span>
+        </span>
+      </button>
+
+      <button name="btn_AprobarSolicitud" mat-raised-button class="ok"
+        (click)="approveReject(true, selectedLeaveRequest)" fxFlex="50" *ngIf="showApproveBtn()">
+        <span fxLayout="row" fxLayoutGap="12px" fxLayoutAlign="center center">
+          <mat-icon fontSet="fas" fontIcon="fa-thumbs-up">
+          </mat-icon>
+          <span>
+            Aprobar Solicitud
+          </span>
+        </span>
+      </button>
+
+    </div>
+  </div>
+</form>

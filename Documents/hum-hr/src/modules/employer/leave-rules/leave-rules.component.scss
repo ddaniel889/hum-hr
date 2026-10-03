@@ -1,0 +1,86 @@
+.form-fields-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  align-items: center;
+}
+
+.form-fields-container mat-checkbox {
+  padding-right: 40px;
+}
+
+.toggle-checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 15px;
+  padding-left: 30px;
+}
+
+.toggle-label-toggle-tooltip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+
+.toggle-checkbox-container mat-label {
+  flex: none;
+}
+
+.toggle-checkbox-container mat-button-toggle-group {
+  flex: none;
+}
+
+.mat-button-toggle-checked{
+  background-color: #3f51b5;
+  color: white
+}
+
+.toggle-checkbox-container mat-tooltip {
+  flex: none;
+  margin-left: 5px;
+}
+
+#rule-check {
+  margin-left: auto;
+}
+
+.btn-container{
+  display: flex;
+  justify-content: flex-end !important;
+}
+
+.rounded-button span {
+  font-family: 'Helvetica Neue',Arial, Helvetica, sans-serif;
+}
+
+ span{
+  padding: 0 25px !important;
+}
+
+.rounded-button {
+  border-radius: 25px;
+  text-transform: none;
+  font-size: 10px;
+  font-family: 'Helvetica Neue',Arial, Helvetica, sans-serif;
+  vertical-align: middle;
+}
+
+mat-form-field {
+  min-width: 220px;
+  max-width: 800px;
+}
+
+.toggle-checkbox-container mat-form-field {
+  min-width: 220px;
+  max-width: 800px;
+}
+
+.day-selector-container {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+

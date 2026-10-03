@@ -1,0 +1,125 @@
+<div class="deferred-process-list" fxLayout="column" fxFill>
+  <!-- Header -->
+  <div class="header" fxLayout="row" fxLayoutGap="20px">
+    <mat-icon
+      class="fa-lg"
+      fontSet="fa"
+      fontIcon="fa-cogs"
+      color="primary"
+    ></mat-icon>
+    <div
+      class="container-ou"
+      fxLayout="row"
+      fxLayoutAlign="start center"
+      fxLayoutGap="16px"
+    >
+      <div
+        class="title"
+        fxLayout="column"
+        fxLayoutAlign="center start"
+        fxFlex="100"
+      >
+        <h3>Procesos Diferidos</h3>
+        <h5>{{ selectedOrganizationalUnit?.description }}</h5>
+      </div>
+    </div>
+    <button mat-icon-button [matTooltip]="'Actualizar'" aria-label="Actualizar" (click)="refreshAll()">
+      <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-redo"></mat-icon>
+    </button>
+  </div>
+
+  <!-- On going -->
+  <section class="on-going" *ngIf="inCourse?.length > 0">
+    <h4>En curso</h4>
+    <!-- Cards Grid Layout -->
+    <div class="cards-container">
+      <!-- Card -->
+      <app-process-card
+        *ngFor="let process of inCourse"
+        [routerLink]="[process.id]"
+        [process]="process"
+      ></app-process-card>
+    </div>
+  </section>
+
+  <!-- History -->
+  <section class="history">
+    <div
+      fxLayout="column"
+      fxLayout.gt-md="row"
+      fxLayoutAlign.gt-md="space-between"
+    >
+      <h4>Historial</h4>
+      <!-- Search -->
+      <form class="form-group" fxLayout="row wrap" fxLayoutGap="16px" [formGroup]="historyParamsForm">
+        <ng-container *ngIf="typeChoices?.length > 1">
+          <mat-form-field class="form-item" fxFlex="1 1 420px" appearance="fill" >
+            <mat-label>Tipo</mat-label>
+            <mat-select formControlName="type" (selectionChange)="refreshHistory()" [multiple]="true">
+              <mat-option *ngFor="let choice of typeChoices" [value]="choice.id">{{
+                choice.name
+              }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </ng-container>
+
+
+        <mat-form-field class="form-item" appearance="fill">
+          <mat-label>Estado</mat-label>
+          <mat-select formControlName="groupedState" (selectionChange)="refreshHistory()" [multiple]="true">
+            <mat-option *ngFor="let choice of groupedStateChoices" [value]="choice.id">{{
+              choice.name
+            }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field class="form-item dates" appearance="fill">
+          <mat-label>Fecha</mat-label>
+          <mat-date-range-input [rangePicker]="picker">
+            <input readonly matStartDate placeholder="Desde" formControlName="createdFrom"/>
+            <input readonly matEndDate placeholder="Hasta" formControlName="createdTo"/>
+          </mat-date-range-input>
+          <button
+            *ngIf="(historyParamsForm.value.createdFrom || historyParamsForm.value.createdTo)"
+            class="clear-date-btn"
+            mat-icon-button
+            matSuffix
+            [matTooltip]="'Limpiar'"
+            aria-label="Limpiar"
+            (click)="clearDates()"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+          <mat-datepicker-toggle
+            matSuffix
+            [for]="picker"
+          ></mat-datepicker-toggle>
+          <mat-date-range-picker #picker>
+            <mat-date-range-picker-actions>
+              <button mat-button matDateRangePickerCancel class="custom-action-button">Cancelar</button>
+              <button mat-raised-button matDateRangePickerApply class="custom-action-button" (click)="refreshHistory()">Aceptar</button>
+            </mat-date-range-picker-actions>
+          </mat-date-range-picker>
+        </mat-form-field>
+      </form>
+    </div>
+    <app-process-history-table
+      *ngIf="history?.length > 0"
+      [data]="history"
+      [isLoading]="isLoading"
+    ></app-process-history-table>
+    <!-- Loading -->
+    <div class="load-window new" *ngIf="isLoading && !history">
+      <mat-progress-spinner mode="indeterminate" color="primary">
+      </mat-progress-spinner>
+    </div>
+
+    <ng-container *ngIf="!isLoading">
+      <ng-container *ngIf="history?.length === 0">
+        <!-- Empty (app chapa) -->
+        <app-chapa [className]="'info-empty'" [icon]="'fa-meh'" [text]="'¡Ups! No hay procesos aquí...'"
+            [subText]="'Intenta hacer otra búsqueda o prueba con otros filtros'"></app-chapa>
+      </ng-container>
+    </ng-container>
+  </section>
+</div>

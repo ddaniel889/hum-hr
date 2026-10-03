@@ -1,0 +1,41 @@
+<div class="login" fxLayout="row" fxLayoutAlign="center center" fxFill>
+  <img class="login-bg" src="../../../assets/img/background.jpg">
+    <mat-card class="login-card" fxLayout="column" fxFlex.xl="20" fxFlex.lg="30" fxFlex.md="40" fxFlex.sm="70" fxFlex.xs="90">
+        <mat-card-header>
+            <mat-card-title fxLayout="column" fxLayoutGap="12px">
+                <div class="brand" fxLayout="column" fxLayoutAlign="center center">
+                    <img src="../../../assets/img/logo.png">
+                </div>
+                <div class="description">Humanage es una herramienta de RRHH y gestión documental. <br><a href="http://www.cardinalsystems.com.ar/" target="blank">
+</div>
+            </mat-card-title>
+        </mat-card-header>
+        <mat-horizontal-stepper #stepper *ngIf="!isLoading">
+            <mat-step>
+                <mat-card-content fxLayout="column">
+                    <div fxLayout="column" *ngIf="organizationalUnits.length > 0 else emptyOus">
+                        <h3 fxFlex="grow">Selecciona la unidad organizacional a utilizar</h3>
+                        <mat-form-field fxFlex="grow">
+                            <mat-select [(ngModel)]="selectedOu">
+                                <mat-option></mat-option>
+                                <mat-option *ngFor="let ou of organizationalUnits" value="{{ou.organizationalUnitId}}">{{ou.organizationalUnitName}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+
+                    <ng-template #emptyOus>
+                        <h3 fxFlex="grow">Tu usuario y contraseña son correctos. Tu portal no tiene funcionalidades habilitadas, por favor solicitalas al administrador para poder ingresar.</h3>
+                    </ng-template>
+
+                    <mat-card-footer fxLayout="row-reverse" fxLayoutGap="12px" fxLayoutAlign="space-between center">
+                        <div fxLayout="row-reverse" fxLayoutGap="12px">
+                            <button mat-raised-button (click)="changeOu()" color="primary" class="btn" *ngIf="organizationalUnits.length > 0">Finalizar</button>
+                            <button mat-button (click)="backToLogin()">Volver</button>
+                        </div>
+                    </mat-card-footer>
+                </mat-card-content>
+            </mat-step>
+        </mat-horizontal-stepper>
+        <mat-progress-bar mode="indeterminate" [style.display]="isLoading ? 'block' : 'none'"></mat-progress-bar>
+    </mat-card>
+</div>

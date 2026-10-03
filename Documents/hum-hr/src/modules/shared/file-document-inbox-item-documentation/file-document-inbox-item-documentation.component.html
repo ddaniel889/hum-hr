@@ -1,0 +1,14 @@
+<mat-list-item>
+  <mat-icon matListAvatar class="fa-lg" fxLayout="row" fxLayoutAlign="center center" mat-list-icon fontSet="fa"
+    matBadge="{{this.item.countDocuments}}" matBadgePosition="before" matBadgeColor="warn"
+    matBadgeHidden="{{this.item.countDocuments <= 0}}" fontIcon="fa-folder-open"></mat-icon>
+  <span matLine><b>{{item?.documentationName}}</b></span>
+  <p matLine>
+    fecha envio: {{ item?.documentationDate | date :'dd/MM/yyyy'}}
+  </p>
+  <div class="floating-actions" fxlayout="row" fxlayoutgap="16px" *ngIf="this.showSignAll">
+    <button mat-icon-button (click)="signAllDocuments($event)" title="Firmar">
+      <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-signature"></mat-icon>
+    </button>
+  </div>
+</mat-list-item>

@@ -1,0 +1,57 @@
+<div class="new_leave_modal">
+  <div class="load-window new" *ngIf="isLoading">
+    <mat-progress-spinner mode="indeterminate" color="primary">
+    </mat-progress-spinner>
+  </div>
+  <div class="new_leave_modal-toolbar" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px" *ngIf="!isLoading">
+    <div class="new_leave_modal-title" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+      <mat-icon class="fa-lg primary" fontSet="fas" fontIcon="fa-cog"></mat-icon>
+      <div class="new_leave_modal-title_content" fxLayout="column" fxLayoutGap="10px">
+        <h2 class="primary">Configuración de Año para Licencias</h2>
+        <h4> {{ currentOu.name }} </h4>
+      </div>
+    </div>
+  </div>
+
+  <div class="new_leave_modal-content" fxLayout="column" fxLayoutGap="24px" style="padding: 10px 30px;" *ngIf="!isLoading">
+    <!-- Empresa selector -->
+    <div fxLayout="column" fxLayoutGap="8px">
+      <div class="ou-select" matRipple fxLayout="row" fxLayoutAlign="space-between center">
+      </div>
+    </div>
+
+    <!-- Crear año vacacional -->
+    <div fxLayout="column" fxLayoutGap="16px">
+      <h3 class="primary">Crear año vacacional</h3>
+
+      <div fxLayout="column" fxLayoutGap="8px">
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+          <span class="field-label">Seleccione el año vacacional que necesitas configurar</span>
+          <mat-icon style="cursor: pointer;" [matTooltip]="'Inicia el asistente para configurar desde cero un nuevo año vacacional en tu empresa.'" matTooltipPosition="above">
+              help_outline
+            </mat-icon>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+          <form class="px72" [formGroup]="yearForm" fxLayout="column" #editingForm="ngForm">
+
+            <mat-form-field class="new_leave_modal-field" fxLayput="row" fxLayoutAlign="start center" appearance="fill" fxFill>
+              <mat-label>Año</mat-label>
+              <input matInput style="display: none;" [matDatepicker]="fechaInicia" formControlName="startDateFormControl" [matDatepickerFilter]="yearFilter"
+                (dateChange)="onStartDateChange($event)">
+              <input matInput [value]="year" readonly>
+              <mat-datepicker-toggle matSuffix [for]="fechaInicia">
+              </mat-datepicker-toggle>
+              <mat-datepicker #fechaInicia startView="multi-year" (yearSelected)="chosenYearHandler($event, fechaInicia)">
+              </mat-datepicker>
+            </mat-form-field>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="new_leave_modal-actions" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="45px" style="padding: 16px 24px;" *ngIf="!isLoading">
+    <button mat-button color="basic" class="cancel_create-year" mat-dialog-close="">Cancelar</button>
+    <button mat-raised-button color="primary" [disabled]="!enableSaveButton" (click)="save()">Guardar</button>
+  </div>
+</div>

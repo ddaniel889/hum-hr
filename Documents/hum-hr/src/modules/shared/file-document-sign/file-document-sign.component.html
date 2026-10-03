@@ -1,0 +1,476 @@
+<div *ngIf="!signing" class="firmador">
+  <!-- BOTON FIRMAR-->
+  <button mat-raised-button class="content-action-main" color="accent" fxLayout="row" fxLayoutAlign="center center"
+    (click)="setSign()" [disabled]="certificates == null || signLoading">
+    <mat-icon *ngIf="!signLoading" class="fa-lg" fontSet="fa" fontIcon="fa-signature"></mat-icon>
+    <mat-icon *ngIf="signLoading" class="fa-xs fa-spin" fontSet="fa" fontIcon="fa-spinner-third"></mat-icon>
+    <span>Firmar</span>
+  </button>
+</div>
+<!-- PASOS FIRMADOR -->
+<div class="sign-cycle" [hidden]="!signing" [ngClass]="{'employer' : employerSign}">
+  <mat-divider></mat-divider>
+  <!-- LOAD-BAR-->
+  <mat-progress-bar mode="indeterminate" [style.display]="loading ? 'block' : 'none'">
+  </mat-progress-bar>
+  <mat-horizontal-stepper #stepper>
+    <!-- PASO 1 CERTIFICADO-->
+    <mat-step>
+      <!-- PASO 1 CON CERTIFICADO (CC)-->
+      <div class="sign-cycle-content" *ngIf="certificates?.length > 0" fxLayout="row">
+        <!-- PASO 1 CC TITULO-->
+        <div class="cycle-content-title-container" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px"
+          fxFlex="50%">
+          <button *ngIf="!employerSign" mat-icon-button color="basic"
+            (click)="signing=false; signingChanged.emit(false); this.stepper.reset()" title="Cerrar">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+          </button>
+          <div class="cycle-content-title" fxLayout="column" fxLayoutAlign="center start">
+            <h2 fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+              {{certificates?.length < 2 ? 'Tu Firma' : '¿Qué Firma querés usar?' }} <span class="help-hoverable"
+                *ngIf="selectedCertificate?.providerId == '2' && certificates?.length < 2"
+                (click)="$event.stopPropagation()">
+                <button mat-icon-button (click)="showHelpHint = true">
+                  <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-question-circle"></mat-icon>
+                </button>
+                <mat-hint *ngIf="showHelpHint && signing">
+                  <button class="close-desktop" mat-icon-button (click)="showHelpHint = false">
+                    <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+                  </button>
+                  <span>
+                    <span>
+                      Al presionar <b>"Continuar"</b> serás redirigido al <b>sitio de Nación</b> para
+                      poder firmar tu
+                      documento, no
+                      necesitas cerrar esta ventana, aunque si lo hubieras hecho no hay problema, lo
+                      peor que puede pasar
+                      es que tengas que ingresar nuevamente a Humanage ;)
+                    </span>
+                    <br>
+                    <br>
+                    <span>
+                      Alli se te solicitará tu <b>clave de acceso al portal de Nación</b> (la que
+                      hubieras generado luego
+                      de la carga de datos iniciales efectuada por el "OR") y ademas deberás contar
+                      con tu <b>clave de
+                        acceso OTP</b> disponible al momento de validar tu identidad.
+                    </span>
+                    <br>
+                    <br>
+                    <span>
+                      Puede que necesites volver a ingresar tu clave de Nación para finalizar el
+                      proceso de firma.
+                    </span>
+                    <br>
+                    <br>
+                    <span>
+                      Finalizada la operación en Nación, <b>Humanage validará el estado del
+                        documento</b> y te informará
+                      el
+                      resultado (si vuelves inmediatamente a Humanage luego de haber firmado en Nación
+                      el documento podría
+                      no estar actualizado, <b>aguarda unos instantes y vuelve a consultar</b> el
+                      estado de la firma).
+                    </span>
+                  </span>
+                  <button class="close-mobile" color="accent" mat-raised-button (click)="showHelpHint = false">
+                    Cerrar ayuda
+                  </button>
+                </mat-hint>
+                </span>
+            </h2>
+            <h4 *ngIf="certificates?.length > 1"> Seleccioná uno de la lista</h4>
+            <ng-container *ngIf="certificates?.length < 2">
+              <span>{{certificates[0].provider}}</span>
+              <span *ngIf="certificates[0].expirationDate && !certificates[0].isPending">
+                ({{certificates[0].expirationDate | date:'dd/MM/yyyy'}})
+              </span>
+            </ng-container>
+          </div>
+        </div>
+        <!-- PASO 1 CC ACCION-->
+        <div class="cycle-content-action" fxLayout.lg="row" fxLayout.xs="column" fxLayoutAlign="center center"
+          fxLayoutGap="16px">
+          <mat-form-field fxLayout="row" fxLayoutAlign="center center" fxFlex="100" *ngIf="certificates?.length > 1">
+            <mat-select placeholder="Certificado" [(ngModel)]="selectedCertificate">
+              <mat-option *ngFor="let certificate of certificates" [value]="certificate">
+                {{certificate.provider}}
+                <span *ngIf="certificate.expirationDate && !certificate.isPending">
+                  ({{certificate.expirationDate | date:'dd/MM/yyyy'}})
+                </span>
+              </mat-option>
+            </mat-select>
+            <span class="help-hoverable wide" matSuffix *ngIf="selectedCertificate?.providerId == '2'"
+              (click)="$event.stopPropagation()">
+              <button mat-icon-button (click)="showHelpHint = true">
+                <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-question-circle"></mat-icon>
+              </button>
+              <mat-hint *ngIf="showHelpHint && signing">
+                <button class="close-desktop" mat-icon-button (click)="showHelpHint = false">
+                  <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+                </button>
+                <span>
+                  <span>
+                    Al presionar <b>"Continuar"</b> serás redirigido al <b>sitio de Nación</b> para
+                    poder firmar tu
+                    documento, no
+                    necesitas cerrar esta ventana, aunque si lo hubieras hecho no hay problema, lo peor
+                    que puede pasar
+                    es que tengas que ingresar nuevamente a Humanage ;)
+                  </span>
+                  <br>
+                  <br>
+                  <span>
+                    Alli se te solicitará tu <b>clave de acceso al portal de Nación</b> (la que hubieras
+                    generado luego
+                    de la carga de datos iniciales efectuada por el "OR") y ademas deberás contar con tu
+                    <b>clave de
+                      acceso OTP</b> disponible al momento de validar tu identidad.
+                  </span>
+                  <br>
+                  <br>
+                  <span>
+                    Puede que necesites volver a ingresar tu clave de Nación para finalizar el proceso
+                    de firma.
+                  </span>
+                  <br>
+                  <br>
+                  <span>
+                    Finalizada la operación en Nación, <b>Humanage validará el estado del documento</b>
+                    y te informará el
+                    resultado (si vuelves inmediatamente a Humanage luego de haber firmado en Nación el
+                    documento podría
+                    no estar actualizado, <b>aguarda unos instantes y vuelve a consultar</b> el estado
+                    de la firma).
+                  </span>
+                </span>
+                <button class="close-mobile" color="accent" mat-raised-button (click)="showHelpHint = false">
+                  Cerrar ayuda
+                </button>
+              </mat-hint>
+            </span>
+          </mat-form-field>
+          <button mat-raised-button class="content-action-main" color="accent" fxLayout="row"
+            fxLayoutAlign="center center" [disabled]="!selectedCertificate || loading" (click)="setCertificate()">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-arrow-right"></mat-icon>
+            <span>continuar</span>
+          </button>
+        </div>
+      </div>
+      <!-- PASO 1 SIN CERTIFICADO SC-->
+      <div class="sign-cycle-content" *ngIf="certificates?.length === 0" fxLayout="row">
+        <!-- PASO 1 SC TITULO-->
+        <div class="cycle-content-title-container" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+          <div *ngIf="!haveExpiredCertif" class="cycle-content-title" fxLayout="column" fxLayoutAlign="center start">
+            <h3 *ngIf="!someCertificates">Lamentablemente no tenés un tipo de firma configurado</h3>
+            <h3 *ngIf="someCertificates">Lamentablemente no tenés configurado un tipo de firma que soporte esta acción
+            </h3>
+            <h4 *ngIf="!isSigner">Ya hemos avisado a RRHH y se pondrán en contacto contigo lo antes posible</h4>
+          </div>
+          <div *ngIf="haveExpiredCertif" class="cycle-content-title" fxLayout="column" fxLayoutAlign="center start">
+            <h3>Lamentablemente tenes tu certificado vencido</h3>
+            <h4 *ngIf="isEmployee() && useRenewCertificate">Podes renovarlo desde tu perfil</h4>
+            <h4 *ngIf="isEmployee() && !useRenewCertificate">Ya hemos avisado a RRHH y se pondrán en contacto contigo lo antes posible</h4>
+          </div>
+        </div>
+        <!-- PASO 1 SC ACCION-->
+        <div class="cycle-content-action" fxLayout.lg="row-reverse" fxLayout.xs="column" fxLayoutAlign="center center"
+          fxLayoutGap="16px">
+          <button *ngIf="!isSigner && useRenewCertificate && someCertificates " mat-raised-button class="content-action-main" color="primary" fxLayout="row"
+            fxLayoutAlign="center center" (click)="signing=false; signingChanged.emit(false); this.stepper.reset()"
+            [disabled]="loading">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-thumbs-up"></mat-icon>
+            <span>Entendido</span>
+          </button>
+          <button *ngIf="isSigner && !isEmployee()" mat-raised-button class="content-action-main" color="primary"
+            fxLayout="row" fxLayoutAlign="center center" (click)="openDeclareCertificate()" [disabled]="loading">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-signature"></mat-icon>
+            <span>Configurar Firma</span>
+          </button>
+        </div>
+      </div>
+    </mat-step>
+    <!-- PASO 2 CONFORMIDAD-->
+    <mat-step>
+      <div class="sign-cycle-content" fxLayout="row">
+        <!-- PASO 2 TITULO-->
+        <div class="cycle-content-title-container" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px"
+          fxFlex="50%">
+          <button mat-icon-button matStepperPrevious *ngIf="certificates.length > 1" [disabled]="loading"
+            title="Anterior">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-arrow-left"></mat-icon>
+          </button>
+          <button mat-icon-button color="basic"
+            (click)="signing=false; signingChanged.emit(false); this.stepper.reset()" *ngIf="certificates.length == 1"
+            title="Cerrar">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+          </button>
+          <div class="cycle-content-title" fxLayout="column" fxLayoutAlign="center start">
+            <h2>Vamos a firmar, ¿Estás conforme?</h2>
+            <h4>Seleccioná una opción</h4>
+          </div>
+        </div>
+        <!-- PASO 2 ACCION-->
+        <div class="cycle-content-action" fxLayout.lg="row-reverse" fxLayout.xs="column" fxLayoutAlign="center center"
+          fxLayoutGap="16px">
+          <button mat-raised-button class="content-action-main" color="accent" fxLayout="row"
+            fxLayoutAlign="center center" (click)="setAgreement()" [disabled]="loading">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-smile"></mat-icon>
+            <span>sí, estoy conforme</span>
+          </button>
+          <a mat-button class="content-action-side" (click)="setDisagreement()" [disabled]="loading">
+            <u>no lo estoy</u>
+          </a>
+        </div>
+      </div>
+    </mat-step>
+    <!-- PASO 3 MOTIVO DISCONFORMIDAD-->
+    <mat-step>
+      <div class="sign-cycle-content" fxLayout="row">
+        <!-- PASO 3 TITULO-->
+        <div class="cycle-content-title-container" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px"
+          fxFlex="50%">
+          <button mat-icon-button (click)="revertMotive()" title="Anterior">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-arrow-left"></mat-icon>
+          </button>
+          <div class="cycle-content-title" fxLayout="column" fxLayoutAlign="center start">
+            <h2>Estás por firmar en disconformidad</h2>
+            <h4>Por favor, indicá el motivo</h4>
+          </div>
+        </div>
+        <!-- PASO 3 ACCION-->
+        <div class="cycle-content-action" fxLayout.lg="row" fxLayout.xs="column" fxLayoutAlign="center center"
+          fxLayoutGap="16px">
+          <mat-form-field fxLayout="row" fxLayoutAlign="center center" fxFlex="100">
+            <mat-select placeholder="Motivo" [(ngModel)]="doc?.disagrementMotive.metadataValue"
+              name="nonConformityReason">
+              <mat-option *ngFor="let option of disagreementMotives" value="{{option.value}}">
+                {{option.description}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <button mat-raised-button class="content-action-main" color="accent" fxLayout="row"
+            fxLayoutAlign="center center"
+            [disabled]="loading || (doc?.disagrementMotive.metadataValue == '' && showMotiveDisagreement && disagreementSelected)"
+            (click)="setDisagreementMotive()">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-arrow-right"></mat-icon>
+            <span>continuar</span>
+          </button>
+        </div>
+      </div>
+    </mat-step>
+    <!-- PASO 4 CONFIRMACION-->
+    <mat-step>
+      <div class="sign-cycle-content" fxLayout="row">
+        <!-- PASO 4 TITULO-->
+        <div class="cycle-content-title-container" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px"
+          fxFlex="50%">
+          <button mat-icon-button (click)="revertDisagreement()" title="Anterior">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-arrow-left"></mat-icon>
+          </button>
+          <div class="cycle-content-title" fxLayout="column" fxLayoutAlign="center start">
+            <h2>Ingresá tu clave</h2>
+            <h4>Dale click al botón</h4>
+          </div>
+        </div>
+        <!-- PASO 4 ACCION-->
+        <div class="cycle-content-action" fxLayout.lg="row" fxLayout.xs="column" fxLayoutAlign="center center"
+          fxLayoutGap="16px">
+          <div fxLayout="column" fxLayoutAlign="center center">
+            <mat-form-field fxLayout="row" fxLayoutAlign="center center" fxFlex="100">
+              <input matInput [placeholder]="selectedCertificate?.providerId == '1' ? 'Clave de Certificado':
+            (selectedCertificate?.providerId == '4' || selectedCertificate?.providerId == '5' ? 'Clave de Login':
+            (selectedCertificate?.providerId == '6' ? 'Clave de Firma':'Clave'))" type="password"
+                [(ngModel)]="password">
+              <span class="help-hoverable" matSuffix (click)="$event.stopPropagation()"
+                *ngIf="selectedCertificate?.providerId == '1' || selectedCertificate?.providerId == '4' || selectedCertificate?.providerId == '5' || selectedCertificate?.providerId == '6'">
+                <button mat-icon-button (click)="showHelpHint = true">
+                  <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-question-circle"></mat-icon>
+                </button>
+                <mat-hint *ngIf="selectedCertificate?.providerId == '1'  && (showHelpHint && signing)">
+                  <button class="close-desktop" mat-icon-button (click)="showHelpHint = false">
+                    <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+                  </button>
+                  Es tu clave para firmar con certificado
+                  <button class="close-mobile" color="accent" mat-raised-button (click)="showHelpHint = false">
+                    Cerrar ayuda
+                  </button>
+                </mat-hint>
+                <mat-hint
+                  *ngIf="(selectedCertificate?.providerId == '4' || selectedCertificate?.providerId == '5')  && (showHelpHint && signing)">
+                  <button class="close-desktop" mat-icon-button (click)="showHelpHint = false">
+                    <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+                  </button>
+                  Es tu clave de acceso a Humanage
+                  <button class="close-mobile" color="accent" mat-raised-button (click)="showHelpHint = false">
+                    Cerrar ayuda
+                  </button>
+                </mat-hint>
+                <mat-hint *ngIf="selectedCertificate?.providerId == '6' && (showHelpHint && signing)">
+                  <button class="close-desktop" mat-icon-button (click)="showHelpHint = false">
+                    <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+                  </button>
+                  Es tu clave para firmar documentación, la cual has tenido que definir exclusivamente para ésto
+                  <div class="footer">
+                    <button class="close-mobile" color="accent" mat-raised-button (click)="showHelpHint = false">
+                      Cerrar ayuda
+                    </button>
+                    <button *ngIf="providerSelected && providerSelected.manageAction == 'createCertificatePassword'"
+                      mat-raised-button class="content-action-side" color="primary" fxLayout="row"
+                      fxLayoutAlign="center center" (click)="forgotPassword()" routerLink="" [disabled]="loading">
+                      Olvidé mi clave
+                    </button>
+                  </div>
+                </mat-hint>
+              </span>
+            </mat-form-field>
+          </div>
+          <button mat-raised-button class="content-action-main"
+            [ngClass]="(doc?.documentationTypeSelected?.isNonConformityAllowed && disagreementSelected) ? 'warning' : 'success'"
+            fxLayout="row" fxLayoutAlign="center center" (click)="onSigning()"
+            [disabled]="loading || !password || (doc?.disagrementMotive.metadataValue == '' && showMotiveDisagreement && disagreementSelected)">
+            <mat-icon class="fa-lg" fontSet="fa"
+              [fontIcon]="(doc?.documentationTypeSelected?.isNonConformityAllowed && disagreementSelected) ? 'fa-thumbs-down' : 'fa-thumbs-up'">
+            </mat-icon>
+            <span *ngIf="doc?.documentationTypeSelected?.isNonConformityAllowed">
+              {{(doc?.documentationTypeSelected?.isNonConformityAllowed && disagreementSelected) ?
+              'firmar en disconformidad' : 'firmar conforme'}}</span>
+            <span *ngIf="! doc?.documentationTypeSelected?.isNonConformityAllowed">
+              {{employerSign ? 'firmar' : 'firmar documento' }}
+            </span>
+          </button>
+        </div>
+      </div>
+    </mat-step>
+    <!-- PASO 5 SIN CERTIFICADO HABILITADO-->
+    <mat-step>
+      <div class="sign-cycle-content" *ngIf="selectedCertificate?.isPending" fxLayout="row">
+        <!-- PASO 5 SCH TITULO-->
+        <div class="cycle-content-title-container" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+          <button *ngIf="!employerSign" mat-icon-button color="basic"
+            (click)="signing=false; signingChanged.emit(false); this.stepper.reset()" title="Cerrar">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+          </button>
+          <div class="cycle-content-title" fxLayout="column" fxLayoutAlign="center start">
+            <h3>Para poder firmar tus documentos necesitás tener un tipo de firma habilitada. Te enviamos un correo
+              electrónico con las instrucciones.
+            </h3>
+          </div>
+        </div>
+        <!-- PASO 5 SCH ACCION-->
+        <div class="cycle-content-action" fxLayout.lg="row-reverse" fxLayout.xs="column" fxLayoutAlign="center center"
+          fxLayoutGap="16px">
+          <button mat-raised-button class="content-action-main" color="primary" fxLayout="row"
+            fxLayoutAlign="center center" (click)="signing=false; signingChanged.emit(false); this.stepper.reset()"
+            [disabled]="loading">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-thumbs-up"></mat-icon>
+            <span>Entendido</span>
+          </button>
+        </div>
+      </div>
+    </mat-step>
+    <!-- PASO 5' CERTIFICADO REQUIERE FECHA-->
+    <mat-step>
+      <div class="sign-cycle-content" fxLayout="row">
+        <!-- PASO 5' TITULO-->
+        <div class="cycle-content-title-container" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px"
+          fxFlex="50%">
+          <button mat-icon-button (click)="revertDisagreement()" title="Anterior">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-arrow-left"></mat-icon>
+          </button>
+          <div class="cycle-content-title" fxLayout="column" fxLayoutAlign="center start">
+            <h2>Ingresá la fecha de vencimiento</h2>
+            <h4>Dale click al botón</h4>
+          </div>
+        </div>
+        <!-- PASO 5' ACCION-->
+        <div class="cycle-content-action" fxLayout.lg="row" fxLayout.xs="column" fxLayoutAlign="center center"
+          fxLayoutGap="16px">
+          <mat-form-field fxLayout="row" fxLayoutAlign="center center" fxFlex="100">
+            <input matInput [matDatepicker]="picker" [min]="minDate" placeholder="Fecha Vencimiento dd/mm/aaaa"
+              [(ngModel)]="fechaVencimiento">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+          <button mat-raised-button class="content-action-main" color="accent" fxLayout="row"
+            fxLayoutAlign="center center" (click)="setExpirationDate()"
+            [disabled]="fechaVencimiento == null || fechaVencimiento < minDate">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-arrow-right"></mat-icon>
+            <span>continuar</span>
+          </button>
+        </div>
+      </div>
+    </mat-step>
+    <!-- PASO 6 AYUDA NUNCA USO CERTIFICADO TOKEN HUMANAGE-->
+    <mat-step>
+      <app-help-stepper [model]="helpStepperModel" (helpFinish)="finishHelp()" *ngIf="helpStepperModel">
+      </app-help-stepper>
+    </mat-step>
+    <mat-step>
+      <!-- PASO 7 CREACION DE LOTE-->
+      <div class="sign-cycle-content" fxLayout="row">
+        <!-- PASO 7 CREACION DE LOTE TITULO-->
+        <div class="cycle-content-title-container" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px"
+          fxFlex="50%">
+          <button mat-icon-button (click)="revertBatch()" title="Anterior" [disabled]="loading">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-arrow-left"></mat-icon>
+          </button>
+          <div class="cycle-content-title" fxLayout="column" fxLayoutAlign="center start">
+            <h2>Dale un nombre al lote</h2>
+            <h4>Enviá el lote para firmar en otro momento o iniciá Husigner y firmá ahora! </h4>
+          </div>
+        </div>
+        <!-- PASO 7 CREACION DE LOTE ACCION-->
+        <div class="cycle-content-action" fxLayout.lg="row" fxLayout.xs="column" fxLayoutAlign="center center"
+          fxLayoutGap="16px">
+          <mat-form-field fxLayout="row" fxLayoutAlign="center center" fxFlex="100">
+            <mat-label>Indica el nombre de este lote</mat-label>
+            <input matInput placeholder="Descripción" type="text" [(ngModel)]="batchDescription">
+          </mat-form-field>
+          <!-- boton enviar lote -->
+          <button mat-stroked-button class="content-action-main" color="accent" fxLayout="row"
+            fxLayoutAlign="center center" (click)="createBatch(false)" routerLink=""
+            [disabled]="loading || !batchDescription">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-external-link"></mat-icon>
+            <span>Enviar</span>
+          </button>
+          <!-- boton abrir y firmar -->
+          <button mat-raised-button class="content-action-main" color="accent" fxLayout="row"
+            fxLayoutAlign="center center" (click)="createBatch(true)" routerLink=""
+            [disabled]="loading || !batchDescription || !loginAutomatico">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-signature"></mat-icon>
+            <span>Firmar</span>
+          </button>
+        </div>
+      </div>
+    </mat-step>
+    <!-- PASO 8 INDICA QUE LA FIRMA ESTA EN PROCESO-->
+    <mat-step>
+      <div class="sign-cycle-content" fxLayout="row">
+        <!-- PASO 8 TITULO-->
+        <div class="cycle-content-title-container" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px"
+          fxFlex="50%">
+          <div class="cycle-content-title" fxLayout="column" fxLayoutAlign="center start">
+            <h2>Vamos a demorar un poco en firmar.</h2>
+            <h3>Podés cerrar ésta ventana y seguir con tus tareas.</h3><br>
+            <h4>No te preocupes nosotros seguiremos con el proceso de firma igualmente.</h4>
+          </div>
+        </div>
+        <!-- PASO 8 ACCION-->
+        <div class="cycle-content-action" fxLayout.lg="row" fxLayout.xs="column" fxLayoutAlign="center center"
+          fxLayoutGap="16px">
+          <button mat-raised-button class="content-action-main" color="accent" fxLayout="row"
+            fxLayoutAlign="center center" (click)="close()">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+            <span>Cerrar</span>
+          </button>
+        </div>
+      </div>
+    </mat-step>
+  </mat-horizontal-stepper>
+</div>
+
+<app-certificate-declaration *ngIf="isCertificateDeclarationOpen" [certificateType]="certificateType()"
+  [onlyMultipleSign]="onlyMultiple()" (addFinish)="closeAdd($event)">
+</app-certificate-declaration>

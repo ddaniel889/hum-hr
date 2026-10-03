@@ -1,0 +1,255 @@
+@import '../../../../assets/styles/img-management';
+
+app-file-document-view {
+  position: relative;
+
+  .new-container {
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: auto;
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+
+    app-file-document-upload {
+      display: flex;
+      height: 100%;
+      flex-direction: column;
+      width: 40%;
+      min-width: 40%;
+
+      app-cs-cropper-control {
+        height: 100%;
+        padding: 16px;
+
+        .cropper-area {
+          justify-content: space-between;
+
+          image-cropper {
+            height: calc(100% - 36px - 16px) !important;
+            padding: 0 !important;
+            overflow: visible !important;
+          }
+        }
+      }
+    }
+
+    app-upload-form {
+      height: calc(100% - 97px);
+      width: 100%;
+      margin: 0 !important;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      flex-basis: auto;
+
+      .dropzone {
+        flex-grow: 1;
+        flex-shrink: 1;
+        margin: 16px;
+        width: unset !important;
+      }
+
+      .file-upload-list {
+        margin-bottom: 0;
+        overflow-y: auto;
+        position: relative;
+        padding: 0 16px;
+        width: 100%;
+        max-width: unset;
+
+        .mat-subheader {
+          position: sticky !important;
+          width: 100%;
+          z-index: 1;
+          top: -1px !important;
+          margin-bottom: 16px;
+        }
+      }
+    }
+
+    .firmador {
+      position: relative;
+
+      button {
+        pointer-events: all;
+      }
+    }
+  }
+
+  .formio-send-fixed {
+  position: sticky;
+  bottom: 10px;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  padding: 12px;
+  pointer-events: none;
+}
+
+.formio-send-fixed #btn-enviar {
+  pointer-events: auto;
+}
+
+  .preview-content {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    h4 {
+      text-align: center;
+      line-height: 1.5;
+
+    }
+  }
+
+  .upload-indications {
+    display: none !important
+  }
+
+  app-pdf-wrapper:not([hidden]) {
+    display: grid;
+    width: 100%;
+    height: 100%;
+
+    .cardinal-pdf-viewer-container {
+      overflow: unset !important;
+    }
+  }
+
+  .view-container {
+    height: 100%;
+    display: block;
+
+    mat-toolbar.side-bar {
+      &.upload {
+        position: absolute;
+        top: -65px;
+        z-index: 12;
+      }
+
+      .mat-toolbar-row {
+        justify-content: space-between;
+
+
+        .toolbar-actions {
+          button {
+            margin: 0 4px;
+          }
+        }
+      }
+    }
+
+    .view-content {
+      display: flex;
+      flex-direction: column;
+      height: calc(100% - 64px);
+      position: relative;
+
+      .toggle-buttons-container {
+        height: 64px;
+        padding: 0 8px;
+      }
+
+      .zip {
+        position: absolute;
+        top: 0;
+
+        &+app-pdf-wrapper {
+          height: 0 !important;
+        }
+      }
+    }
+  }
+}
+
+app-home-file-documents {
+
+  app-file-document-state.bottom-container,
+  .view-container app-file-document-state {
+    display: none;
+  }
+}
+
+app-file-document-view-dialog .bottom-container {
+  display: none;
+}
+
+.formio-hint {
+  position: absolute;
+  bottom: 100%;
+  line-height: 20px;
+  max-width: 430px;
+  padding: 8px 16px;
+  border-radius: 30px;
+  z-index: 1;
+  margin: 0 auto;
+  left: 0;
+  right: 0;
+  text-align: center;
+  animation: pulse 2s infinite;
+}
+
+
+@mixin fileDocumentViewComponent($bg-card, $bg-background, $bg-dark-blue, $primary, $divider, $text-main) {
+
+  app-file-document-view {
+    .new-container {
+      app-file-document-upload {
+        border-right: 1px solid $divider;
+      }
+
+      app-upload-form {
+        .file-upload-list {
+          .mat-subheader {
+            background: $bg-card;
+          }
+
+          mat-list-item {
+            background: $bg-background !important;
+          }
+        }
+      }
+    }
+
+    .preview-content {
+      background: $bg-dark-blue;
+
+      h4 {
+        color: $text-main;
+      }
+    }
+
+    .view-container {
+      background: $bg-card;
+
+      mat-toolbar.side-bar {
+        border-bottom: 1px solid $divider;
+      }
+    }
+  }
+
+  .formio-hint {
+    background: $primary;
+    color: $text-main;
+  }
+}
+
+.formio-hint {
+  position: absolute;
+  bottom: 100%;
+  line-height: 20px;
+  max-width: 430px;
+  background: #3F51B5;
+  padding: 8px 16px;
+  border-radius: 30px;
+  color: #fff;
+  z-index: 1;
+  margin: 0 auto;
+  left: 0;
+  right: 0;
+  text-align: center;
+  animation: pulse 2s infinite;
+}

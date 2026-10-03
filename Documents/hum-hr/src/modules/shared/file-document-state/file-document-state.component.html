@@ -1,0 +1,124 @@
+<mat-chip-list>
+    <!-- TODO: SHOW DOCUMENT EMPLOYER STATE -->
+    <!-- Show Archivar-->
+    <mat-basic-chip disabled class="unseen" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px" *ngIf="this.item?.isArchiveSequence() && !(this.item?.isCanceled())">
+        <mat-icon  fontSet="fa" fontIcon="fa-archive">
+        </mat-icon>
+        <span>Archivado</span>
+    </mat-basic-chip>
+
+    <!-- Show Pendiente de Firmar Firmante-->
+    <mat-basic-chip disabled class="not-signed-employer" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px" *ngIf="!(this.item?.isArchiveSequence()) && !(this.item?.isEmployerViewPending()) && this.item?.isEmployerActionPending() && !(this.item?.isCanceled())">
+        <mat-icon  fontSet="fa" fontIcon="fa-signature">
+        </mat-icon>
+        <span>No firmado firmante</span>
+    </mat-basic-chip>
+
+    <!-- Show firmado sin estado Empleado -->
+    <mat-basic-chip disabled class="signed-ok" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px" *ngIf="!(this.item?.isArchiveSequence()) &&  this.item?.employeeStateClass == 'firmado'  && !(this.item?.isEmployerActionPending()) && !(this.item?.isCanceled())"
+        matTooltip="Firmado el {{this.item?.EmployeeSignatureDate() | date :'dd/MM/yyyy'}}">
+        <mat-icon  fontSet="fa" fontIcon="fa-smile">
+        </mat-icon>
+        <span *ngIf="this.showSmallChips">Firmado</span>
+        <span *ngIf="!this.showSmallChips">Firmado:
+      {{this.item?.EmployeeSignatureDate() | date :'dd/MM/yyyy'}}</span>
+    </mat-basic-chip>
+
+    <!-- Show firmado conforme Empleado -->
+    <mat-basic-chip disabled class="signed-ok" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px" *ngIf="!(this.item?.isArchiveSequence()) &&  this.item?.employeeStateClass == 'firmado-conforme'  && !(this.item?.isEmployerActionPending())"
+        matTooltip="Firmado Conforme el {{this.item?.EmployeeSignatureDate() | date :'dd/MM/yyyy'}}">
+        <mat-icon  fontSet="fa" fontIcon="fa-smile">
+        </mat-icon>
+        <span *ngIf="this.showSmallChips">Conforme</span>
+        <span *ngIf="!this.showSmallChips">Firmado Conforme:
+      {{this.item?.EmployeeSignatureDate() | date :'dd/MM/yyyy'}}
+    </span>
+    </mat-basic-chip>
+
+    <!-- Show firmado no-conforme Empleado -->
+    <mat-basic-chip disabled class="signed-not-ok" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px" *ngIf="!(this.item?.isArchiveSequence()) &&  this.item?.employeeStateClass == 'firmado-no-conforme'  && !(this.item?.isEmployerActionPending())"
+        matTooltip="Firmado No Conforme el {{this.item?.EmployeeSignatureDate() | date :'dd/MM/yyyy'}}">
+        <mat-icon  fontSet="fa" fontIcon="fa-frown">
+        </mat-icon>
+        <span *ngIf="this.showSmallChips">No conforme</span>
+        <span *ngIf="!this.showSmallChips">Firmado no conforme:
+      {{this.item?.EmployeeSignatureDate() | date :'dd/MM/yyyy'}}
+      <span *ngIf="this.item?.employeeDocumentSignData?.motiveDisagreement" id='motiveDisagreement'> -
+        {{this.item?.employeeDocumentSignData?.motiveDisagreement}}</span>
+        </span>
+    </mat-basic-chip>
+
+    <!-- Chip de Consultas  -->
+    <mat-basic-chip disabled class="chat-chip" [class.thread-open]="!this.item?.threadClosed" [class.thread-closed]="this.item?.threadClosed" fxLayout="row" fxLayoutAlign="center center" *ngIf="this.useDocComments && this.item?.hasMessage" matTooltip="{{ this.item?.threadClosed ? 'Consulta cerrada' : 'Consulta abierta' }}">
+      <div class="chat-icon-container">
+        <mat-icon fontSet="fa" fontIcon="fa-comment"></mat-icon>
+        <span *ngIf="!this.item?.threadClosed" class="status-dot-badge"></span>
+      </div>
+    </mat-basic-chip>
+
+    <!-- Show pendiente de firmar Empleado -->
+    <mat-basic-chip disabled class="not-signed" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px" matTooltip="Listo para Firmar" *ngIf="!(this.item?.isArchiveSequence()) && this.item?.employeeStateClass == 'no-firmado' && this.item?.isEmployeeActionPending()  && !(this.item?.isEmployerActionPending()) && !this.item?.isUploadPending() && !(this.item?.isCanceled())">
+        <mat-icon  fontSet="fa" fontIcon="fa-signature">
+        </mat-icon>
+        <span>No firmado</span>
+    </mat-basic-chip>
+
+    <!-- Show pendiente de subida Empleado -->
+    <mat-basic-chip disabled class="not-signed" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px" matTooltip="Listo para adjuntar contenido" *ngIf="this.item?.isUploadPending() && !(this.item?.isCanceled())">
+        <mat-icon  fontSet="fa" fontIcon="fa-paperclip">
+        </mat-icon>
+        <span>Sin adjunto</span>
+    </mat-basic-chip>
+
+     <!-- Show No visto por Empleado -->
+     <mat-basic-chip disabled class="unseen" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px" *ngIf="!(this.item?.isArchiveSequence()) && this.item?.isEmployeeViewPending() && !(this.item?.isEmployerActionPending()) && !(this.item?.isCanceled())">
+      <mat-icon  fontSet="fa" fontIcon="fa-eye-slash">
+      </mat-icon>
+      <span>No visto</span>
+  </mat-basic-chip>
+
+  <!-- Show visto por Empleado -->
+  <mat-basic-chip disabled class="seen" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px" *ngIf="!(this.item?.isArchiveSequence()) &&  !this.item?.isEmployeeViewPending()  && !(this.item?.isEmployerActionPending()) && !(this.item?.isCanceled()) && this.sign==undefined"
+      matTooltip="{{this.item?.EmployeeViewedDate() | date :'dd/MM/yyyy'}}">
+      <mat-icon  fontSet="fa" fontIcon="fa-eye">
+      </mat-icon>
+      <span *ngIf="this.showSmallChips">Visto</span>
+      <span *ngIf="!this.showSmallChips">Visto:
+    {{this.item?.EmployeeViewedDate() | date :'dd/MM/yyyy'}}</span>
+  </mat-basic-chip>
+
+  <!-- Show Documento cancelado -->
+  <mat-basic-chip disabled class="signed-ok cancelled" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px" *ngIf="this.item?.isCanceled()" matTooltip="Rechazado">
+    <mat-icon  fontSet="fa" fontIcon="fa-times-circle">
+    </mat-icon>
+    <span>Rechazado</span>
+</mat-basic-chip>
+
+<!-- Show Pendiente de Ver Firmante-->
+<mat-basic-chip disabled class="unseen-employer" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px" *ngIf="!(this.item?.isArchiveSequence()) && this.item?.isEmployerViewPending() && !(this.item?.isCanceled())">
+    <mat-icon  fontSet="fa" fontIcon="fa-eye-slash">
+    </mat-icon>
+    <span>No visto firmante</span>
+</mat-basic-chip>
+
+<mat-basic-chip disabled (click)="verEvidenciasdeFirmas(this.item)" *ngIf="this.item?.documentFileSignaturesData?.length>0 && this.item?.documentFileSignaturesData[0].proveDocumentId != undefined"   matTooltip="Mostrar Evidencias de Firmas">
+<mat-icon  fontSet="fa" fontIcon="fa-file-certificate"></mat-icon>
+
+</mat-basic-chip>  
+
+   <!-- Show evidencia Empleado -->
+   <mat-basic-chip disabled class="signed-ok" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px" *ngIf="this.sign?.signedBy == 'Empleado'"
+   matTooltip="Firmado el {{this.sign?.signedDate | date :'dd/MM/yyyy'}}">
+   <mat-icon  fontSet="fa" fontIcon="fa-smile">
+   </mat-icon>   
+   <span>Firmado  {{this.sign?.signedDate | date :'dd/MM/yyyy'}}
+</span>
+</mat-basic-chip>
+
+<mat-basic-chip disabled  fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="4px" matTooltip="Firmado el {{this.sign?.signedDate | date :'dd/MM/yyyy'}}" *ngIf="this.sign?.signedBy == 'Firmante'">
+  <mat-icon  fontSet="fa" fontIcon="fa-check">
+  </mat-icon>
+  <span>Firmado el {{this.sign?.signedDate | date :'dd/MM/yyyy'}}</span>
+</mat-basic-chip>
+
+</mat-chip-list>

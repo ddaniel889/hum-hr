@@ -1,0 +1,113 @@
+@import '../../../../assets/styles/img-management';
+
+
+app-help-index {
+  mat-horizontal-stepper.help-stepper.mat-stepper-horizontal {
+    width: 100%;
+    height: auto;
+    overflow: hidden;
+
+    .mat-horizontal-content-container {
+      padding: 0;
+
+      mat-card.mat-card.help-card {
+        box-shadow: none;
+        padding: 0;
+        border-radius: 0;
+        height: 100%;
+        width: 100%;
+
+        .mat-card-header {
+          display: none
+        }
+
+        .mat-card-content {
+          margin-bottom: 0;
+          display: block !important;
+          flex: 1 1 100%;
+          max-height: 100%;
+
+          .help-header {
+            height: 64px;
+            padding: 0 16px;
+
+            h3 {
+              font-size: 20px;
+            }
+
+            h3,
+            h4 {
+              margin: 0;
+            }
+          }
+
+          .help-content {
+            height: calc(100% - 56px);
+            padding: 0 72px 16px;
+            justify-content: center;
+            width: calc(100vw / 3);
+            min-width: 720px;
+
+            h4 {
+              margin-top: 0 !important;
+            }
+
+            ul {
+              margin-top: 0;
+              display: flex;
+              flex-direction: column;
+              padding-inline-start: 13px;
+
+              li {
+                font-weight: 400;
+
+                &+li {
+                  margin-top: 3%;
+                }
+
+                b.tip-text {
+                  margin-left: -13px;
+                  margin-top: 3%;
+                }
+              }
+            }
+
+            .husigner-icon {
+              height: 128px;
+            }
+          }
+
+          mat-action-list.mat-list.mat-list-base.mat-action-list {
+            margin-bottom: 16px;
+
+            button.option-btn.mat-list-item {
+              padding: 0px 56px;
+            }
+          }
+        }
+
+        .mat-card-footer {
+          min-height: 56px;
+          padding: 0 16px 16px;
+          margin: 0;
+        }
+      }
+    }
+  }
+}
+
+@mixin helpIndex($bg-card) {
+  app-help-index {
+    mat-horizontal-stepper.help-stepper.mat-stepper-horizontal {
+      .mat-horizontal-content-container {
+        mat-card.mat-card.help-card {
+          background: $bg-card;
+
+          .mat-card-footer {
+            background: $bg-card;
+          }
+        }
+      }
+    }
+  }
+}

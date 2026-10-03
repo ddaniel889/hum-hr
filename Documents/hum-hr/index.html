@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <meta charset="utf-8">
+    <title>Humanage Hr</title>
+    <base href="/">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <script src="https://kit.fontawesome.com/d477f380a7.js" crossorigin="anonymous"></script>
+</head>
+<!-- body class name theme change -->
+
+<body hidden>
+    <div id="noCompatible">
+        <div class="ux-modal">
+            <div class="card">
+                <div class="main-title">Lamentablemente tu navegador no es compatible :(</div>
+                <div class="sub-title">Te recomendamos que utilices la última versión de Google Chrome</div>
+                <div class="cad-row">
+                    <a href="https://www.google.com/intl/es-419/chrome/" target="_blank" class="icon big chr"></a>
+                </div>
+                <div class="sub-title">o cualquiera de estos navegadores</div>
+                <div class="cad-row">
+                    <a href="https://www.mozilla.org/es-AR/firefox/new/" target="_blank" class="icon fir"></a>
+                    <div class="divider"></div>
+                    <a href="https://www.microsoft.com/es-es/windows/microsoft-edge" target="_blank"
+                        class="icon edg"></a>
+                    <div class="divider"></div>
+                    <a href="https://www.opera.com/es-419/download" target="_blank" class="icon ope"></a>
+                    <div class="divider"></div>
+                    <a href="https://www.apple.com/la/safari/" target="_blank" class="icon saf"></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById("noCompatible").style.display = "none";
+        const ua = navigator.userAgent;
+        var tem;
+        var M = ua.match(/(Googlebot|opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
+        if (/trident/i.test(M[1])) {
+            // estoy en ie no funciona angular
+            document.getElementById("noCompatible").style.display = "block";
+        }
+    </script>
+    <app-root>
+        <div class="intro-spinner"></div>
+    </app-root>
+
+    <!-- Google Analytics Object -->
+    <script>
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r;
+            i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date();
+            a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+            a.async = 1;
+            a.src = g;
+            m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+    </script>
+    <!-- Start of HubSpot Embed Code -->
+    <script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/5707360.js"></script>
+    <!-- End of HubSpot Embed Code -->
+</body>
+
+</html>

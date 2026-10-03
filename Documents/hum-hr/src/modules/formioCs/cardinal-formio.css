@@ -1,0 +1,127 @@
+.cardinal-formio {
+  width: 100%;
+  height: 100%;
+}
+
+.cardinal-formio div:not(.alert-success) {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.cardinal-formio .alert {
+  display: none !important
+}
+
+.cardinal-formio .formio-iframe {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: calc(90vh - 128px) !important;
+  border: none !important;
+}
+
+.formio-form-pdf button.btn.btn-primary {
+  display: none;
+}
+
+.formio-form-pdf span.btn.btn-secondary {
+  position: absolute !important;
+  z-index: 1;
+  top: 14px !important;
+  right: 64px !important;
+  background: rgba(255, 255, 255, .6);
+  transition: background .2s ease;
+  border: none;
+  color: rgba(0, 0, 0, .87);
+  font-size: 20px;
+  line-height: 20px;
+  height: 40px;
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+}
+
+
+
+.formio-form-pdf span.btn.btn-secondary+span.btn.btn-secondary {
+  right: 16px !important;
+}
+
+.cardinal-formio.close-action .formio-form-pdf span.btn.btn-secondary {
+  right: 122px !important;
+}
+
+.cardinal-formio.close-action .formio-form-pdf span.btn.btn-secondary+span.btn.btn-secondary {
+  right: 72px !important;
+}
+
+.cardinal-formio .has-error {
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  height: 64px;
+  padding: 16px;
+  color: transparent;
+  pointer-events: none;
+}
+
+.cardinal-formio .has-error.null {
+  display: none !important;
+}
+
+.cardinal-formio .has-error p {
+  display: none !important;
+}
+
+.cardinal-formio .has-error::before {
+  content: '* Revisa los datos ingresados';
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  height: 32px;
+  line-height: 32px;
+  color: #a94442;
+  background-color: #f2dede;
+  border-radius: 16px;
+  padding: 0 16px;
+  font-size: 12px;
+}
+
+.cardinal-formio .null.has-success {
+  position: absolute !important;
+  top: 0;
+  pointer-events: none;
+}
+
+.cardinal-formio .form-group.has-feedback {
+  position: absolute!important;
+  top: 0;
+  pointer-events: none;
+}
+
+
+.formio-form-pdf span.btn.btn-secondary:hover {
+  background: rgba(255, 255, 255, 1);
+  transition: background .2s ease;
+}
+
+@media (max-width: 599px) {
+  .cardinal-formio {
+    position: relative;
+  }
+
+  .formio-form-pdf span.btn.btn-secondary {
+    background: rgba(255, 255, 255, 1) !important;
+    left: calc(50% - 44px) !important;
+  }
+
+  .formio-form-pdf span.btn.btn-secondary+span.btn.btn-secondary {
+    left: calc(50% + 4px) !important;
+  }
+}
+
+.formio-errors {
+  display: none !important;
+}

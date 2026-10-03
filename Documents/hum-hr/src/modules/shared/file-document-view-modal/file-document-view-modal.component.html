@@ -1,0 +1,69 @@
+<div class="employee-deetail-dialog" mat-dialog-content>
+  <!-- LOADER -->
+  <span class="view-container" *ngIf="doc">
+    <mat-toolbar class="view-toolbar">
+      <mat-toolbar-row>
+        <!-- document-selected-header-info -->
+        <div class="view-description">
+          <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-file">
+          </mat-icon>
+          <div class="view-description-text" fxLayout="column" fxLayoutAlign="center start">
+            <h3 matLine [title]="doc.documentationTypeName"> {{ doc.documentationTypeName}}</h3>
+            <h5 matLine> Id: {{doc.id}} - Fecha Documento: {{ doc.documentDate | date :'dd/MM/yyyy' }}</h5>
+          </div>
+        </div>
+        <div class="view-actions">
+          <div fxLayout="row" fxLayoutAlign="end center">
+            <app-file-document-state [item]="doc" [showSmallChips]="false" *ngIf="data.showDocumentState">
+            </app-file-document-state>
+            <div class="divider-vert"></div>
+            <!-- PDF-controls -->
+            <app-pdf-wrapper-controls [pdfWrapper]="pdfWrapper" [showPrint]="true" [showSave]="true"
+              [disabled]="workInProgress || disableButtons" [showZoomIn]="filePdf" [showZoomOut]="filePdf" [(showRemove)]="showRemove"
+              (OnRemoveFile)="removeFile()">
+            </app-pdf-wrapper-controls>
+            <!--cancel-document -->
+            <button mat-icon-button *ngIf="canCancel && !isCanceled()" (click)="cancelFileDocument()"
+              title="Rechazar documento" [disabled]="workInProgress || disableButtons">
+              <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-file-times"></mat-icon>
+            </button>
+            <!-- delete-document -->
+            <button *ngIf="canDelete" mat-icon-button (click)="deleteFileDocument()" title="Eliminar documento"
+              [disabled]="workInProgress || disableButtons">
+              <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-trash"></mat-icon>
+            </button>
+            <!-- metadata-view -->
+            <button mat-icon-button *ngIf="showData"  (click)="this.showMetadatos()" title="Ver más Datos" [disabled]="workInProgress || disableButtons">
+              <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-file-alt"></mat-icon>
+            </button>
+            <!-- view rejected motive -->
+            <button id="btnViewMotie" mat-icon-button (click)="canceledChapa = true" title="Ver Motivo de Rechazo"
+              *ngIf="isCanceled() && !canceledChapa">
+              <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-eye"></mat-icon>
+            </button>
+            <div class="divider-vert"></div>
+            <!-- close-modal-only -->
+            <button mat-icon-button (click)="dialogClose()" title="Cerrar" [disabled]="workInProgress">
+              <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times"></mat-icon>
+            </button>
+          </div>
+        </div>
+      </mat-toolbar-row>
+    </mat-toolbar>
+    <span class="view-content">
+      <mat-progress-bar mode="indeterminate" [style.display]="(workInProgress) ? 'block' : 'none'">
+      </mat-progress-bar>
+      <!-- employee-pending-upload -->
+      <app-chapa [className]="'upload-bk'" [text]="'Documento pendiente de carga'"
+        *ngIf="doc && doc.isUploadPending()">
+      </app-chapa>
+      <!-- PDF-viewer -->
+      <app-pdf-wrapper [showControls]="false" #pdfWrapper [doc]="doc" [file]="filePdf" [fileName]="fileName"
+        [hidden]="canceledChapa" [autoView]="false">
+      </app-pdf-wrapper>
+      <app-chapa [className]="'info-empty'" [icon]="'fa-file-times'" [text]="'El Documento ha sido Rechazado'"
+        [subText]="doc.rejectedMotive ? 'Motivo:' : ''" [infoExtra]="doc.rejectedMotive" [actionIcon]="'fa-eye'"
+        [actionText]="'Ver documento'" (actionClick)="canceledChapa = false;" *ngIf="canceledChapa"></app-chapa>
+    </span>
+  </span>
+</div>

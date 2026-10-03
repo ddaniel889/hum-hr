@@ -1,0 +1,14 @@
+<div fxLayout="column" fxLayoutAlign="center stretch" >
+    <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+        <mat-select placeholder="Escaner" [(ngModel)]="selectedSource">
+            <mat-option *ngFor="let scanner of sources" [value]="scanner">
+                {{scanner.name}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+    <div fxLayout="row-reverse" fxLayoutAlign="start center" fxFlex="grow">
+        <button mat-raised-button color="primary" (click)="finish()" [disabled]="canFinish()">Generar Archivo</button>
+        <button mat-button color="primary" (click)="acquireImage()" [disabled]="!selectedSource">Escanear</button>
+    </div>
+    <div [id]="containerId"></div>
+</div>

@@ -1,0 +1,36 @@
+<div fxLayout="row" fxFill>
+  <div class="inbox-container" fxFlex.lt-md="100" fxFlex.gt-sm="30" fxFill>
+    <mat-toolbar class="inbox-toolbar" color="grey">
+      <mat-toolbar-row>
+        <div class="mat-avatar" fxLayout="row" fxLayoutAlign="space-between center">
+          <div class="toolbar-line container-ou" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+            <mat-icon  class="fa-lg" fontSet="fa" fontIcon="fa-folder-open">
+            </mat-icon>
+            <div class="title" fxLayout="column" fxLayoutAlign="center start">
+              <h3>Documentación en Curso</h3>
+            </div>
+          </div>
+        </div>
+        <button mat-icon-button title="Actualizar">
+          <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-redo" (click)="this.refresh()"></mat-icon>
+        </button>
+      </mat-toolbar-row>
+    </mat-toolbar>
+    <mat-divider [inset]="true"></mat-divider>
+    <div class="scroll-infinite">
+      <mat-progress-bar mode="indeterminate" [style.display]="!loaded ? 'block' : 'none'"></mat-progress-bar>
+      <mat-accordion>
+        <app-file-document-inbox-block-ou *ngFor="let ou of organizationalUnits" [organizationalUnit]="ou"
+          [items]="this.items" [showSignAll]=false [expanded]="ou.id == this.ouSelected.id"
+          (openProcess)="openProcess($event)" (click)="changeExpander(ou)"
+          [progressBarDisplay]="this.progressChildDisplay(ou)">
+        </app-file-document-inbox-block-ou>
+      </mat-accordion>
+    </div>
+  </div>
+  <mat-divider [vertical]="true"></mat-divider>
+  <div class="detail" [ngClass]="detailClass()" fxFlex.lt-md="100" fxFlex.gt-sm="70" fxFill>
+    <app-file-document-list [floatingMode]="true" (goBackEvent)="this.setIsOpen(false)" [item]="this.selectedProcess" [showSign]=false [showDocumentState]=true
+      [showSearchFilter]=false [showDocumentStateBottom]=false [showDocumentMetadata]=true></app-file-document-list>
+  </div>
+</div>

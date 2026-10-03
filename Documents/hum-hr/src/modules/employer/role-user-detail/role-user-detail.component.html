@@ -1,0 +1,360 @@
+<form [formGroup]="editForm" (keydown.enter)="save()" (keydown.escape)="cancel()" fxFill fxFlex="100">
+  <div class="side">
+    <div class="toolbar" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+      <div class="header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-info-circle">
+        </mat-icon>
+        <h3>Detalle del Actor</h3>
+      </div>
+      <!-- cerrar detalles -->
+      <button mat-icon-button fxLayout="row" fxLayoutAlign="center center" (click)="close()">
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-times">
+        </mat-icon>
+      </button>
+    </div>
+    <!-- listado detalles -->
+    <div class="container">
+      <!-- cabecera detalles -->
+      <div class="role-resume" fxLayout="column">
+        <!-- role -->
+        <div class="line" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="16px">
+          <div class="header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+            <mat-icon class="fa-lg" fontSet="fas" [fontIcon]="roleUser?.icon">
+            </mat-icon>
+            <div class="info" fxLayout="column">
+              <h6>Rol</h6>
+              <h4>{{roleUser?.roleName}}</h4>
+            </div>
+          </div>
+        </div>
+        <!-- name -->
+        <div class="line editable" fxLayout="row" fxLayoutAlign="space-between center"
+          *ngIf="selectedEditingControl !== 'fullName'">
+          <div class="header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-user">
+            </mat-icon>
+            <div class="info" fxLayout="column">
+              <h6>Nombre</h6>
+              <h4>{{roleUser?.firstName}} {{roleUser?.lastName}}</h4>
+            </div>
+          </div>
+          <button mat-icon-button fxLayout="row" fxLayoutAlign="center center" (click)="editControl('fullName')">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-pen">
+            </mat-icon>
+          </button>
+        </div>
+        <div class="edition-line" *ngIf="selectedEditingControl === 'fullName'">
+          <mat-form-field>
+            <mat-icon matPrefix fxLayout="row" fxLayoutAlign="center center" class="fa-lg" fontSet="fas"
+              fontIcon="fa-user">
+            </mat-icon>
+            <input matInput="matInput"
+              [placeholder]="editForm.controls['lastName'].hasError('required') ? 'Es un dato requerido' : 'Ingresa el nuevo apellido'"
+              formControlName="lastName" required [readOnly]="saving" />
+          </mat-form-field>
+          <mat-form-field>
+            <mat-icon matPrefix fxLayout="row" fxLayoutAlign="center center" class="fa-lg" fontSet="fas"
+              fontIcon="fa-user">
+            </mat-icon>
+            <input matInput="matInput"
+              [placeholder]="editForm.controls['firstName'].hasError('required') ? 'Es un dato requerido' : 'Ingresa el nuevo nombre'"
+              formControlName="firstName" required [readOnly]="saving" />
+          </mat-form-field>
+          <div class="actions" fxLayout="row-reverse" fxLayoutGap="8px">
+            <button mat-button color="accent" (click)="save()" [disabled]="saving">
+              Guardar
+            </button>
+            <button mat-button (click)="cancel()" [disabled]="saving">
+              Cancelar
+            </button>
+          </div>
+          <mat-progress-bar mode="indeterminate" *ngIf="saving"> </mat-progress-bar>
+        </div>
+        <!-- user -->
+
+        <div class="line editable" fxLayout="row" fxLayoutAlign="space-between center"
+          *ngIf="roleUser?.nickName != roleUser?.mail">
+          <div class="header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-id-badge">
+            </mat-icon>
+            <div class="info" fxLayout="column">
+              <h6>Usuario</h6>
+              <h4>{{roleUser?.nickName}}</h4>
+            </div>
+          </div>
+        </div>
+
+        <div class="line editable" fxLayout="row" fxLayoutAlign="space-between center"
+          *ngIf="selectedEditingControl !== 'nickName' && useSaml">
+          <div class="header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-id-badge">
+            </mat-icon>
+            <div class="info" fxLayout="column">
+              <h6>Identificación Delegada</h6>
+              <h4>{{roleUser?.delegatedSystemId}}</h4>
+            </div>
+          </div>
+          <button mat-icon-button fxLayout="row" fxLayoutAlign="center center" (click)="editControl('nickName')"
+            *ngIf="useSaml">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-pen">
+            </mat-icon>
+          </button>
+        </div>
+        <div class="edition-line" *ngIf="selectedEditingControl === 'nickName'">
+          <mat-form-field>
+            <mat-icon matPrefix fxLayout="row" fxLayoutAlign="center center" class="fa-lg" fontSet="fas"
+              fontIcon="fa-id-badge">
+            </mat-icon>
+            <input matInput="matInput"
+              [placeholder]="editForm.controls['nickName'].hasError('required') ? 'Es un dato requerido' : 'Ingresa el nuevo nombre de usuario'"
+              formControlName="nickName" required [readOnly]="saving" />
+          </mat-form-field>
+          <div class="actions" fxLayout="row-reverse" fxLayoutGap="8px">
+            <button mat-button color="accent" (click)="save()" [disabled]="saving">
+              Guardar
+            </button>
+            <button mat-button (click)="cancel()" [disabled]="saving">
+              Cancelar
+            </button>
+          </div>
+          <mat-progress-bar mode="indeterminate" *ngIf="saving"> </mat-progress-bar>
+        </div>
+        <!-- mail -->
+        <div class="line editable" fxLayout="row" fxLayoutAlign="space-between center"
+          *ngIf="selectedEditingControl !== 'mail'">
+          <div class="header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-envelope">
+            </mat-icon>
+            <div class="info" fxLayout="column">
+              <h6>Correo Electrónico</h6>
+              <h4>{{roleUser?.mail}}</h4>
+            </div>
+          </div>
+          <button mat-icon-button fxLayout="row" fxLayoutAlign="center center" (click)="editControl('mail')">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-pen">
+            </mat-icon>
+          </button>
+        </div>
+        <div class="edition-line" *ngIf="selectedEditingControl === 'mail'">
+          <mat-form-field>
+            <mat-icon matPrefix fxLayout="row" fxLayoutAlign="center center" class="fa-lg" fontSet="fas"
+              fontIcon="fa-envelope">
+            </mat-icon>
+            <input matInput="matInput"
+              [placeholder]="editForm.controls['mail'].hasError('required') ? 'Es un dato requerido' : 'Ingresa el nuevo mail'"
+              formControlName="mail" required [readOnly]="saving" />
+          </mat-form-field>
+          <div class="actions" fxLayout="row-reverse" fxLayoutGap="8px">
+            <button mat-button color="accent" (click)="save()" [disabled]="saving">
+              Guardar
+            </button>
+            <button mat-button (click)="cancel()" [disabled]="saving">
+              Cancelar
+            </button>
+          </div>
+          <mat-progress-bar mode="indeterminate" *ngIf="saving"> </mat-progress-bar>
+        </div>
+      </div>
+
+      <!-- otras secciones -->
+      <!-- titulo Permisos -->
+      <div class="section-title" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px"
+        *ngIf="roleUser && roleUser.filtersAvaliable">
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-folder-tree">
+        </mat-icon>
+        <h5>Permisos y Documentación</h5>
+      </div>
+
+      <!-- seccion Permisos -->
+      <div class="section-resume" *ngIf="roleUser && roleUser.filtersAvaliable">
+        <div class="line editable" fxLayout="row" fxLayoutAlign="space-between start"
+          *ngIf="selectedEditingControl !== 'employeeFolder'">
+          <div class="header" fxLayout="row" fxLayoutGap="16px">
+            <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+              <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-folder-open">
+              </mat-icon>
+              <mat-icon class="fa-lg complex" fontSet="fas" fontIcon="fa-filter">
+              </mat-icon>
+            </div>
+            <div class="info" fxLayout="column" fxLayoutAlign="center start">
+              <h6>Filtros para Legajo</h6>
+              <h4 *ngIf="roleUser?.filters.length === 0">Todos Habilitados</h4>
+              <ng-container *ngIf="roleUser?.filters.length > 0">
+                <ul *ngFor="let filter of roleUser?.filters">
+                  <li>
+                    <h4>
+                      {{filter.name}}
+                    </h4>
+                    <ul>
+                      <li *ngFor="let meta of filter.values">
+                        {{meta}}
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </ng-container>
+            </div>
+          </div>
+          <button mat-icon-button fxLayout="row" fxLayoutAlign="center center" (click)="editControl('employeeFolder')">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-pen">
+            </mat-icon>
+          </button>
+        </div>
+        <div class="edition-line" *ngIf="selectedEditingControl === 'employeeFolder'">
+          <div fxLayout="column">
+            <mat-checkbox [checked]="allFilters" (change)="toggleAllFilters()">Habilitar Todos*
+            </mat-checkbox>
+            <ng-container *ngFor="let meta of metadataFilters">
+              <app-autocomplete-chip [originalList]="meta.filters" [showIcons]="true" [iconName]="'fa-filter'"
+                [listView]="true" [placeHolderText]="meta.placeHolderDescription"
+                (OnItemSelected)="selectMetadata($event, meta)" (OnRemoveItem)="removeMetadata($event, meta)"
+                [selectedItemsList]="meta.selectedMetadatas" fxFlex="grow" fxLayout="row" fxLayoutAlign="start center"
+                *ngIf="!allFilters">
+              </app-autocomplete-chip>
+            </ng-container>
+            <h6 class="hint" [ngClass]="{'all' : allFilters}">
+              {{allFilters ? '*Quedan habilitados todos los Filtros para Legajo disponibles':'*Quedan habilitados sólo
+              los Filtros para Legajo seleccionados'}}
+            </h6>
+          </div>
+          <div class="actions" fxLayout="row-reverse" fxLayoutGap="8px">
+            <button mat-button color="accent" (click)="save()" [disabled]="saving">
+              Guardar
+            </button>
+
+            <button mat-button (click)="cancel()" [disabled]="saving">
+              Cancelar
+            </button>
+          </div>
+          <mat-progress-bar mode="indeterminate" *ngIf="saving"> </mat-progress-bar>
+        </div>
+        <div class="line editable" fxLayout="row" fxLayoutAlign="space-between start"
+          *ngIf="selectedEditingControl !== 'docTypes' && seeDocumentFilter">
+          <div class="header" fxLayout="row" fxLayoutGap="16px">
+            <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+              <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-file">
+              </mat-icon>
+              <mat-icon class="fa-lg complex" fontSet="fas" fontIcon="fa-filter">
+              </mat-icon>
+            </div>
+            <div class="info" fxLayout="column" fxLayoutAlign="center start">
+              <h6>Filtros de Documentación</h6>
+              <h4 *ngIf="roleUser?.documentationTypes.length === 0">Todos Habilitados</h4>
+              <ul *ngIf="roleUser?.documentationTypes.length > 0">
+                <li *ngFor="let dt of roleUser?.documentationTypes">
+                  <h4>
+                    {{dt}}
+                  </h4>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <button mat-icon-button fxLayout="row" fxLayoutAlign="center center" (click)="editControl('docTypes')">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-pen">
+            </mat-icon>
+          </button>
+        </div>
+        <div class="edition-line" *ngIf="selectedEditingControl === 'docTypes'">
+          <div fxLayout="column">
+            <mat-checkbox [checked]="allDocumentations" (change)="toggleAllDocumentations()">Habilitar Todos
+            </mat-checkbox>
+            <app-autocomplete-chip [showIcons]="true" [iconName]="'fa-file'" [originalList]="documentationTypes"
+              [placeHolderText]="'Selecciona Tipos de Documentación'" [selectedItemsList]="selectedDocumentationTypes"
+              (OnItemSelected)="selectDocumentationType($event)" (OnRemoveItem)="removeDocumentation($event)"
+              fxFlex="grow" fxLayout="row" fxLayoutAlign="start center" *ngIf="!allDocumentations" [listView]="true">
+            </app-autocomplete-chip>
+            <h6 class="hint" [ngClass]="{'all' : allDocumentations}">
+              {{allDocumentations ? '*Quedan habilitados todos los Filtros de Documentación disponibles':'*Quedan
+              habilitados sólo los Filtros de Documentación seleccionados'}}
+            </h6>
+          </div>
+          <div class="actions" fxLayout="row-reverse" fxLayoutGap="8px">
+            <button mat-button color="accent" (click)="save()" [disabled]="saving">
+              Guardar
+            </button>
+            <button mat-button (click)="cancel()" [disabled]="saving">
+              Cancelar
+            </button>
+          </div>
+          <mat-progress-bar mode="indeterminate" *ngIf="saving"> </mat-progress-bar>
+        </div>
+      </div>
+
+      <!-- titulo seccion Accesos -->
+      <div class="section-title" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+        <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-key">
+        </mat-icon>
+        <h5>Accesos</h5>
+      </div>
+      <!-- seccion Accesos -->
+      <div class="section-resume">
+        <div class="line">
+          <div class="header" fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-clock">
+            </mat-icon>
+            <div class="info" fxLayout="column">
+              <h6>Fecha de creación</h6>
+              <h4>
+                {{(roleUser?.creationDate == null) ? 'Sin registro' : roleUser.creationDate | date: 'dd/MM/yyyy HH:mm'}}
+              </h4>
+            </div>
+          </div>
+        </div>
+        <div class="line" fxLayout="row" fxLayoutAlign="space-between center">
+          <div class="header" fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-clock">
+            </mat-icon>
+            <div class="info" fxLayout="column">
+              <h6>Último Ingreso</h6>
+              <h4>
+                {{(roleUser?.lastLoginDate == null) ? 'Sin registro' : roleUser.lastLoginDate | date: 'dd/MM/yyyy
+                HH:mm'}}
+              </h4>
+            </div>
+          </div>
+          <button *ngIf="roleUser && roleUser.locked" mat-icon-button (click)="unlock()" title="Desbloquear">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-lock">
+            </mat-icon>
+          </button>
+          <button mat-icon-button fxLayout="row" fxLayoutAlign="center center"
+            *ngIf="!welcomeSent && !roleUser?.lastLoginDate" (click)="sendWelcomeMail()">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-envelope">
+            </mat-icon>
+          </button>
+        </div>
+        <div class="line" fxLayout="row" fxLayoutAlign="space-between center" *ngIf="hasSAML">
+          <div class="header" fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+            <mat-icon class="fa-lg" fontSet="fas" [fontIcon]="roleUser.isSamlActive ? 'fa-hand-receiving' : 'fa-hands'">
+            </mat-icon>
+            <div class="info" fxLayout="column">
+              <h6>Autenticación Delegada</h6>
+              <h4>
+                SAML
+              </h4>
+            </div>
+          </div>
+          <mat-slide-toggle class="example-margin" (change)="changeSaml()" [(ngModel)]="roleUser.isSamlActive"
+            [ngModelOptions]="{standalone: true}">
+          </mat-slide-toggle>
+        </div>
+        <div class="line" fxLayout="row" fxLayoutAlign="space-between center">
+          <div class="header" fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="start center">
+            <mat-icon class="fa-lg" [fontSet]="roleUser?.enabled ? 'fa' : 'far'" fontIcon="fa-lightbulb">
+            </mat-icon>
+            <div class="info" fxLayout="column">
+              <h6>Estado del Actor</h6>
+              <h4>
+                {{roleUser?.enabled ? 'Habilitado':'Deshabilitado'}}
+              </h4>
+            </div>
+          </div>
+          <mat-slide-toggle class="example-margin" (change)="changeEnabled()" [(ngModel)]="isEnabled"
+            [ngModelOptions]="{standalone: true}">
+          </mat-slide-toggle>
+        </div>
+      </div>
+      <app-certificates *ngIf="roleUser != null && isFirmante" [userId]="roleUser.userId" [isRRHH]="true">
+      </app-certificates>
+    </div>
+  </div>
+</form>

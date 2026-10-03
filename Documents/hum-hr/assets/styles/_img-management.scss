@@ -1,0 +1,328 @@
+@mixin display($display, $direction, $wrap, $halign, $valign, $calign) {
+
+  @if $display==f {
+    display: flex;
+  }
+
+  @else if $display==n {
+    display: none;
+  }
+
+  @else if $display==b {
+    display: block;
+  }
+
+  @else if $display==fi {
+    display: flex !important;
+  }
+
+  @else if $display==ni {
+    display: none !important;
+  }
+
+  @else if $display==bi {
+    display: block !important;
+  }
+
+  @else {
+    //Undefined
+  }
+
+  @if $direction==r {
+    flex-direction: row;
+  }
+
+  @else if $direction==rr {
+    flex-direction: row-reverse;
+  }
+
+  @else if $direction==c {
+    flex-direction: column;
+  }
+
+  @else if $direction==cr {
+    flex-direction: column-reverse;
+  }
+
+  @else if $direction==ri {
+    flex-direction: row !important;
+  }
+
+  @else if $direction==rri {
+    flex-direction: row-reverse !important;
+  }
+
+  @else if $direction==ci {
+    flex-direction: column !important;
+  }
+
+  @else if $direction==cri {
+    flex-direction: column-reverse !important;
+  }
+
+  @else {
+    //Undefined
+  }
+
+  @if $wrap==nw {
+    flex-wrap: nowrap;
+  }
+
+  @else if $wrap==w {
+    flex-wrap: wrap;
+  }
+
+  @else if $wrap==wr {
+    flex-wrap: wrap-reverse;
+  }
+
+  @else if $wrap==nwi {
+    flex-wrap: nowrap !important;
+  }
+
+  @else if $wrap==wi {
+    flex-wrap: wrap !important;
+  }
+
+  @else if $wrap==wri {
+    flex-wrap: wrap-reverse !important;
+  }
+
+  @else {
+    //Undefined
+  }
+
+  @if $halign==fs {
+    justify-content: flex-start;
+  }
+
+  @else if $halign==fe {
+    justify-content: flex-end;
+  }
+
+  @else if $halign==c {
+    justify-content: center;
+  }
+
+  @else if $halign==sb {
+    justify-content: space-between;
+  }
+
+  @else if $halign==sa {
+    justify-content: space-around;
+  }
+
+  @else if $halign==se {
+    justify-content: space-evenly;
+  }
+
+  @else if $halign==fsi {
+    justify-content: flex-start !important;
+  }
+
+  @else if $halign==fei {
+    justify-content: flex-end !important;
+  }
+
+  @else if $halign==ci {
+    justify-content: center !important;
+  }
+
+  @else if $halign==sbi {
+    justify-content: space-between !important;
+  }
+
+  @else if $halign==sai {
+    justify-content: space-around !important;
+  }
+
+  @else if $halign==sei {
+    justify-content: space-evenly !important;
+  }
+
+  @else {
+    //Undefined
+  }
+
+  @if $valign==fs {
+    align-items: flex-start;
+  }
+
+  @else if $valign==fe {
+    align-items: flex-end;
+  }
+
+  @else if $valign==c {
+    align-items: center;
+  }
+
+  @else if $valign==b {
+    align-items: baseline;
+  }
+
+  @else if $valign==s {
+    align-items: stretch;
+  }
+
+  @else if $valign==fsi {
+    align-items: flex-start !important;
+  }
+
+  @else if $valign==fei {
+    align-items: flex-end !important;
+  }
+
+  @else if $valign==ci {
+    align-items: center !important;
+  }
+
+  @else if $valign==bi {
+    align-items: baseline !important;
+  }
+
+  @else if $valign==si {
+    align-items: stretch !important;
+  }
+
+  @else {
+    //Undefined
+  }
+
+  @if $calign==fs {
+    align-content: flex-start;
+  }
+
+  @else if $calign==fe {
+    align-content: flex-end;
+  }
+
+  @else if $calign==c {
+    align-content: center;
+  }
+
+  @else if $calign==sb {
+    align-content: space-between;
+  }
+
+  @else if $calign==sa {
+    align-content: space-around;
+  }
+
+  @else if $calign==s {
+    align-content: stretch;
+  }
+
+  @else if $calign==fsi {
+    align-content: flex-start !important;
+  }
+
+  @else if $calign==fei {
+    align-content: flex-end !important;
+  }
+
+  @else if $calign==ci {
+    align-content: center !important;
+  }
+
+  @else if $calign==sbi {
+    align-content: space-between !important;
+  }
+
+  @else if $calign==sai {
+    align-content: space-around !important;
+  }
+
+  @else if $calign==si {
+    align-content: stretch !important;
+  }
+
+  @else {
+    //Undefined
+  }
+}
+
+
+///images
+$imagedir:'../img/';
+
+@mixin bkimg($color, $name, $prop, $size) {
+
+  @if $color==u {
+
+    @if $prop==nrcc {
+
+      @if $size==ct {
+        background: url("#{$imagedir}#{$name}")no-repeat center center !important;
+        background-size: contain !important;
+      }
+
+      @else if $size==cv {
+        background: url("#{$imagedir}#{$name}")no-repeat center center !important;
+        background-size: cover !important;
+      }
+
+      @else {
+        background: url("#{$imagedir}#{$name}")no-repeat center center !important;
+
+      }
+
+    }
+
+    @else {
+      @if $size==ct {
+        background: url("#{$imagedir}#{$name}")#{$prop} !important;
+        background-size: contain !important;
+      }
+
+      @else if $size==cv {
+        background: url("#{$imagedir}#{$name}")#{$prop} !important;
+        background-size: cover !important;
+      }
+
+      @else {
+        background: url("#{$imagedir}#{$name}")#{$prop} !important;
+
+      }
+    }
+  }
+
+  @else {
+    @if $prop==nrcc {
+
+      @if $size==ct {
+        background: $color url("#{$imagedir}#{$name}")no-repeat center center !important;
+        background-size: contain !important;
+      }
+
+      @else if $size==cv {
+        background: $color url("#{$imagedir}#{$name}")no-repeat center center !important;
+        background-size: cover !important;
+      }
+
+      @else {
+        background: $color url("#{$imagedir}#{$name}")no-repeat center center !important;
+
+      }
+    }
+
+    @else {
+      @if $size==ct {
+        background: $color url("#{$imagedir}#{$name}")#{$prop} !important;
+        background-size: contain !important;
+      }
+
+      @else if $size==cv {
+        background: $color url("#{$imagedir}#{$name}")#{$prop} !important;
+        background-size: cover !important;
+      }
+
+      @else {
+        background: $color url("#{$imagedir}#{$name}")#{$prop} !important;
+
+      }
+
+    }
+
+  }
+
+}

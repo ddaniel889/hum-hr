@@ -1,0 +1,606 @@
+<!-- documentation in process -->
+<ng-container *ngIf="itemSelected() && !isNewStyle">
+  <mat-toolbar class="side-bar">
+    <mat-toolbar-row>
+      <div class="mat-avatar" fxLayout="row" fxLayoutAlign="space-between center">
+        <div class="toolbar-line" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+          <button fxLayout="row" fxLayoutAlign="center center" *ngIf="floatingMode" class="show-md" mat-icon-button
+            (click)='goBack()' title="Regresar al listado">
+            <mat-icon fxLayout="row" fxLayoutAlign="center center" class="fa-lg" fontSet="fa" fontIcon="fa-arrow-left">
+            </mat-icon>
+          </button>
+          <mat-icon fxLayout="row" fxLayoutAlign="center center" class="hide-md fa-lg" fontSet="fa"
+            fontIcon="fa-folder-open">
+          </mat-icon>
+          <div class="title" fxLayout="column" fxLayoutAlign="center start">
+            <h3 matLine>{{item.documentationName}} fecha {{ item?.documentationDate | date :'dd/MM/yyyy'}}
+            </h3>
+            <h5>
+              {{showSign ? 'pendientes de Firma' : 'en curso'}} - {{itemsCount}} {{itemsCount > 1 ? 'documentos' :
+              'documento'}}
+            </h5>
+          </div>
+        </div>
+      </div>
+      <button mat-icon-button (click)='refresh()' title="Actualizar Listado">
+        <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-redo" fxLayout="row" fxLayoutAlign="center center"></mat-icon>
+      </button>
+    </mat-toolbar-row>
+  </mat-toolbar>
+  <mat-divider></mat-divider>
+
+  <!-- LOADER -->
+  <div class="load-window" *ngIf="loading">
+    <mat-progress-spinner style="z-index: 1" mode="indeterminate" color="primary">
+    </mat-progress-spinner>
+  </div>
+
+  <!-- SEARCH-INPUT -->
+  <div class="document-search-sub-toolbar" fxLayout="row-reverse" fxLayoutAlign="space-between center">
+    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+      <mat-form-field fxLayout="row" fxLayoutAlign="start center">
+        <mat-select [(ngModel)]="pageSize" (selectionChange)="setSizePage()">
+          <mat-option *ngFor="let page of optionsPageSize" [value]="page">
+            {{page}}
+          </mat-option>
+        </mat-select>
+        <mat-hint>Resultados por página</mat-hint>
+      </mat-form-field>
+      <app-cs-paginator [hidden]="documents?.length == 0" [pageSize]="this.pageSize" [pageCount]="itemsCount"
+        [(pageIndex)]="pageIndex" (pageChanged)="selectedPageChanged($event)"></app-cs-paginator>
+    </div>
+    <div class="mat-search-field" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px"
+      *ngIf="showSearchFilter">
+      <mat-icon class="fa" fontSet="fal" fontIcon="fa-search">
+      </mat-icon>
+      <input type="search" [(ngModel)]="filterName" placeholder="Inicia tu búsqueda"
+        (keydown.enter)="filteredSearch()" />
+    </div>
+  </div>
+
+  <!-- SEARCH-TABLE -->
+  <div class="document-table" [hidden]="documents.length == 0">
+    <div class="mat-table" [hidden]="loading">
+      <!-- SEARCH-TABLE_HEAD -->
+      <div class="mat-header-row sticky" fxLayout="row" fxLayoutAlign="start center">
+        <div class="mat-header-cell w-1" fxLayout="row" fxLayoutAlign="center center">
+          <mat-checkbox [(ngModel)]="allSelected" (ngModelChange)="selectAllToogle()"></mat-checkbox>
+        </div>
+        <div class="w-12" fxLayout="row" fxLayoutAlign="start center">
+          <ng-container *ngIf="showDocumentState">
+            <div class="mat-header-cell w-1 icon" fxLayout="row" fxLayoutAlign="center center" title="Firmante">
+              <span class="hide-md">Firmante</span>
+              <mat-icon class="fa-lg show-md" fxLayout="row" fxLayoutAlign="center center" fontSet="fas"
+                fontIcon="fa-user-crown"></mat-icon>
+            </div>
+            <div class="mat-header-cell w-1 icon" fxLayout="row" fxLayoutAlign="center center" title="Empleado">
+              <span class="hide-md">Empleado</span>
+              <mat-icon class="fa-lg show-md" fxLayout="row" fxLayoutAlign="center center" fontSet="fas"
+                fontIcon="fa-user"></mat-icon>
+            </div>
+          </ng-container>
+          <div class="mat-header-cell sorteable" [ngClass]="showDocumentState ?'w-4': 'w-6'"
+            (click)="sortColumn(docOnlyforOrderData.lastNameSystemName)" fxLayout="row" fxLayoutAlign="start center"
+            title="Ordenar por Apellido">
+            <div class="sort-icon" *ngIf="orderBy === docOnlyforOrderData.lastNameSystemName">
+              <mat-icon *ngIf="orderAsc" class="fa" fontSet="fal" fontIcon="fa-arrow-down"></mat-icon>
+              <mat-icon *ngIf="!orderAsc" class="fa" fontSet="fal" fontIcon="fa-arrow-up"></mat-icon>
+            </div>
+            <span>Apellido y Nombre</span>
+          </div>
+          <div class="mat-header-cell sorteable w-2" (click)="sortColumn(docOnlyforOrderData.nroLegSystemName)"
+            fxLayout="row" fxLayoutAlign="start center" title="Ordenar por Nro Legajo">
+            <div class="sort-icon" *ngIf="orderBy === docOnlyforOrderData.nroLegSystemName">
+              <mat-icon *ngIf="orderAsc" class="fa" fontSet="fal" fontIcon="fa-arrow-down"></mat-icon>
+              <mat-icon *ngIf="!orderAsc" class="fa" fontSet="fal" fontIcon="fa-arrow-up"></mat-icon>
+            </div>
+            <span>Nro Legajo</span>
+          </div>
+          <div class="mat-header-cell w-2 sorteable" (click)="sortColumn(docOnlyforOrderData.legalIdSystemName)"
+            fxLayout="row" fxLayoutAlign="start center" title="Ordenar por {{containerType?.label}}">
+            <div class="sort-icon" *ngIf="orderBy === docOnlyforOrderData.legalIdSystemName">
+              <mat-icon *ngIf="orderAsc" class="fa" fontSet="fal" fontIcon="fa-arrow-down"></mat-icon>
+              <mat-icon *ngIf="!orderAsc" class="fa" fontSet="fal" fontIcon="fa-arrow-up"></mat-icon>
+            </div>
+            <span>{{containerType?.label}}</span>
+          </div>
+          <div class="mat-header-cell sorteable w-2" (click)="sortColumn(docOnlyforOrderData.dateSystemName)"
+            fxLayout="row" fxLayoutAlign="start center" title="Ordenar por {{headerDateOrPeriod}}">
+            <div class="sort-icon" *ngIf="orderBy === docOnlyforOrderData.dateSystemName">
+              <mat-icon *ngIf="orderAsc" class="fa" fontSet="fal" fontIcon="fa-arrow-down"></mat-icon>
+              <mat-icon *ngIf="!orderAsc" class="fa" fontSet="fal" fontIcon="fa-arrow-up"></mat-icon>
+            </div>
+            <span>{{headerDateOrPeriod}}</span>
+          </div>
+        </div>
+      </div>
+      <!-- SEARCH-TABLE-ROWS -->
+      <div class="mat-row" matRipple *ngFor="let doc of documents" fxLayout="row" fxLayoutAlign="start center"
+        (click)="selectDocument(doc)"
+        [ngClass]="{'active': doc == selectedDoc, 'selected': doc.selected, 'disabled': '' }">
+        <div [ngClass]="{'turn': doc.selected}" class="mat-cell w-1 off" fxLayout="row" fxLayoutAlign="center center">
+          <ngx-avatar (click)="checkDocument(doc)" [name]="doc.employeeLastName + ' ' + doc.employeeFirstName" size="30" textSizeRatio="2"
+            [round]="true">
+          </ngx-avatar>
+          <mat-checkbox [(ngModel)]="doc.selected" (ngModelChange)="selectedChange()"></mat-checkbox>
+        </div>
+        <div class="w-12 w-sticky" fxLayout="row" fxLayoutAlign="start center" title="{{ doc.organizationalUnitName }}">
+          <ng-container *ngIf="showDocumentState">
+            <div class="mat-cell w-1 icon" fxLayout="row" fxLayoutAlign="center center">
+              <mat-icon title="{{doc.state}}" class="fa-lg" fxLayout="row" fxLayoutAlign="center center" fontSet="fas"
+                fontIcon="fa-signature"
+                *ngIf="doc.requireLawyerSignature() && doc.viewedByLawyer() && !doc.wasSignedByLawyer()">
+              </mat-icon>
+              <mat-icon title="{{doc.state}}" class="fa-lg" fxLayout="row" fxLayoutAlign="center center" fontSet="fas"
+                fontIcon="fa-eye-slash" *ngIf="doc.requireLawyerSignature() && !doc.viewedByLawyer()">
+              </mat-icon>
+              <mat-icon title="{{doc.state}}" class="fa-lg" fxLayout="row" fxLayoutAlign="center center" fontSet="fas"
+                fontIcon="fa-check" *ngIf="doc.requireLawyerSignature() && doc.wasSignedByLawyer()">
+              </mat-icon>
+            </div>
+            <div class="mat-cell w-1 icon" fxLayout="row" fxLayoutAlign="center center">
+              <mat-icon title="{{doc.state}}" class="fa-lg" fxLayout="row" fxLayoutAlign="center center" fontSet="fas"
+                fontIcon="fa-eye"
+                *ngIf="!doc.requireEmployeeSignature() && doc.viewedByEmployee() && !doc.isUploadPending()">
+              </mat-icon>
+              <mat-icon title="{{doc.state}}" class="fa-lg" fxLayout="row" fxLayoutAlign="center center" fontSet="fas"
+                fontIcon="fa-upload" *ngIf="doc.isUploadPending()">
+              </mat-icon>
+              <mat-icon title="{{doc.state}}" class="fa-lg" fxLayout="row" fxLayoutAlign="center center" fontSet="fas"
+                fontIcon="fa-signature"
+                *ngIf="doc.requireEmployeeSignature() && doc.viewedByEmployee() && !doc.wasSignedByEmployee() && !doc.isUploadPending()">
+              </mat-icon>
+              <mat-icon title="{{doc.state}}" class="fa-lg" fxLayout="row" fxLayoutAlign="center center" fontSet="fas"
+                fontIcon="fa-eye-slash"
+                *ngIf="!doc.viewedByEmployee() && doc.requireEmployeeView() && !doc.isUploadPending()">
+              </mat-icon>
+              <mat-icon title="{{doc.state}}" class="fa-lg" fxLayout="row" fxLayoutAlign="center center" fontSet="fas"
+                fontIcon="fa-check"
+                *ngIf="doc.requireEmployeeSignature() && doc.wasSignedByEmployee() && !doc.isUploadPending()">
+              </mat-icon>
+            </div>
+          </ng-container>
+          <div class="mat-cell" [ngClass]="showDocumentState ?'w-4': 'w-6'" fxLayoutAlign="start center"
+            title=" {{ doc.employeeLastName }}, {{ doc.employeeFirstName}}">
+            <span> {{ doc.employeeLastName }}, {{ doc.employeeFirstName}} </span>
+          </div>
+          <div class="mat-cell w-2" fxLayoutAlign="start center" title="{{ doc.nroLegajo}}">
+            <span>
+              {{ doc.nroLegajo}}
+            </span>
+          </div>
+          <div class="mat-cell w-2" fxLayoutAlign="start center" title="{{ doc.employeeLegalId}}">
+            <span>{{ doc.employeeLegalId | mask: maskSplited(containerType?.mask)}}</span>
+          </div>
+          <div class="mat-cell w-2" fxLayoutAlign="start center" title="{{ doc.employeeLegalId}}">
+            <span>{{ periodOverDate(doc)}}</span>
+          </div>
+        </div>
+        <div class="mat-cell sticky-actions" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+          <button mat-icon-button title="Firmar" *ngIf="this.showSign" (click)="signDocument(doc)">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-signature"></mat-icon>
+          </button>
+          <button mat-icon-button title="Ver" [disabled]="clickOnce" (click)="openDocumentDialog(doc)"
+            *ngIf="!doc.isUploadPending()">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-eye"></mat-icon>
+          </button>
+          <button mat-icon-button title="Ejecutar workflow" [disabled]="clickOnce" (click)="runWorkflow(doc.id)"
+            *ngIf="!doc.isUploadPending()">
+            <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-user-gear"></mat-icon>
+          </button>
+          <button id="btn_Metadatos" name="btn_Metadatos" mat-icon-button title="Ver más Datos" (click)="showMetadatos(doc)"
+          *ngIf="!doc.isUploadPending()">
+          <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-file-alt"></mat-icon>
+        </button>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>
+<!-- welcome -->
+<app-chapa *ngIf="!itemSelected() && !isNewStyle" [className]="'info-empty'" [icon]="'fa-hand-sparkles'"
+  [text]="'Humanage te da la bienvenida'"
+  [subText]="'Decile adiós al papel, aquí podrás gestionar todo digitalmente y de la manera más fácil'">
+</app-chapa>
+
+<!-- newSigner -->
+<ng-container *ngIf="itemSelected() && isNewStyle">
+  <!-- Lotes -->
+
+  <!-- vista ppal -->
+  <div class="main" fxFill fxLayout="column">
+    <!-- TOOLBAR -->
+    <div class="toolbar" fxLayout="row">
+      <!-- info -->
+      <div class="header">
+        <div class="content" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px" fxFlex="100">
+          <!-- app selector -->
+          <div class="module-title" fxLayout="row" fxLayoutAlign="start center">
+            <div class="info" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+              <button fxLayout="row" fxLayoutAlign="center center" *ngIf="floatingMode" class="show-md" mat-icon-button
+                (click)='goBack()' title="Regresar al listado">
+                <mat-icon fxLayout="row" fxLayoutAlign="center center" class="fa-lg" fontSet="fa"
+                  fontIcon="fa-arrow-left"></mat-icon>
+              </button>
+              <mat-icon class="hide-md fa-lg" fontSet="fa" fontIcon="fa-folder-open" fxLayout="row"
+                fxLayoutAlign="center center">
+              </mat-icon>
+              <div fxLayout="column">
+                <h3>{{item.documentationName}}</h3>
+                <h5>Listado de Documentos a Firmar</h5>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Busqueda  -->
+      <div class="search-container">
+        <div class="search" fxLayout="row" fxLayoutAlign="start center" fxFlex="100">
+          <div class="content" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px" fxFlex="100">
+            <mat-icon class="fa" fontSet="fal" fontIcon="fa-search">
+            </mat-icon>
+            <input #documentsListSearchInput type="search" [(ngModel)]="filterName" placeholder="Buscar Documentos"
+              (keydown.enter)="filteredSearch()" [disabled]="loading" />
+            <!-- <button mat-button color="primary" [matMenuTriggerFor]="menu" [disabled]="loading">
+                            <mat-icon  class="fa-lg" fontSet="fa"
+                                fontIcon="fa-caret-down"></mat-icon>
+                            Búsqueda Avanzada
+                        </button> -->
+            <button mat-icon-button title="Ver Guía de Búsqueda" [matMenuTriggerFor]="menuHelp" [disabled]="loading">
+              <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-question-circle"></mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- loader -->
+    <div class="load-window new" *ngIf="loading && documents?.length < 1">
+      <mat-progress-spinner style="z-index: 1" mode="indeterminate" color="primary">
+      </mat-progress-spinner>
+    </div>
+    <app-chapa *ngIf="itemsCount == 0" [className]="'info-empty'" [icon]="'fa-search-minus'"
+      [text]="'¡Ups! No hay Documentos aquí...'" [subText]="'Intenta hacer otra Búsqueda o prueba con otra Empresa'">
+    </app-chapa>
+    <!-- listado de Lotes -->
+    <ng-container *ngIf="itemsCount > 0">
+      <!-- ayuda de actores c/filtro -->
+      <!-- helper -->
+      <div class="helper" fxLayout="row" fxLayoutAlign="space-between center">
+        <!-- hint -->
+        <mat-hint fxLayout="row" fxLayoutGap="16px" fxLayoutAlign="space-between center">
+          <!-- ACTUALIZAR -->
+          <button mat-icon-button (click)='refresh()' title="Actualizar Listado">
+            <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-redo"></mat-icon>
+          </button>
+          <div fxLayout="column">
+            <h4>
+              {{itemsCount > 1 ? 'Listando ' + itemsCount + ' Documentos' : 'Listando 1 Documento'}}
+            </h4>
+            <h6 *ngIf="itemsCount > 15">{{pageSize}} ítems por página</h6>
+          </div>
+        </mat-hint>
+        <!-- Acciones -->
+        <div class="actions" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+          <!-- Descargar -->
+          <button mat-stroked-button [title]="itemsCount > pageSize ? 'Descargar Documentos' : ''"
+            (click)='downloadAllDocuments()' [disabled]="loading" *ngIf="showSign">
+            <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+              <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-arrow-to-bottom">
+              </mat-icon>
+              <span *ngIf="itemsCount < pageSize">Descargar Documentos</span>
+            </div>
+          </button>
+          <!-- Eliminar -->
+          <!-- <button mat-stroked-button [title]="itemsCount > pageSize ? 'Eliminar Lote' : ''" (click)='openBottomSheetDelete()' color="primary" [disabled]="loading" *ngIf="canDelete && showSign">
+              <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="8px">
+                <mat-icon  class="fa-lg" fontSet="fas"
+                  fontIcon="fa-trash-alt">
+                </mat-icon>
+                <span *ngIf="itemsCount < pageSize">Eliminar Lote</span>
+              </div>
+            </button> -->
+          <!-- paginator -->
+          <ng-container *ngIf="itemsCount > 15">
+            <mat-form-field fxLayout="row" fxLayoutAlign="start center">
+              <mat-label>Mostrar</mat-label>
+              <mat-select [(ngModel)]="pageSize" (selectionChange)="setSizePage()">
+                <mat-option *ngFor="let page of optionsPageSize" [value]="page">
+                  {{page}} Ítems
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <app-cs-paginator *ngIf="itemsCount > pageSize" [pageSize]="pageSize" [pageCount]="itemsCount"
+              [(pageIndex)]="pageIndex" (pageChanged)="selectedPageChanged($event)"></app-cs-paginator>
+          </ng-container>
+        </div>
+        <mat-progress-bar mode="indeterminate" *ngIf="loading && documents?.length"></mat-progress-bar>
+      </div>
+      <!-- archivos del lote -->
+      <div class="new-table w-main-action" [hidden]="documents?.length == 0">
+        <div class="mat-table">
+          <!-- TABLE_HEAD -->
+          <div class="mat-header-row sticky" fxLayout="row" fxLayoutAlign="start center">
+            <div class="mat-header-cell w-1" fxLayout="row" fxLayoutAlign="center center">
+              <mat-checkbox [disabled]="loading" [(ngModel)]="allSelected" (ngModelChange)="selectAllToogle()">
+              </mat-checkbox>
+            </div>
+            <div class="w-12" fxLayout="row" fxLayoutAlign="start center">
+              <ng-container *ngIf="showDocumentState">
+                <div class="mat-header-cell w-1-5 icon" fxLayout="row" fxLayoutAlign="center center" title="Firmante">
+                  <span>Firmante</span>
+                </div>
+                <div class="mat-header-cell w-1-5 icon" fxLayout="row" fxLayoutAlign="center center" title="Empleado">
+                  <span>Empleado</span>
+                </div>
+              </ng-container>
+              <div class="mat-header-cell" [ngClass]="showDocumentState ?'w-4': 'w-6'" fxLayout="row"
+                fxLayoutAlign="start center" title="Ordenar por Apellido">
+                <div class="sorteable" fxLayout="row" fxLayoutAlign="start center"
+                  (click)="sortColumn(docOnlyforOrderData.lastNameSystemName)">
+                  <span>Apellido y Nombre</span>
+                  <mat-icon [hidden]="orderBy === docOnlyforOrderData.lastNameSystemName" class="fal indication"
+                    fxLayout="row" fxLayoutAlign="center center" fontSet="fal" fontIcon="fa-sort-alt"></mat-icon>
+                  <div class="sort-icon" *ngIf="orderBy === docOnlyforOrderData.lastNameSystemName">
+                    <mat-icon *ngIf="orderAsc" class="fa" fontSet="fal" fontIcon="fa-arrow-down"></mat-icon>
+                    <mat-icon *ngIf="!orderAsc" class="fa" fontSet="fal" fontIcon="fa-arrow-up"></mat-icon>
+                  </div>
+                </div>
+              </div>
+              <div class="mat-header-cell" [ngClass]="showDocumentState ? 'w-1-5': 'w-2'" fxLayout="row"
+                fxLayoutAlign="start center" title="Ordenar por Nro Legajo">
+                <div class="sorteable" fxLayout="row" fxLayoutAlign="start center"
+                  (click)="sortColumn(docOnlyforOrderData.nroLegSystemName)">
+                  <span>Nro Legajo</span>
+                  <mat-icon [hidden]="orderBy === docOnlyforOrderData.nroLegSystemName" class="fal indication"
+                    fxLayout="row" fxLayoutAlign="center center" fontSet="fal" fontIcon="fa-sort-alt"></mat-icon>
+                  <div class="sort-icon" *ngIf="orderBy === docOnlyforOrderData.nroLegSystemName">
+                    <mat-icon *ngIf="orderAsc" class="fa" fontSet="fal" fontIcon="fa-arrow-down"></mat-icon>
+                    <mat-icon *ngIf="!orderAsc" class="fa" fontSet="fal" fontIcon="fa-arrow-up"></mat-icon>
+                  </div>
+                </div>
+              </div>
+              <div class="mat-header-cell w-2" fxLayout="row" fxLayoutAlign="start center"
+                title="Ordenar por {{containerType?.label}}">
+                <div class="sorteable" fxLayout="row" fxLayoutAlign="start center"
+                  (click)="sortColumn(docOnlyforOrderData.legalIdSystemName)">
+                  <span>{{containerType?.label}}</span>
+                  <mat-icon [hidden]="orderBy === docOnlyforOrderData.legalIdSystemName" class="fal indication"
+                    fxLayout="row" fxLayoutAlign="center center" fontSet="fal" fontIcon="fa-sort-alt"></mat-icon>
+                  <div class="sort-icon" *ngIf="orderBy === docOnlyforOrderData.legalIdSystemName">
+                    <mat-icon *ngIf="orderAsc" class="fa" fontSet="fal" fontIcon="fa-arrow-down"></mat-icon>
+                    <mat-icon *ngIf="!orderAsc" class="fa" fontSet="fal" fontIcon="fa-arrow-up"></mat-icon>
+                  </div>
+                </div>
+              </div>
+              <div class="mat-header-cell" [ngClass]="showDocumentState ? 'w-1-5': 'w-2'" fxLayout="row"
+                fxLayoutAlign="start center" title="Ordenar por {{headerDateOrPeriod}}">
+                <div class="sorteable" fxLayout="row" fxLayoutAlign="start center"
+                  (click)="sortColumn(docOnlyforOrderData.dateSystemName)">
+                  <span>{{headerDateOrPeriod}}</span>
+                  <mat-icon [hidden]="orderBy === docOnlyforOrderData.dateSystemName" class="fal indication"
+                    fxLayout="row" fxLayoutAlign="center center" fontSet="fal" fontIcon="fa-sort-alt"></mat-icon>
+                  <div class="sort-icon" *ngIf="orderBy === docOnlyforOrderData.dateSystemName">
+                    <mat-icon *ngIf="orderAsc" class="fa" fontSet="fal" fontIcon="fa-arrow-down"></mat-icon>
+                    <mat-icon *ngIf="!orderAsc" class="fa" fontSet="fal" fontIcon="fa-arrow-up"></mat-icon>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- SEARCH-TABLE-ROWS -->
+          <div class="mat-row" *ngFor="let doc of documents" fxLayout="row" fxLayoutAlign="start center"
+            (click)="selectDocument(doc)" [ngClass]="{ 'selected': doc.selected}">
+            <div [ngClass]="{'turn': doc.selected && !loading}" class="mat-cell w-1 off" fxLayout="row"
+              fxLayoutAlign="center center">
+              <ngx-avatar (click)="checkDocument(doc)" [name]="doc.employeeLastName + ' ' + doc.employeeFirstName"
+                size="30" [round]="true">
+              </ngx-avatar>
+              <mat-checkbox [disabled]="loading" [(ngModel)]="doc.selected" (ngModelChange)="selectedChange()">
+              </mat-checkbox>
+            </div>
+            <div class="w-12 w-sticky" fxLayout="row" fxLayoutAlign="start center"
+              title="{{ doc.organizationalUnitName }}">
+              <ng-container *ngIf="showDocumentState">
+                <div class="mat-cell w-1-5 icon" fxLayout="row" fxLayoutAlign="center center">
+                  <mat-icon title="{{doc.state}}" class="fa-lg" fxLayout="row" fxLayoutAlign="center center"
+                    fontSet="fas" fontIcon="fa-signature"
+                    *ngIf="doc.requireLawyerSignature() && doc.viewedByLawyer() && !doc.wasSignedByLawyer()">
+                  </mat-icon>
+                  <mat-icon title="{{doc.state}}" class="fa-lg" fxLayout="row" fxLayoutAlign="center center"
+                    fontSet="fas" fontIcon="fa-eye-slash" *ngIf="doc.requireLawyerSignature() && !doc.viewedByLawyer()">
+                  </mat-icon>
+                  <mat-icon title="{{doc.state}}" class="fa-lg" fxLayout="row" fxLayoutAlign="center center"
+                    fontSet="fas" fontIcon="fa-check" *ngIf="doc.requireLawyerSignature() && doc.wasSignedByLawyer()">
+                  </mat-icon>
+                </div>
+                <div class="mat-cell w-1-5 icon" fxLayout="row" fxLayoutAlign="center center">
+                  <mat-icon title="{{doc.state}}" class="fa-lg" fxLayout="row" fxLayoutAlign="center center"
+                    fontSet="fas" fontIcon="fa-eye"
+                    *ngIf="!doc.requireEmployeeSignature() && doc.viewedByEmployee() && !doc.isUploadPending()">
+                  </mat-icon>
+                  <mat-icon title="{{doc.state}}" class="fa-lg" fxLayout="row" fxLayoutAlign="center center"
+                    fontSet="fas" fontIcon="fa-upload" *ngIf="doc.isUploadPending()">
+                  </mat-icon>
+                  <mat-icon title="{{doc.state}}" class="fa-lg" fxLayout="row" fxLayoutAlign="center center"
+                    fontSet="fas" fontIcon="fa-signature"
+                    *ngIf="doc.requireEmployeeSignature() && doc.viewedByEmployee() && !doc.wasSignedByEmployee() && !doc.isUploadPending()">
+                  </mat-icon>
+                  <mat-icon title="{{doc.state}}" class="fa-lg" fxLayout="row" fxLayoutAlign="center center"
+                    fontSet="fas" fontIcon="fa-eye-slash"
+                    *ngIf="!doc.viewedByEmployee() && doc.requireEmployeeView() && !doc.isUploadPending()">
+                  </mat-icon>
+                  <mat-icon title="{{doc.state}}" class="fa-lg" fxLayout="row" fxLayoutAlign="center center"
+                    fontSet="fas" fontIcon="fa-check"
+                    *ngIf="doc.requireEmployeeSignature() && doc.wasSignedByEmployee() && !doc.isUploadPending()">
+                  </mat-icon>
+                </div>
+              </ng-container>
+              <div class="mat-cell" [ngClass]="showDocumentState ?'w-4': 'w-6'" fxLayoutAlign="start center"
+                title=" {{ doc.employeeLastName }}, {{ doc.employeeFirstName}}">
+                <span> {{ doc.employeeLastName }}, {{ doc.employeeFirstName}} </span>
+              </div>
+              <div class="mat-cell" [ngClass]="showDocumentState ?'w-1-5': 'w-2'" fxLayoutAlign="start center"
+                title="{{ doc.nroLegajo}}">
+                <span>
+                  {{ doc.nroLegajo}}
+                </span>
+              </div>
+              <div class="mat-cell w-2" fxLayoutAlign="start center" title="{{ doc.employeeLegalId}}">
+                <span>{{ doc.employeeLegalId | mask: maskSplited(containerType?.mask) }}</span>
+              </div>
+              <div class="mat-cell" [ngClass]="showDocumentState ?'w-1-5': 'w-2'" fxLayoutAlign="start center"
+                title="{{ doc.employeeLegalId}}">
+                <span>{{ periodOverDate(doc)}}</span>
+              </div>
+            </div>
+            <div class="mat-cell sticky-actions" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+              <button mat-icon-button title="Firmar" *ngIf="this.showSign" (click)="signDocument(doc)">
+                <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-signature"></mat-icon>
+              </button>
+              <button mat-icon-button title="Ver" [disabled]="clickOnce" (click)="openDocumentDialog(doc)"
+                *ngIf="!doc.isUploadPending()">
+                <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-eye"></mat-icon>
+              </button>
+              <button mat-icon-button title="Ejecutar workflow" [disabled]="clickOnce" (click)="runWorkflow(doc.id)"
+                *ngIf="!doc.isUploadPending()">
+                <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-user-gear"></mat-icon>
+              </button>
+              <button id="btn_Metadatos" name="btn_Metadatos" mat-icon-button title="Ver más Datos" (click)="showMetadatos(doc)"
+              *ngIf="!doc.isUploadPending()">
+              <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-file-alt"></mat-icon>
+            </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Firmar -->
+      <div class="main-action" fxLayout="row" fxLayoutAlign="center center">
+        <button mat-raised-button class="main-btn" color="accent" (click)="signDocuments()" [disabled]="loading || disabledSign">
+          <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-signature">
+          </mat-icon>
+          {{showSign && !showSignSelected && documents && documents.length > 0 ? "Firmar Documentos" : "Firmar
+          Seleccionados"}}
+        </button>
+      </div>
+    </ng-container>
+  </div>
+</ng-container>
+<!-- chapa -->
+<app-chapa [className]="'info-empty'" [icon]="'fa-copy'" [text]="'Aquí verás los Documentos a firmar'"
+  [subText]="'Selecciona un Pendiente de la lista'" *ngIf="!itemSelected() && isNewStyle">
+</app-chapa>
+
+<!-- APP SEARCH MENU -->
+<mat-menu #menu="matMenu" xPosition="before" yPosition="below" class="menu-options mat-card">
+  <div class="container" (click)="$event.stopPropagation()" fxLayout="column" fxLayoutAlign="start stretch">
+    <app-advanced-employee-search [filters]="employeeFilters" [containerType]="containerType"
+      (OnFilter)="filteredSearch()">
+    </app-advanced-employee-search>
+    <div class="slide-group" fxLayout="column" fxLayoutAlign="start stretch" *ngIf="itemsCount > 0">
+      <app-autocomplete-chip [showIcons]="true" [iconName]="'fa-filter'" [originalList]="documentationTypes"
+        title="'Ingrese Tipo de Documentación'" [placeHolderText]="'Ingrese Tipo de Documentación'" [listView]="true"
+        [selectedItemsList]="selectedDocumentationTypes" (OnRemoveItem)="itemRemoved($event)"
+        (OnItemSelected)="selectDocumentationType($event)" (OnChipClick)="openMetadata($event)"
+        [itemButtonIcon]="'fa-ellipsis-h'" [itemButtonTitle]="'Filtrar Datos'" fxFlex="grow" fxLayout="row"
+        fxLayoutAlign="start center">
+      </app-autocomplete-chip>
+      <div class="title" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+        <div class="icon-complex" fxLayout="row" fxLayoutAlign="center center">
+          <mat-icon class="fa-lg" fontSet="fas" fontIcon="fa-file">
+          </mat-icon>
+          <mat-icon class="fa-lg complex" fontSet="fas" fontIcon="fa-times-circle">
+          </mat-icon>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer" fxLayout="row-reverse" fxLayoutAlign="start center" fxLayoutGap="16px">
+    <button mat-raised-button color="primary" (click)="filteredSearch()">Buscar</button>
+    <button mat-button>Cerrar</button>
+  </div>
+</mat-menu>
+
+<!-- APP SEARCH HELP -->
+<mat-menu #menuHelp="matMenu" yPosition="below" class="menu-options help mat-card">
+  <div class="container">
+    <div class="title" fxLayout="row" fxLayoutAlign="space-between center">
+      <span fxLayout="column">
+        <h6>Guía y Ejemplos de Uso</h6>
+        <h4 class="primary">Cómo funciona la búsqueda: Buscar Documentación</h4>
+      </span>
+      <button mat-icon-button title="Ocultar Guía">
+        <mat-icon class="fa-lg" fontSet="fa" fontIcon="fa-times">
+        </mat-icon>
+      </button>
+    </div>
+    <div class="slide-group">
+      <mat-accordion (click)="$event.stopPropagation()">
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <h4>Podés buscar por período ingresando 01/2020 ó 2020/01.</h4>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <ul style="margin-top:16px">
+            <li>
+              <i>Si ingresas <b>01/2020</b> encontrarás los <b>documentos del período</b> indicado.</i>
+            </li>
+            <li>
+              <i>Si ingresas <b>01/2020 12/2020</b> encontrarás los <b>documentos</b> que se encuentren
+                dentro <b>del
+                  rango de períodos</b> indicados.</i>
+            </li>
+            <li>
+              <i>Si ingresas <b>01/2020 06/2020 12/2020</b> encontrarás los <b>documentos de cada uno de
+                  los
+                  períodos</b>
+                indicados.</i>
+            </li>
+          </ul>
+        </mat-expansion-panel>
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <h4>Podés buscar por apellido y/o nombre de una persona.</h4>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <ul style="margin-top:16px">
+            <li>
+              <i>Si ingresas <b>José</b> encontrarás los <b>documentos</b> de las personas <b>con este
+                  apellido o
+                  nombre</b>.</i>
+            </li>
+            <li>
+              <i>Si ingresas <b>José Ignacio Salinas</b> encontrarás los <b>documentos</b> de las personas
+                cuyos
+                <b>apellidos y/o nombres contengan alguna de las palabras</b> ingresadas.</i>
+            </li>
+          </ul>
+        </mat-expansion-panel>
+        <mat-expansion-panel hideToggle="true">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <h4>Podés buscar por número de legajo de la persona.
+              </h4>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+        </mat-expansion-panel>
+        <mat-expansion-panel hideToggle="true">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <h4>Podés buscar por el Identificador Fiscal de la persona.
+              </h4>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+        </mat-expansion-panel>
+      </mat-accordion>
+      <div class="title" fxLayout="row" fxLayoutAlign="space-between center">
+        <span fxLayout="column">
+          <h6>Nota:</h6>
+          <h4 class="accent">¡Todos los casos de Búsqueda anteriormente mencionados son combinables!</h4>
+        </span>
+      </div>
+    </div>
+  </div>
+</mat-menu>

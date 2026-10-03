@@ -1,0 +1,42 @@
+@import '../../../../assets/styles/img-management';
+
+
+app-file-document-inbox-block-ou {
+  mat-list-item {
+    .floating-actions {
+      visibility: hidden;
+      pointer-events: none;
+      transition: visivility .2s ease;
+
+    }
+
+    :hover .floating-actions {
+      visibility: visible;
+      pointer-events: all;
+      transition: visivility .2s ease;
+    }
+  }
+
+  mat-expansion-panel-header {
+    .floating-actions {
+      visibility: hidden;
+      pointer-events: none;
+      transition: visivility .2s ease;
+      margin-right: 16px;
+    }
+  }
+
+  mat-expansion-panel-header.mat-expanded {
+    .floating-actions {
+      visibility: visible;
+      pointer-events: all;
+      transition: visivility .2s ease;
+
+    }
+  }
+}
+
+app-file-document-list {
+  height: 100%;
+  @include display(b, u, u, u, u, u);
+}

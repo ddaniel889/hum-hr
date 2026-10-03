@@ -1,0 +1,142 @@
+@import '../../../../assets/styles/img-management';
+
+.search-container {
+  display: flex;
+  width: 100%;
+
+  .year-selector {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    width: 145px;
+
+    &.compact {
+      margin: 0;
+    }
+
+    .year-button {
+      background-color: #f0f0ff;
+      border-radius: 24px;
+      border: 1px solid #e0e0ff;
+      padding: 0 12px;
+      height: 40px;
+      width: 100%;
+
+      .button-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        .year-text {
+          color: #536dfe;
+          font-weight: 500;
+          font-size: 15px;
+        }
+
+        .dropdown-icon {
+          color: #536dfe;
+          font-size: 14px;
+          height: 14px;
+          width: 14px;
+          line-height: 14px;
+          margin-left: 8px;
+        }
+      }
+
+      &:hover {
+        background-color: #e6e6ff;
+      }
+    }
+    // Estilo para el menú de años
+    .year-drop {
+      &[id^="mat-menu-panel-"] {
+        max-width: 100px !important;
+        min-width: 100px !important;
+      }
+    }
+  }
+
+  .search-field {
+    margin-left: 16px;
+
+    .search {
+      border: 1px solid #e0e0e0;
+      border-radius: 24px;
+      padding: 0 16px;
+      height: 40px;
+
+      input {
+        border: none;
+        outline: none;
+        width: 100%;
+        font-size: 15px;
+        background: transparent;
+      }
+
+      mat-icon {
+        margin-right: 8px;
+        color: rgba(0, 0, 0, 0.54);
+      }
+    }
+  }
+}
+
+
+
+.toolbar {
+  padding: 16px;
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  .header {
+    margin-bottom: 16px;
+  }
+}
+
+.helper {
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  mat-hint {
+    color: rgba(0, 0, 0, 0.6);
+
+    h4 {
+      margin: 0;
+      font-weight: normal;
+    }
+  }
+}
+
+.new-table {
+  .mat-table {
+    width: 100%;
+
+    .mat-header-row {
+      background-color: #ffffff;
+
+      .mat-header-cell {
+        font-weight: 500;
+        color: rgba(0, 0, 0, 0.87);
+      }
+    }
+
+    .mat-row {
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.04);
+      }
+
+      &.active, &.selected {
+        background-color: rgba(83, 109, 254, 0.12);
+      }
+
+      .mat-cell {
+        color: rgba(0, 0, 0, 0.87);
+      }
+    }
+  }
+}

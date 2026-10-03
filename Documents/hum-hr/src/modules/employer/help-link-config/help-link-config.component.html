@@ -1,0 +1,48 @@
+<ng-container *ngIf="!loading">
+  <div class="separator" fxLayout="row" fxLayoutAlign="start center">
+    <div class="subtitle" fxLayoutAlign="start center" fxLayoutGap="16px">
+      <mat-icon  class="fa-lg" fontSet="fas" fontIcon="fa-question-circle">
+      </mat-icon>
+      <div class="text" fxLayout="column">
+        <h5>Ayuda Online</h5>
+        <h6>Personaliza tu link de ayuda</h6>
+      </div>
+    </div>
+  </div>
+  <div fxLayout="column" fxLayoutGap="16px">
+    <form [formGroup]="ouHelpLinkConfigForm">
+      <div class="form-steped-body" fxLayout="column">
+        <div class="asisted-input icon-only" fxLayout="row-reverse" fxLayoutAlign="start center">
+          <mat-form-field fxLayout="row" fxLayoutAlign="start center" fxFlex="grow">
+            <input matInput placeholder="Ingresa la URL" formControlName="url">
+            <span class="help-hoverable" matSuffix>
+              <mat-icon  class="fa " fontSet="fal"
+                fontIcon="fa-question-circle">
+              </mat-icon>
+              <mat-hint hidden>
+                El <b>link</b> ingresado en este campo reemplazará <b>la ayuda online por defecto</b> de
+                Humanage, sólo puedes usar links que inicien con <b>http o https</b>
+              </mat-hint>
+            </span>
+            <mat-error *ngIf="ouHelpLinkConfigForm.controls.url.hasError('required')">
+              *La URL es <strong>obligratoria</strong>
+            </mat-error>
+            <mat-error *ngIf="!ouHelpLinkConfigForm.controls.url.hasError('required') && ouHelpLinkConfigForm.controls.url.hasError('pattern')">
+              *La URL debe iniciar con <strong>http o https</strong>
+            </mat-error>
+          </mat-form-field>
+          <div class="indicator">
+            <i class="bubble far fa-globe"></i>
+          </div>
+        </div>
+
+      </div>
+    </form>
+    <div class="confirm" fxLayout="row-reverse" fxFlex="grow" fxLayoutGap="12px">
+      <button mat-raised-button color="primary" (click)="save()"
+        [disabled]="loading || !ouHelpLinkConfigForm.dirty || ouHelpLinkConfigForm.invalid">
+        Guardar Cambios
+      </button>
+    </div>
+  </div>
+</ng-container>
